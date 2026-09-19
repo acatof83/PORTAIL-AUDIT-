@@ -371,7 +371,7 @@
             </div>
         </div>
 
-        <!-- ONGLET 3 : HISTORIQUE GLOBAL COLORÉ & AVEC IMPRESSION -->
+        <!-- ONGLET 3 : HISTORIQUE GLOBAL -->
         <div id="tab-archives" class="tab-content">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -841,7 +841,7 @@
             renderGrille();
         }
 
-        /* RENDU HISTORIQUE GLOBAL AMÉLIORÉ */
+        /* RENDU HISTORIQUE GLOBAL CORRIGÉ */
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
@@ -1038,8 +1038,8 @@
                         const row = data[i];
                         const anabel = row[1];
                         if (anabel) {
+                            const store = storesData.find(s => s.ANABEL === anabel) || {};
                             if (!auditsHistory[anabel]) {
-                                const store = storesData.find(s => s.ANABEL === anabel) || {};
                                 auditsHistory[anabel] = {
                                     anabel: anabel,
                                     store: store.STORE || '',
@@ -1051,6 +1051,8 @@
                                     items: defaultAuditItems
                                 };
                             } else {
+                                if (!auditsHistory[anabel].store) auditsHistory[anabel].store = store.STORE || '';
+                                if (!auditsHistory[anabel].enseigne) auditsHistory[anabel].enseigne = store.ENSEIGNE || '';
                                 if (row[2]) auditsHistory[anabel].date = formatDateISO(row[2]);
                                 if (row[3]) auditsHistory[anabel].csi = row[3];
                                 if (row[4] !== "") auditsHistory[anabel].note = parseFloat(row[4]);
