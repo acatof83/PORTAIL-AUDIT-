@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail Audit Magasins — Carrefour Proximité</title>
+    <style>
+        :root {
+            --primary: #00A651; --primary-dark: #00823F;
+            --secondary: #F37021; --secondary-dark: #D55C19;
+            --blue-carrefour: #00387B; --danger-red: #dc2626;
+            --warning-orange: #f59e0b; --success-green: #10b981;
+            --bg-light: #eef4f8; --card-bg: #ffffff;
+            --text-dark: #1e293b; --border: #cbd5e1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); padding-bottom: 50px; }
+
+        header { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: white; padding: 20px 40px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 4px solid var(--secondary); overflow: hidden; position: relative;
+            min-height: 90px;
+        }
+
+        .runner-scene-left {
+            position: absolute; bottom: 8px; display: flex; align-items: flex-end; gap: 2px;
+            animation: runFromLeft 12s linear infinite; z-index: 1;
+        }
+
+        .runner-scene-right {
+            position: absolute; bottom: 8px; display: flex; align-items: flex-end; gap: 2px;
+            transform: scaleX(-1);
+            animation: runFromRight 12s linear infinite; z-index: 1;
+        }
+        
+        .stickman { position: relative; width: 35px; height: 50px; transform: rotate(12deg); margin-right: -4px; }
+        .runner-scene-right .stickman { transform: rotate(-12deg); }
+
+        .head { 
+            width: 15px; height: 15px; border-radius: 50%; background: #ffccb3; 
+            position: absolute; left: 14px; top: -2px; animation: bob 0.3s infinite alternate ease-in-out; z-index: 3;
+        }
+        
+        .head::before {
+            content: ''; position: absolute; top: -3px; left: -2px; width: 19px; height: 8px;
+            background: var(--secondary); border-radius: 10px 10px 2px 2px;
+        }
+        .head::after {
+            content: ''; position: absolute; top: 3px; right: -5px; width: 8px; height: 3px;
+            background: var(--secondary); border-radius: 2px; transform: rotate(15deg);
+        }
+        
+        .torso { 
+            width: 13px; height: 22px; background: var(--blue-carrefour); 
+            position: absolute; left: 10px; top: 13px; border-radius: 6px; z-index: 2;
+        }
+        
+        .arm { 
+            width: 16px; height: 4.5px; background: #ffccb3; position: absolute; 
+            border-radius: 3px; transform-origin: left center; z-index: 1;
+        }
+        .arm.left { left: 15px; top: 17px; transform: rotate(-15deg); background: #eba988; }
+        .arm.right { left: 17px; top: 15px; transform: rotate(-30deg); z-index: 3; }
+
+        .leg { 
+            width: 5.5px; height: 20px; background: #334155; position: absolute; top: 31px; 
+            border-radius: 3px; transform-origin: top center; z-index: 1;
+        }
+        .leg.left { left: 11px; animation: runLegLeft 0.3s infinite alternate linear; background: #1e293b; }
+        .leg.right { left: 13px; animation: runLegRight 0.3s infinite alternate linear; z-index: 3; }
+
+        .cart-emoji { 
+            font-size: 2.3rem; 
+            display: inline-block; 
+            animation: cartShake 0.2s infinite alternate; 
+            z-index: 4; 
+        }
+
+        @keyframes runLegLeft { 0% { transform: rotate(-50deg); } 100% { transform: rotate(40deg); } }
+        @keyframes runLegRight { 0% { transform: rotate(40deg); } 100% { transform: rotate(-50deg); } }
+        @keyframes bob { 0% { transform: translateY(0px); } 100% { transform: translateY(2.5px); } }
+        @keyframes cartShake { 
+            0% { transform: scaleX(-1) translateY(4px) translateX(0px); } 
+            100% { transform: scaleX(-1) translateY(5px) translateX(-2px); } 
+        }
+
+        @keyframes runFromLeft {
+            0% { left: -120px; }
+            40% { left: calc(50% - 70px); }
+            65% { left: calc(50% - 70px); }
+            100% { left: 110%; }
+        }
+
+        @keyframes runFromRight {
+            0% { right: -120px; }
+            40% { right: calc(50% - 70px); }
+            65% { right: calc(50% - 70px); }
+            100% { right: 110%; }
+        }
+
+        .header-title h1 { font-size: 1.6rem; z-index: 2; position: relative; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .header-title p { font-size: 0.9rem; margin-top: 4px; z-index: 2; position: relative; }
+        
+        .btn { padding: 9px 18px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; z-index: 2; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: var(--secondary); color: white; }
+        .btn-primary:hover { background-color: var(--secondary-dark); }
+        .btn-secondary { background-color: white; color: var(--primary-dark); }
+        .btn-danger { background-color: var(--danger-red); color: white; }
+
+        nav { background-color: var(--blue-carrefour); padding: 0 40px; display: flex; gap: 20px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2); }
+        .tab-btn { padding: 15px 16px; color: rgba(255,255,255,0.7); background: none; border: none; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab-btn:hover { color: white; }
+        .tab-btn.active { color: white; border-bottom-color: var(--secondary); }
+
+        .container { max-width: 100%; margin: 25px auto; padding: 0 25px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card { 
+            background: var(--card-bg); padding: 30px; border-radius: 12px; 
+            border: 1px solid var(--border); margin-bottom: 25px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05); 
+        }
+        .search-container { display: flex; gap: 15px; align-items: flex-end; background: #e8f5e9; padding: 20px; border-radius: 10px; border: 1px solid #bbf7d0; margin-bottom: 20px; flex-wrap: wrap; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+        .filter-container { background: #f1f5f9; border-color: #cbd5e1; }
+        
+        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .kpi-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); position: relative; overflow: hidden; transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-2px); }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
+        .kpi-card.blue::before { background: var(--blue-carrefour); }
+        .kpi-card.green::before { background: var(--primary); }
+        .kpi-card.orange::before { background: var(--secondary); }
+        .kpi-card.purple::before { background: #8b5cf6; }
+        
+        .kpi-card h3 { font-size: 0.8rem; color: #64748b; margin-bottom: 8px; text-transform: uppercase; font-weight: 700;}
+        .kpi-card .value { font-size: 1.8rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+        
+        .progress-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); transition: width 0.5s; border-radius: 4px; }
+        
+        .stats-mini { display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.75rem; font-weight: bold; }
+        .badge-stat { padding: 4px 8px; border-radius: 6px; color: white; font-weight: 600; }
+        .badge-stat.badge-exc { background: var(--success-green); }
+        .badge-stat.badge-cor { background: var(--warning-orange); }
+        .badge-stat.badge-cri { background: var(--danger-red); }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+        .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--blue-carrefour); }
+        .input-group input, .input-group select { padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background-color: #fafafa; transition: 0.2s; }
+        .input-group input:focus, .input-group select:focus { background-color: #fff; border-color: var(--blue-carrefour); outline: none; box-shadow: 0 0 0 3px rgba(0,56,123,0.1); }
+
+        .store-info-badge { background: linear-gradient(135deg, var(--blue-carrefour), #00224d); color: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 6px solid var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .store-info-badge .nom { font-size: 1.4rem; font-weight: bold; margin: 8px 0; }
+
+        .table-container { 
+            background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); 
+            overflow-x: auto; width: 100%; max-height: 70vh; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03), inset 0 1px 3px rgba(0,0,0,0.02); 
+        }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        
+        th { 
+            background: linear-gradient(180deg, #f8fafc, #edf2f7); 
+            padding: 14px 16px; position: sticky; top: 0; z-index: 10; 
+            border-bottom: 2px solid var(--border); color: var(--blue-carrefour); 
+            font-weight: 700; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+        
+        tbody tr:nth-child(even) { background-color: #fcfdfe; }
+        tr:hover td { background-color: #f1f5f9; color: #0f172a; }
+
+        table.excel-table { width: max-content; min-width: 100%; font-size: 12px; }
+        table.excel-table th, table.excel-table td { border: 1px solid #cbd5e1; padding: 6px 8px; }
+        table.excel-table th { background: linear-gradient(180deg, #f1f5f9, #e2e8f0); color: var(--blue-carrefour); text-align: center; }
+        table.excel-table input, table.excel-table select { width: 100%; border: 1px solid transparent; background: transparent; font-size: 12px; padding: 4px; border-radius: 4px; transition: 0.2s; }
+        table.excel-table input:focus, table.excel-table select:focus { border-color: var(--blue-carrefour); background-color: #fff; outline:none; box-shadow: 0 0 0 2px rgba(0,56,123,0.1); }
+
+        .cat-header { background-color: #e2e8f0; font-weight: bold; color: var(--blue-carrefour); text-transform: uppercase; font-size: 0.8rem; }
+
+        .badge-status-audited { background-color: #dcfce7; color: #166534; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #bbf7d0; }
+        .badge-status-pending { background-color: #fef3c7; color: #92400e; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #fde68a; }
+
+        #toast { position: fixed; bottom: 25px; right: 25px; background: var(--primary-dark); color: white; padding: 14px 28px; border-radius: 8px; font-weight: bold; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        @media print {
+            body, html { background: white !important; height: auto !important; overflow: visible !important; }
+            header, nav, .no-print { display: none !important; }
+            .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .tab-content { display: none !important; }
+            .tab-content.active { display: block !important; }
+            .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 0 !important; }
+            .table-container { max-height: none !important; overflow: visible !important; border: none !important; box-shadow: none !important; }
+            table { width: 100% !important; table-layout: auto !important; }
+            table.excel-table { width: 100% !important; font-size: 10px !important; }
+            th, td { border: 1px solid #94a3b8 !important; padding: 4px !important; }
+            input, select { border: none !important; background: transparent !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="runner-scene-left" id="sceneLeft">
+            <div class="stickman">
+                <div class="head"></div>
+                <div class="arm left"></div>
+                <div class="torso"></div>
+                <div class="arm right"></div>
+                <div class="leg left"></div>
+                <div class="leg right"></div>
+            </div>
+            <div class="cart-emoji">🛒</div>
+        </div>
+
+        <div class="runner-scene-right" id="sceneRight">
+            <div class="stickman">
+                <div class="head"></div>
+                <div class="arm left"></div>
+                <div class="torso"></div>
+                <div class="arm right"></div>
+                <div class="leg left"></div>
+                <div class="leg right"></div>
+            </div>
+            <div class="cart-emoji">🛒</div>
+        </div>
+        
+        <div class="header-title">
+            <h1>🛒 Portail Audit Magasins CSI</h1>
+            <p>Suivi des équipements & conformité — Carrefour Proximité 
+               <span id="db-status" style="color:#a7f3d0; margin-left: 10px;">(72 Magasins Intégrés 🟢)</span>
+            </p>
+        </div>
+        <button class="btn btn-secondary no-print" onclick="window.print()">📊 Imprimer</button>
+    </header>
+
+    <nav class="no-print">
+        <button class="tab-btn" onclick="switchTab('tab-audit', this)">📝 Saisie de l'Audit (Détaillé)</button>
+        <button class="tab-btn active" onclick="switchTab('tab-grille', this)">📊 Grille & Statistiques</button>
+        <button class="tab-btn" onclick="switchTab('tab-archives', this)">📁 Historique Global</button>
+    </nav>
+
+    <div class="container">
+        
+        <!-- ONGLET 1 : SAISIE -->
+        <div id="tab-audit" class="tab-content">
+            <div class="card">
+                <div class="search-container no-print">
+                    <div class="input-group">
+                        <label>Code ANABEL ou Ville</label>
+                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, LYON..." onkeyup="if(event.key==='Enter') chercherMagasin()">
+                    </div>
+                    <div class="input-group">
+                        <label>Ou choisir dans la liste complète</label>
+                        <select id="storeSelect" onchange="activerMagasin(this.value)">
+                            <option value="">-- Chargement des magasins --</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="chercherMagasin()">🔍 Démarrer l'audit</button>
+                </div>
+
+                <div id="activeStoreInfo" style="display: none;">
+                    <div class="store-info-badge">
+                        <span id="dispEnseigne">-</span>
+                        <div class="nom"><span id="dispAnabel">-</span> - <span id="dispStore">-</span></div>
+                        <div>Directeur Territorial : <span id="dispDT">-</span> | Chef de Secteur : <span id="dispCDF">-</span></div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:20px;">
+                        <div class="input-group"><label>Auditeur CSI</label>
+                            <select id="auditCSI">
+                                <option value="AMANDA">AMANDA</option>
+                                <option value="CHRISTOPHE">CHRISTOPHE</option>
+                                <option value="EMMANUEL">EMMANUEL</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><label>Date de visite</label><input type="date" id="auditDate"></div>
+                        <div class="input-group"><label>Note Globale /20</label><input type="number" id="auditNote" max="20" min="0" placeholder="Ex: 16"></div>
+                        <div class="input-group" style="flex:2;"><label>Conclusion / Commentaire Général</label><input type="text" id="auditCommentaire" placeholder="Bilan global de la visite..."></div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 45%;">Équipement / Point de contrôle</th>
+                                    <th style="width: 30%;">Quantité / Modèle / Valeur</th>
+                                    <th style="width: 25%;">État / Conformité</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditGridBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px;" class="no-print">
+                        <button class="btn btn-danger" style="font-size: 1.1rem; padding: 12px 25px;" onclick="archiverAudit()">💾 Valider et Enregistrer l'Audit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 2 : GRILLE ET DASHBOARD STATISTIQUES -->
+        <div id="tab-grille" class="tab-content active">
+            
+            <div class="kpi-container no-print">
+                <div class="kpi-card blue">
+                    <h3>Couverture du Parc</h3>
+                    <div class="value"><span id="kpi-audits">0</span> / <span id="kpi-total" style="font-size:1.2rem; color:#94a3b8;">72</span></div>
+                    <div class="progress-bg"><div class="progress-bar" id="kpi-progress" style="width: 0%;"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-size: 0.8rem; margin-top:6px; font-weight:bold;">
+                        <span style="color:#64748b;">Reste à auditer: <b id="kpi-reste">72</b></span>
+                        <span style="color:var(--primary);" id="kpi-percent">0%</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card green">
+                    <h3>Note Moyenne Globale</h3>
+                    <div class="value" id="kpi-moyenne">- <span style="font-size:1rem; color:#94a3b8;">/ 20</span></div>
+                    <div class="stats-mini">
+                        <span class="badge-stat badge-exc" title=">= 15/20"><span id="kpi-exc">0</span> Excellent</span>
+                        <span class="badge-stat badge-cor" title="10 à 14/20"><span id="kpi-cor">0</span> Correct</span>
+                        <span class="badge-stat badge-cri" title="< 10/20"><span id="kpi-cri">0</span> Critique</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card orange">
+                    <h3>Meilleur Contributeur</h3>
+                    <div class="value">🏆 <span id="kpi-top-auditor">-</span></div>
+                    <div class="stats-mini" id="kpi-csi-details" style="display:flex; flex-direction:column; gap:4px; margin-top:8px;"></div>
+                </div>
+                
+                <div class="kpi-card purple">
+                    <h3>Activité Récente</h3>
+                    <div class="value" style="font-size: 1.2rem; margin-top: 10px;" id="kpi-last-date">-</div>
+                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 8px;" id="kpi-last-store">Aucun audit récent</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="search-container filter-container no-print" style="padding:15px;">
+                    <div class="input-group"><label>Filtrer par Statut Audit</label>
+                        <select id="g-filter-status" onchange="filtrerGrille()">
+                            <option value="ALL">Tous les magasins</option>
+                            <option value="AUDITED">Magasins Audités</option>
+                            <option value="NOT_AUDITED">Magasins Non Audités</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Filtrer par DT</label><select id="g-filter-dt" onchange="filtrerGrille()"><option value="ALL">Tous les DT</option></select></div>
+                    <div class="input-group"><label>Filtrer par Chef de Secteur</label><select id="g-filter-cdf" onchange="filtrerGrille()"><option value="ALL">Tous les CDF</option></select></div>
+                    <div class="input-group"><label>Filtrer par CSI Assigné</label><select id="g-filter-csi" onchange="filtrerGrille()"><option value="ALL">Tous les CSI</option></select></div>
+                    <div class="input-group"><label>Filtrer par Priorité (PRIO)</label><select id="g-filter-prio" onchange="filtrerGrille()"><option value="ALL">Tous</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; font-size: 0.8rem; font-weight: bold; align-items: center;" class="no-print">
+                    <span style="color: var(--blue-carrefour);">Légende DT :</span>
+                    <span style="background:#fef08a; padding: 4px 8px; border-radius: 4px; border: 1px solid #fde047; color: #854d0e;">WELTER RONAN</span>
+                    <span style="background:#fbcfe8; padding: 4px 8px; border-radius: 4px; border: 1px solid #f472b6; color: #9d174d;">LEROUX ARNOLD</span>
+                    <span style="background:#bfdbfe; padding: 4px 8px; border-radius: 4px; border: 1px solid #60a5fa; color: #1e40af;">CURT FLORIAN</span>
+                    <span style="background:#bbf7d0; padding: 4px 8px; border-radius: 4px; border: 1px solid #4ade80; color: #166534;">PELLON RENAUD</span>
+                </div>
+
+                <div class="table-container">
+                    <table class="excel-table">
+                        <thead>
+                            <tr>
+                                <th>Statut</th><th>ANABEL</th><th>Région</th><th>DT</th><th>CDF</th><th>STORE</th><th>ENSEIGNE</th>
+                                <th>PRIO</th><th>CSI</th><th>Appel ✏️</th><th>Mail ✏️</th>
+                                <th>Relance ✏️</th><th>Visite ✏️</th><th>Note ✏️</th><th>Commentaire ✏️</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grilleTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 3 : ARCHIVES -->
+        <div id="tab-archives" class="tab-content">
+            <div class="card">
+                <h2 style="color: var(--blue-carrefour); margin-bottom: 5px;">📁 Historique Global des Audits</h2>
+                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Retrouvez l'ensemble des visites de parcs informatiques déjà enregistrées et validées.</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date Visite</th>
+                                <th>ANABEL</th>
+                                <th>Magasin</th>
+                                <th>Auditeur CSI</th>
+                                <th>Note /20</th>
+                                <th>Commentaire Global</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast">✅ Enregistré avec succès</div>
+
+    <script>
+        // --- CONFIGURATION API AIRTABLE ---
+        const AIRTABLE_PAT = "patIzjfTlwG25KRPn.0afbc4ad5fcb497a11612a20b9537e02f2b413540d1ffac83ac0338005c9a5ee";
+         const AIRTABLE_BASE_ID = "appgnEwxlkcToFDhV";
+         const AIRTABLE_TABLE_NAME = "Table 1";
+        // ----------------------------------
+
+        const dtColors = {
+            "WELTER RONAN": { bg: "#fef08a", text: "#854d0e" },
+            "LEROUX ARNOLD": { bg: "#fbcfe8", text: "#9d174d" },
+            "CURT FLORIAN": { bg: "#bfdbfe", text: "#1e40af" },
+            "PELLON RENAUD": { bg: "#bbf7d0", text: "#166534" }
+        };
+
+        const defaultAuditItems = [
+            { cat: "CONFORMITÉ GLOBALE", name: "Base magasin conforme aux équipements ?", qty: "OUI", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Nombre de caisses", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Type de caisses", qty: "TPV Standard", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Écrans Caisse", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Scanners", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Douchettes", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Meti en caisse", qty: "Oui", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Switch", qty: "1", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Baie de brassage & État", qty: "1", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne ADSL", qty: "Oui", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne FIBRE", qty: "Oui", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Opérateur Réseau", qty: "Orange", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Routeur de secours", qty: "4G", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Onduleur", qty: "1", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Imprimante (Marque/État)", qty: "HP Laser", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Terminaux Zebra / DT50", qty: "2", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Batterie de secours DT50", qty: "2", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "PC BOI & Écran", qty: "1 PC / 1 Écran", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "PC MUSE & Écran", qty: "1 PC / 1 Écran", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Autre PC", qty: "0", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Imprimante Deava", qty: "1", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Terminaux MC 3100 / 3200", qty: "0", state: "BON" },
+            { cat: "PROCESS & DIVERS", name: "Utilisation de la PCA", qty: "Oui", state: "BON" },
+            { cat: "PROCESS & DIVERS", name: "Documentation de formation", qty: "Présente", state: "BON" }
+        ];
+
+        let storesData = [
+            { "ANABEL": "6345", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "ARAMON -DE GAULLE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "6266", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -LODI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5569", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -TURCAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "AMANDA" },
+            { "ANABEL": "2752", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "HYERES -TOULON", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5280", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "JUAN LES PIN -WILSON", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "2896", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -BORRIGLIONE 73", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "A46S", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -LAMARTINE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A46E", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -MEDECIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "8956", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -VILLERMONT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "AMANDA" },
+            { "ANABEL": "6617", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "SAINT-LAURENT-DU-VAR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "8926", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "AJACCIO -DEL PELLEGR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5281", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "BEAUSOLEIL -MARCHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "7207", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "MENTON -FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "A5GU", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -DEROULEDE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5982", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MALAUSSENA", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5727", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MEYERBEER", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A5GW", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE-CORNICHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "294", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "OTA- HAMEAU DE PORTO", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "AMANDA" },
+            { "ANABEL": "6744", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "ROQUEBRUNE-CAP-MARTI", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A4R6", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "SARROLA-CARCOPINO -B", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "1786", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "VENCE -RHIN DANUBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "6027", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "AIX EN P -CORDEL 63", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "1076", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "FORCALQUIER", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "2911", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "ORAISON -AILLAUD", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "3095", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "SAINTE-TULLE -PAUL", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5332", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "TOULON -15E CORP 709", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "6193", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -BARA", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5655", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -CAMOINS", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "9467", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -MONTAIGNE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "4825", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "MULLER HELENE", "STORE": "MONTPELLIER -MILHAU", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6260", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "CHAPONOST -CHAUSSE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "8850", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "ST ETIENNE -11 NOV", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5311", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "ST ETIENNE -FRAISSIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "7273", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "GIRARDON THIERRY", "STORE": "BEDOIN", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "618", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "GIRARDON THIERRY", "STORE": "CAROMB -CARPENTRAS", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "A48H", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -EYCHART", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "9485", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "LE COTEAU -LIBERATIO", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "7238", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "ST JUST EN CHEVALET", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5700", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "ST JUST LA PENDUE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "4988", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CHAMALIERES -ROYAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5578", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -BLATN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5315", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -DELILLE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "A5GP", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "ALLAN -MALATAVERNE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 1, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "1061", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "CHATILLON EN DIOIS", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6307", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "MOURS-SAINT-EUSEBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "4686", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "VALENCE -LIBERATION", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6586", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "BARRIOL AMELIE", "STORE": "BRON -BROSSOLETTE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "1790", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "BARRIOL AMELIE", "STORE": "VILLEURBANNE -GENAS", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "1396", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "DIEMOZ -GR. NEUVE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "7258", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "LES GETS -TANINGES", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5627", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "ST-MARTIN-BELLEVUE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "6057", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "TALLOIRES", "ENSEIGNE": "8 A HUIT", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "A4XL", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "ANNEMASSE -GARE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "1081", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "HAUTELUCE L. SAISIES", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "7259", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES HOUCHES", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "8887", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES MENUIRES -CROISE", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "6277", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES MENUIRES -PREYER", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "7260", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "MEGEVE -RTE NATIONAL", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5591", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "VAL THORENS -ARCELLE", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "6184", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "VAL THORENS -PORTILL", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "8942", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GONCALVES ISABELLE", "STORE": "GRENOBLE -FUSILLES", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "4644", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GONCALVES ISABELLE", "STORE": "MONTBONNOT ST MARTIN", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "4922", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -CREQUI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5568", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -CROIX ROUSSE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "5321", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -DUQUESNE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "EMMANUEL" },
+            { "ANABEL": "1649", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -JANIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "A4O2", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -VITTON 6", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "A5Z5", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON-FELIX FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "EMMANUEL" },
+            { "ANABEL": "5326", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "CHAMBERY -MONTMELIAN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "1943", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "FONTAINE -CURIE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "9566", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "ST CHEF EN DAUP", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "8636", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "VASSON KEVIN", "STORE": "AVIGNON -REPUBLIQUE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" }
+        ];
+
+        let auditsHistory = JSON.parse(localStorage.getItem('auditsHistory_csi')) || {};
+        let currentActiveStore = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initStoreSelect();
+            initFilterSelects();
+            renderGrille();
+            renderHistory();
+            updateKPIs();
+            document.getElementById('auditDate').valueAsDate = new Date();
+        });
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        function initStoreSelect() {
+            const select = document.getElementById('storeSelect');
+            select.innerHTML = '<option value="">-- Sélectionner un magasin (' + storesData.length + ') --</option>';
+            storesData.sort((a,b) => a.STORE.localeCompare(b.STORE)).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.ANABEL;
+                opt.textContent = `${s.ANABEL} - ${s.STORE} (${s.ENSEIGNE})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function initFilterSelects() {
+            const dts = [...new Set(storesData.map(s => s.DT))].sort();
+            const cdfs = [...new Set(storesData.map(s => s.CDF))].sort();
+            const csis = [...new Set(storesData.map(s => s.CSI))].sort();
+
+            const dtSel = document.getElementById('g-filter-dt');
+            const cdfSel = document.getElementById('g-filter-cdf');
+            const csiSel = document.getElementById('g-filter-csi');
+
+            dts.forEach(dt => dtSel.innerHTML += `<option value="${dt}">${dt}</option>`);
+            cdfs.forEach(cdf => cdfSel.innerHTML += `<option value="${cdf}">${cdf}</option>`);
+            csis.forEach(csi => csiSel.innerHTML += `<option value="${csi}">${csi}</option>`);
+        }
+
+        function chercherMagasin() {
+            const query = document.getElementById('anabelSearch').value.trim().toLowerCase();
+            if (!query) return;
+            const found = storesData.find(s => s.ANABEL.toLowerCase() === query || s.STORE.toLowerCase().includes(query));
+            if (found) {
+                document.getElementById('storeSelect').value = found.ANABEL;
+                activerMagasin(found.ANABEL);
+            } else {
+                alert("Aucun magasin trouvé pour cette recherche.");
+            }
+        }
+
+        function activerMagasin(anabel) {
+            if (!anabel) return;
+            currentActiveStore = storesData.find(s => s.ANABEL === anabel);
+            if (!currentActiveStore) return;
+
+            document.getElementById('dispEnseigne').textContent = currentActiveStore.ENSEIGNE;
+            document.getElementById('dispAnabel').textContent = currentActiveStore.ANABEL;
+            document.getElementById('dispStore').textContent = currentActiveStore.STORE;
+            document.getElementById('dispDT').textContent = currentActiveStore.DT;
+            document.getElementById('dispCDF').textContent = currentActiveStore.CDF;
+            document.getElementById('auditCSI').value = currentActiveStore.CSI || "AMANDA";
+
+            document.getElementById('activeStoreInfo').style.display = 'block';
+
+            const existing = auditsHistory[anabel];
+            if (existing) {
+                document.getElementById('auditDate').value = existing.date || new Date().toISOString().split('T')[0];
+                document.getElementById('auditNote').value = existing.note !== undefined ? existing.note : '';
+                document.getElementById('auditCommentaire').value = existing.comment || '';
+                renderAuditGridBody(existing.items || defaultAuditItems);
+            } else {
+                document.getElementById('auditNote').value = '';
+                document.getElementById('auditCommentaire').value = '';
+                renderAuditGridBody(defaultAuditItems);
+            }
+        }
+
+        function renderAuditGridBody(items) {
+            const tbody = document.getElementById('auditGridBody');
+            tbody.innerHTML = '';
+            let currentCat = '';
+
+            items.forEach((item, index) => {
+                if (item.cat !== currentCat) {
+                    currentCat = item.cat;
+                    const catTr = document.createElement('tr');
+                    catTr.className = 'cat-header';
+                    catTr.innerHTML = `<td colspan="3">${currentCat}</td>`;
+                    tbody.appendChild(catTr);
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${item.name}</b></td>
+                    <td><input type="text" class="audit-item-qty" data-index="${index}" value="${item.qty || ''}" style="width:100%; padding:6px; border:1px solid #cbd5e1; border-radius:4px;"></td>
+                    <td>
+                        <select class="audit-item-state" data-index="${index}" style="width:100%; padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                            <option value="BON" ${item.state === 'BON' ? 'selected' : ''}>🟢 Conforme / Bon</option>
+                            <option value="MOYEN" ${item.state === 'MOYEN' ? 'selected' : ''}>🟠 À corriger / Moyen</option>
+                            <option value="CRITIQUE" ${item.state === 'CRITIQUE' ? 'selected' : ''}>🔴 Non conforme / Critique</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function archiverAudit() {
+            if (!currentActiveStore) {
+                alert("Veuillez sélectionner un magasin d'abord.");
+                return;
+            }
+
+            const csi = document.getElementById('auditCSI').value;
+            const date = document.getElementById('auditDate').value;
+            const note = document.getElementById('auditNote').value;
+            const comment = document.getElementById('auditCommentaire').value;
+
+            const qtyInputs = document.querySelectorAll('.audit-item-qty');
+            const stateInputs = document.querySelectorAll('.audit-item-state');
+            const items = [];
+
+            qtyInputs.forEach((input, idx) => {
+                const defaultItem = defaultAuditItems[idx];
+                items.push({
+                    cat: defaultItem.cat,
+                    name: defaultItem.name,
+                    qty: input.value,
+                    state: stateInputs[idx].value
+                });
+            });
+
+            auditsHistory[currentActiveStore.ANABEL] = {
+                anabel: currentActiveStore.ANABEL,
+                store: currentActiveStore.STORE,
+                enseigne: currentActiveStore.ENSEIGNE,
+                csi: csi,
+                date: date,
+                note: note !== '' ? parseFloat(note) : null,
+                comment: comment,
+                items: items,
+                updatedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('auditsHistory_csi', JSON.stringify(auditsHistory));
+
+            showToast("✅ Audit enregistré avec succès !");
+            renderGrille();
+            renderHistory();
+            updateKPIs();
+        }
+
+        function renderGrille() {
+            const tbody = document.getElementById('grilleTableBody');
+            tbody.innerHTML = '';
+
+            const statusFilter = document.getElementById('g-filter-status').value;
+            const dtFilter = document.getElementById('g-filter-dt').value;
+            const cdfFilter = document.getElementById('g-filter-cdf').value;
+            const csiFilter = document.getElementById('g-filter-csi').value;
+            const prioFilter = document.getElementById('g-filter-prio').value;
+
+            storesData.forEach(store => {
+                const audit = auditsHistory[store.ANABEL];
+                const isAudited = !!audit;
+
+                if (statusFilter === 'AUDITED' && !isAudited) return;
+                if (statusFilter === 'NOT_AUDITED' && isAudited) return;
+                if (dtFilter !== 'ALL' && store.DT !== dtFilter) return;
+                if (cdfFilter !== 'ALL' && store.CDF !== cdfFilter) return;
+                if (csiFilter !== 'ALL' && store.CSI !== csiFilter) return;
+                if (prioFilter !== 'ALL' && String(store.PRIO) !== prioFilter) return;
+
+                const tr = document.createElement('tr');
+                const dtStyle = dtColors[store.DT] ? `style="background:${dtColors[store.DT].bg}; color:${dtColors[store.DT].text}; font-weight:bold;"` : '';
+
+                const statusBadge = isAudited 
+                    ? `<span class="badge-status-audited">REALISE</span>`
+                    : `<span class="badge-status-pending">A FAIRE</span>`;
+
+                tr.innerHTML = `
+                    <td style="text-align:center;">${statusBadge}</td>
+                    <td><b>${store.ANABEL}</b></td>
+                    <td>${store.region}</td>
+                    <td ${dtStyle}>${store.DT}</td>
+                    <td>${store.CDF}</td>
+                    <td><b>${store.STORE}</b></td>
+                    <td>${store.ENSEIGNE}</td>
+                    <td style="text-align:center;"><b>P${store.PRIO}</b></td>
+                    <td>${store.CSI}</td>
+                    <td><input type="date" value="${audit?.callDate || ''}" onchange="updateGridField('${store.ANABEL}', 'callDate', this.value)"></td>
+                    <td><input type="date" value="${audit?.mailDate || ''}" onchange="updateGridField('${store.ANABEL}', 'mailDate', this.value)"></td>
+                    <td><input type="date" value="${audit?.relanceDate || ''}" onchange="updateGridField('${store.ANABEL}', 'relanceDate', this.value)"></td>
+                    <td><input type="date" value="${audit?.date || ''}" onchange="updateGridField('${store.ANABEL}', 'date', this.value)"></td>
+                    <td><input type="number" min="0" max="20" style="width:60px;" value="${audit?.note !== undefined && audit?.note !== null ? audit.note : ''}" onchange="updateGridField('${store.ANABEL}', 'note', this.value)"></td>
+                    <td><input type="text" style="width:100%; min-width:150px;" value="${audit?.comment || ''}" onchange="updateGridField('${store.ANABEL}', 'comment', this.value)"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateGridField(anabel, field, value) {
+            if (!auditsHistory[anabel]) {
+                const store = storesData.find(s => s.ANABEL === anabel);
+                auditsHistory[anabel] = {
+                    anabel: store.ANABEL,
+                    store: store.STORE,
+                    enseigne: store.ENSEIGNE,
+                    csi: store.CSI,
+                    date: '',
+                    note: null,
+                    comment: '',
+                    items: defaultAuditItems
+                };
+            }
+
+            if (field === 'note') {
+                auditsHistory[anabel][field] = value !== '' ? parseFloat(value) : null;
+            } else {
+                auditsHistory[anabel][field] = value;
+            }
+
+            localStorage.setItem('auditsHistory_csi', JSON.stringify(auditsHistory));
+            renderHistory();
+            updateKPIs();
+            showToast("💾 Mise à jour enregistrée");
+        }
+
+        function filtrerGrille() {
+            renderGrille();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            const auditedList = Object.values(auditsHistory).filter(a => a.date || a.note !== null || a.comment);
+
+            if (auditedList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">Aucun audit enregistré pour le moment.</td></tr>`;
+                return;
+            }
+
+            auditedList.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(audit => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${audit.date || '-'}</b></td>
+                    <td>${audit.anabel}</td>
+                    <td><b>${audit.store}</b> (${audit.enseigne})</td>
+                    <td>${audit.csi || '-'}</td>
+                    <td><b style="color:var(--primary-dark);">${audit.note !== null && audit.note !== undefined ? audit.note + ' / 20' : '-'}</b></td>
+                    <td>${audit.comment || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateKPIs() {
+            const totalStores = storesData.length;
+            const auditedStores = Object.values(auditsHistory).filter(a => a.date || a.note !== null);
+            const countAudited = auditedStores.length;
+            const reste = totalStores - countAudited;
+            const percent = Math.round((countAudited / totalStores) * 100);
+
+            document.getElementById('kpi-audits').textContent = countAudited;
+            document.getElementById('kpi-total').textContent = totalStores;
+            document.getElementById('kpi-reste').textContent = reste;
+            document.getElementById('kpi-percent').textContent = percent + '%';
+            document.getElementById('kpi-progress').style.width = percent + '%';
+
+            const notes = auditedStores.map(a => a.note).filter(n => n !== null && !isNaN(n));
+            if (notes.length > 0) {
+                const avg = (notes.reduce((a,b) => a + b, 0) / notes.length).toFixed(1);
+                document.getElementById('kpi-moyenne').childNodes[0].nodeValue = avg + ' ';
+            } else {
+                document.getElementById('kpi-moyenne').childNodes[0].nodeValue = '- ';
+            }
+
+            let exc = 0, cor = 0, cri = 0;
+            notes.forEach(n => {
+                if (n >= 15) exc++;
+                else if (n >= 10) cor++;
+                else cri++;
+            });
+            document.getElementById('kpi-exc').textContent = exc;
+            document.getElementById('kpi-cor').textContent = cor;
+            document.getElementById('kpi-cri').textContent = cri;
+
+            const csiCounts = {};
+            auditedStores.forEach(a => {
+                if (a.csi) csiCounts[a.csi] = (csiCounts[a.csi] || 0) + 1;
+            });
+
+            let topCsi = '-';
+            let maxCount = 0;
+            for (const [csi, count] of Object.entries(csiCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    topCsi = csi;
+                }
+            }
+            document.getElementById('kpi-top-auditor').textContent = topCsi;
+
+            const csiDetailsDiv = document.getElementById('kpi-csi-details');
+            csiDetailsDiv.innerHTML = '';
+            ['AMANDA', 'CHRISTOPHE', 'EMMANUEL'].forEach(csi => {
+                const count = csiCounts[csi] || 0;
+                csiDetailsDiv.innerHTML += `<div>• ${csi} : <b>${count} audits</b></div>`;
+            });
+
+            if (auditedStores.length > 0) {
+                const sorted = [...auditedStores].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+                const last = sorted[0];
+                document.getElementById('kpi-last-date').textContent = last.date || 'Date non précisée';
+                document.getElementById('kpi-last-store').textContent = `${last.store} (${last.csi || 'CSI'})`;
+            } else {
+                document.getElementById('kpi-last-date').textContent = '-';
+                document.getElementById('kpi-last-store').textContent = 'Aucun audit récent';
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+        }
+    </script>
+</body>
+</html>
