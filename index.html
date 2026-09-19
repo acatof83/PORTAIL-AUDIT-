@@ -841,7 +841,7 @@
             renderGrille();
         }
 
-        /* RENDU HISTORIQUE GLOBAL CORRIGÉ */
+        /* RENDU HISTORIQUE GLOBAL GARANTI SANS "MAGASIN INCONNU" */
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
@@ -855,8 +855,8 @@
 
             auditedList.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(audit => {
                 const storeRef = storesData.find(s => s.ANABEL === audit.anabel) || {};
-                const storeName = audit.store || storeRef.STORE || 'Magasin Inconnu';
-                const enseigneName = audit.enseigne || storeRef.ENSEIGNE || '';
+                const storeName = storeRef.STORE || audit.store || 'Magasin Inconnu';
+                const enseigneName = storeRef.ENSEIGNE || audit.enseigne || '';
 
                 let csiClass = 'badge-csi-amanda';
                 if (audit.csi === 'CHRISTOPHE') csiClass = 'badge-csi-christophe';
@@ -892,9 +892,11 @@
             if (!audit) return;
 
             const storeRef = storesData.find(s => s.ANABEL === anabel) || {};
+            const storeName = storeRef.STORE || audit.store || 'Magasin';
+            const enseigneName = storeRef.ENSEIGNE || audit.enseigne || '';
 
             document.getElementById('modalAnabel').textContent = audit.anabel;
-            document.getElementById('modalStoreName').textContent = `${audit.store || storeRef.STORE} ${audit.enseigne ? '(' + audit.enseigne + ')' : ''}`;
+            document.getElementById('modalStoreName').textContent = `${storeName} ${enseigneName ? '(' + enseigneName + ')' : ''}`;
             document.getElementById('modalCSI').textContent = audit.csi || '-';
             document.getElementById('modalDate').textContent = formatDateFR(audit.date);
             document.getElementById('modalNote').textContent = audit.note !== null && audit.note !== undefined ? `${audit.note} / 20` : '-';
@@ -1020,8 +1022,9 @@
             if (auditedStores.length > 0) {
                 const sorted = [...auditedStores].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
                 const last = sorted[0];
+                const storeRefLast = storesData.find(s => s.ANABEL === last.anabel) || {};
                 document.getElementById('kpi-last-date').textContent = formatDateFR(last.date);
-                document.getElementById('kpi-last-store').textContent = `${last.store} (${last.csi || 'CSI'})`;
+                document.getElementById('kpi-last-store').textContent = `${storeRefLast.STORE || last.store || 'Magasin'} (${last.csi || 'CSI'})`;
             } else {
                 document.getElementById('kpi-last-date').textContent = '-';
                 document.getElementById('kpi-last-store').textContent = 'Aucun audit récent';
