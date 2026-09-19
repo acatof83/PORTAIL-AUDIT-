@@ -760,7 +760,7 @@ async function sendAuditToAirtable(auditData) {
                 items: items,
                 updatedAt: new Date().toISOString()
             };
-await sendAuditToAirtable(auditsHistory[currentActiveStore.ANABEL]);
+async await sendAuditToAirtable(auditsHistory[currentActiveStore.ANABEL]);
             localStorage.setItem('auditsHistory_csi', JSON.stringify(auditsHistory));
 
             showToast("✅ Audit enregistré avec succès !");
