@@ -466,13 +466,47 @@
         let auditsHistory = JSON.parse(localStorage.getItem('auditsHistory_csi_v5')) || {};
         let currentActiveStore = null;
 
+        // FONCTIONS D'OPTIMISATION DE FORMATAGE DES DATES
+        function formatDateFR(dateStr) {
+            if (!dateStr) return '-';
+            if (typeof dateStr !== 'string') dateStr = String(dateStr);
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                const parts = dateStr.split('-');
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            const parsed = new Date(dateStr);
+            if (!isNaN(parsed.getTime())) {
+                return parsed.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+            return dateStr;
+        }
+
+        function formatDateISO(dateStr) {
+            if (!dateStr) return '';
+            if (typeof dateStr !== 'string') dateStr = String(dateStr);
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+                const parts = dateStr.split('/');
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            return '';
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             initStoreSelect();
             initFilterSelects();
             renderGrille();
             renderHistory();
             updateKPIs();
-            document.getElementById('auditDate').valueAsDate = new Date();
+            document.getElementById('auditDate').value = formatDateISO(new Date());
             chargerAuditsDepuisGoogle();
         });
 
@@ -536,11 +570,12 @@
 
             const existing = auditsHistory[anabel];
             if (existing) {
-                document.getElementById('auditDate').value = existing.date || new Date().toISOString().split('T')[0];
+                document.getElementById('auditDate').value = formatDateISO(existing.date) || formatDateISO(new Date());
                 document.getElementById('auditNote').value = existing.note !== undefined && existing.note !== null ? existing.note : '';
                 document.getElementById('auditCommentaire').value = existing.comment || '';
                 renderAuditGridBody(existing.items || defaultAuditItems);
             } else {
+                document.getElementById('auditDate').value = formatDateISO(new Date());
                 document.getElementById('auditNote').value = '';
                 document.getElementById('auditCommentaire').value = '';
                 renderAuditGridBody(defaultAuditItems);
@@ -609,7 +644,7 @@
                 store: currentActiveStore.STORE,
                 enseigne: currentActiveStore.ENSEIGNE,
                 csi: csi,
-                date: date,
+                date: formatDateISO(date),
                 note: parseFloat(noteVal),
                 comment: comment,
                 items: items,
@@ -618,7 +653,6 @@
 
             localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
 
-            // TRANSMISSION AU GOOGLE SHEET
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -683,10 +717,10 @@
                     <td>${store.ENSEIGNE}</td>
                     <td style="text-align:center;"><b>P${store.PRIO}</b></td>
                     <td>${store.CSI}</td>
-                    <td><input type="date" value="${audit?.callDate || ''}" onchange="updateGridField('${store.ANABEL}', 'callDate', this.value)"></td>
-                    <td><input type="date" value="${audit?.mailDate || ''}" onchange="updateGridField('${store.ANABEL}', 'mailDate', this.value)"></td>
-                    <td><input type="date" value="${audit?.relanceDate || ''}" onchange="updateGridField('${store.ANABEL}', 'relanceDate', this.value)"></td>
-                    <td><input type="date" value="${audit?.date || ''}" onchange="updateGridField('${store.ANABEL}', 'date', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.callDate)}" onchange="updateGridField('${store.ANABEL}', 'callDate', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.mailDate)}" onchange="updateGridField('${store.ANABEL}', 'mailDate', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.relanceDate)}" onchange="updateGridField('${store.ANABEL}', 'relanceDate', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.date)}" onchange="updateGridField('${store.ANABEL}', 'date', this.value)"></td>
                     <td><input type="number" min="0" max="20" style="width:55px; font-weight:bold;" value="${audit?.note !== undefined && audit?.note !== null ? audit.note : ''}" onchange="updateGridField('${store.ANABEL}', 'note', this.value)"></td>
                     <td><input type="text" style="width:100%; min-width:140px;" value="${audit?.comment || ''}" onchange="updateGridField('${store.ANABEL}', 'comment', this.value)"></td>
                 `;
@@ -711,6 +745,8 @@
 
             if (field === 'note') {
                 auditsHistory[anabel][field] = value !== '' ? parseFloat(value) : null;
+            } else if (field.toLowerCase().includes('date')) {
+                auditsHistory[anabel][field] = formatDateISO(value);
             } else {
                 auditsHistory[anabel][field] = value;
             }
@@ -739,7 +775,7 @@
             auditedList.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(audit => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><b>${audit.date || '-'}</b></td>
+                    <td><b>${formatDateFR(audit.date)}</b></td>
                     <td>${audit.anabel}</td>
                     <td><b>${audit.store}</b> (${audit.enseigne})</td>
                     <td>${audit.csi || '-'}</td>
@@ -806,7 +842,7 @@
             if (auditedStores.length > 0) {
                 const sorted = [...auditedStores].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
                 const last = sorted[0];
-                document.getElementById('kpi-last-date').textContent = last.date || 'Récemment';
+                document.getElementById('kpi-last-date').textContent = formatDateFR(last.date);
                 document.getElementById('kpi-last-store').textContent = `${last.store} (${last.csi || 'CSI'})`;
             } else {
                 document.getElementById('kpi-last-date').textContent = '-';
@@ -831,13 +867,13 @@
                                     store: store.STORE || '',
                                     enseigne: store.ENSEIGNE || '',
                                     csi: row[3] || store.CSI || '',
-                                    date: row[2] || '',
+                                    date: formatDateISO(row[2]),
                                     note: row[4] !== "" ? parseFloat(row[4]) : null,
                                     comment: row[5] || '',
                                     items: defaultAuditItems
                                 };
                             } else {
-                                if (row[2]) auditsHistory[anabel].date = row[2];
+                                if (row[2]) auditsHistory[anabel].date = formatDateISO(row[2]);
                                 if (row[3]) auditsHistory[anabel].csi = row[3];
                                 if (row[4] !== "") auditsHistory[anabel].note = parseFloat(row[4]);
                                 if (row[5]) auditsHistory[anabel].comment = row[5];
