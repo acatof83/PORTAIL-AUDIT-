@@ -635,7 +635,95 @@
                 tbody.appendChild(tr);
             });
         }
+/**
+ * Sends audit data to Airtable.
+ * Call this function from inside your archiveraudit function.
+ * 
+ * @param {Object} auditData - The collected data object matching your Airtable columns.
+ */
+async function sendAuditToAirtable(auditData) {
+  // Replace these with your actual Airtable credentials and details
+  const personalAccessToken = 'patIzjfTlwG25KRPn.0afbc4ad5fcb497a11612a20b9537e02f2b413540d1ffac83ac0338005c9a5ee';
+  const baseId = 'appgnEwxlkcToFDhV';
+  const tableName = 'Table1'; // e.g., 'Audits'
+  
+  const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
 
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${personalAccessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        records: [
+          {
+            // The keys in auditData must exactly match your column names in Airtable
+            fields: auditData
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      throw new Error(`Airtable API Error: ${response.status} - ${errorDetails}`);
+    }
+
+    const result = await response.json();
+    console.log('Audit successfully archived in Airtable:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('Failed to send audit to Airtable:', error);
+    // Handle the error appropriately for your application
+  }
+}/**
+ * Sends audit data to Airtable.
+ * Call this function from inside your archiveraudit function.
+ * 
+ * @param {Object} auditData - The collected data object matching your Airtable columns.
+ */
+async function sendAuditToAirtable(auditData) {
+  // Replace these with your actual Airtable credentials and details
+  const personalAccessToken = 'patIzjfTlwG25KRPn.0afbc4ad5fcb497a11612a20b9537e02f2b413540d1ffac83ac0338005c9a5ee';
+  const baseId = 'appgnEwxlkcToFDhV';
+  const tableName = 'Table1'; // e.g., 'Audits'
+  
+  const url = `https://api.airtable.com/v0/${baseId}/${tableName}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${personalAccessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        records: [
+          {
+            // The keys in auditData must exactly match your column names in Airtable
+            fields: auditData
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      throw new Error(`Airtable API Error: ${response.status} - ${errorDetails}`);
+    }
+
+    const result = await response.json();
+    console.log('Audit successfully archived in Airtable:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('Failed to send audit to Airtable:', error);
+    // Handle the error appropriately for your application
+  }
+}
         function archiverAudit() {
             if (!currentActiveStore) {
                 alert("Veuillez sélectionner un magasin d'abord.");
@@ -672,7 +760,7 @@
                 items: items,
                 updatedAt: new Date().toISOString()
             };
-
+await sendAuditToAirtable(auditsHistory[currentActiveStore.ANABEL]);
             localStorage.setItem('auditsHistory_csi', JSON.stringify(auditsHistory));
 
             showToast("✅ Audit enregistré avec succès !");
