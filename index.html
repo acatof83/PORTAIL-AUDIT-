@@ -16,7 +16,7 @@
             --text-muted: #718096;
             --border: #e2e8f0;
             --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
@@ -102,19 +102,11 @@
         .store-selector { background: #f8fafc; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
         .audit-form-container { opacity: 0.5; pointer-events: none; transition: 0.3s; }
         .audit-form-container.active { opacity: 1; pointer-events: auto; }
-        
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .full-width { grid-column: 1 / -1; }
 
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
         .cat-row { background: #f1f5f9; font-weight: bold; color: var(--primary); }
-        
-        .status-select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; }
-        .status-select.bon { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
-        .status-select.moyen { background-color: #fef9c3; color: #854d0e; border-color: #fef08a; }
-        .status-select.ko { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; }
 
         .toast {
             position: fixed; bottom: 30px; right: 30px; background: #10b981; color: white; padding: 15px 25px;
@@ -145,7 +137,7 @@
 
         <div class="header-content">
             <h1><i class="fas fa-clipboard-check"></i> Portail Audit & Conformité CSI</h1>
-            <p>Carrefour Proximité - Plateforme Sud-Est (72 Magasins Sync Google Sheets 🟢)</p>
+            <p>Carrefour Proximité - Multi-utilisateurs Sync Google Sheets 🟢</p>
         </div>
     </header>
 
@@ -161,28 +153,21 @@
         <div id="tab-synthese" class="tab-content active">
             <div class="kpi-grid">
                 <div class="kpi-card">
-                    <div class="kpi-title">Taux de Réalisation Global</div>
-                    <div class="kpi-value" id="kpi-taux">0%</div>
-                    <div class="progress-bar-container"><div class="progress-bar-fill" id="kpi-progress"></div></div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
-                        <span id="kpi-faits">0</span> réalisés sur <span id="kpi-total">72</span> magasins
-                    </p>
+                    <div class="kpi-title">Audits Enregistrés</div>
+                    <div class="kpi-value" id="kpi-faits">0</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Centralisés dans Google Sheets</p>
                 </div>
                 <div class="kpi-card green">
-                    <div class="kpi-title">Note Moyenne du Parc</div>
+                    <div class="kpi-title">Note Moyenne</div>
                     <div class="kpi-value" id="kpi-note">- / 20</div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Objectif cible : > 14/20</p>
-                </div>
-                <div class="kpi-card orange">
-                    <div class="kpi-title">Meilleur Contributeur CSI</div>
-                    <div class="kpi-value" id="kpi-top-csi" style="font-size: 1.8rem; margin-top: 10px;">-</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Calculée sur les audits récents</p>
                 </div>
             </div>
 
             <div class="card">
-                <h2 class="card-header">Rapport de Synchronisation avec Google Sheets</h2>
+                <h2 class="card-header">Base de données d'équipe centralisée</h2>
                 <p style="color: var(--text-muted); font-size: 0.95rem;">
-                    Toutes les données saisies par Amanda, Christophe et Emmanuel sont directement transmises au fichier Google Sheet centralisé.
+                    Les audits validés par Amanda, Christophe et Emmanuel sont stockés en temps réel sur le Google Sheet partagé.
                 </p>
             </div>
         </div>
@@ -200,7 +185,7 @@
                     <div class="input-group">
                         <label>Ou choisir dans la liste</label>
                         <select id="selectStore" onchange="activerMagasin(this.value)">
-                            <option value="">-- Sélectionner (72) --</option>
+                            <option value="">-- Sélectionner --</option>
                         </select>
                     </div>
 
@@ -226,21 +211,12 @@
                             <select id="form-csi"><option>AMANDA</option><option>CHRISTOPHE</option><option>EMMANUEL</option></select>
                         </div>
                         <div class="input-group"><label>Note Globale / 20</label><input type="number" id="form-note" min="0" max="20" placeholder="Ex: 15"></div>
-                        <div class="input-group full-width"><label>Conclusion / Plan d'action</label><textarea id="form-comment" rows="3" placeholder="Saisir le bilan de la visite..."></textarea></div>
-                    </div>
-
-                    <div style="margin-top: 30px; overflow-x: auto;">
-                        <table id="auditGridTable">
-                            <thead>
-                                <tr><th style="width: 45%;">Point de contrôle</th><th style="width: 30%;">Valeur / Qté</th><th style="width: 25%;">État</th></tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                        <div class="input-group full-width" style="grid-column: 1 / -1;"><label>Conclusion / Plan d'action</label><textarea id="form-comment" rows="3" placeholder="Saisir le bilan de la visite..."></textarea></div>
                     </div>
 
                     <div style="margin-top: 30px; text-align: right; border-top: 1px solid var(--border); padding-top: 20px;">
                         <button class="btn btn-outline" style="margin-right: 15px;" onclick="resetForm(true)">Annuler</button>
-                        <button class="btn btn-success" id="btnSave" onclick="validerAudit()"><i class="fas fa-cloud-upload-alt"></i> Valider et Enregistrer dans Google Sheets</button>
+                        <button class="btn btn-success" id="btnSave" onclick="validerAudit()"><i class="fas fa-cloud-upload-alt"></i> Valider et Enregistrer</button>
                     </div>
                 </div>
             </div>
@@ -257,9 +233,9 @@
                 <div style="overflow-x: auto;">
                     <table id="archivesTable">
                         <thead>
-                            <tr><th>Date</th><th>Anabel</th><th>Magasin</th><th>CSI</th><th>Note</th><th>Conclusion</th></tr>
+                            <tr><th>Horodatage</th><th>Anabel</th><th>Date Audit</th><th>CSI</th><th>Note</th><th>Commentaire</th></tr>
                         </thead>
-                        <tbody><tr><td colspan="6" style="text-align:center;">Chargement des données...</td></tr></tbody>
+                        <tbody><tr><td colspan="6" style="text-align:center;">Cliquer sur Rafraîchir pour charger...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -270,92 +246,248 @@
     <div class="toast" id="toastMsg">
         <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
         <div>
-            <strong style="display: block;">Audit transmis à Google Sheets !</strong>
-            <span style="font-size: 0.9rem;">La grille est prête pour le prochain magasin.</span>
+            <strong style="display: block;">Audit transmis au Google Sheet !</strong>
+            <span style="font-size: 0.9rem;">La grille a été réinitialisée.</span>
         </div>
     </div>
 
     <script>
-        // LIEN UNIQUE AVEC VOTRE GOOGLE APPS SCRIPT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTPwnh-BXhJu-PlXhvfu4xgNnZ-abgftqIFLG_lZ7rb02HANtIVsrIPmWMY2g1ootf/exec";
 
-        const defaultQuestions = [
-            { cat: "CONFORMITÉ GLOBALE", name: "Base magasin conforme aux équipements ?" },
-            { cat: "LIGNE DE CAISSE", name: "Nombre de caisses TPV" },
-            { cat: "LIGNE DE CAISSE", name: "Écrans Caisse & Scanners" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Switch & Baie de brassage" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne ADSL / FIBRE & Routeur 4G" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Onduleur & Imprimante" },
-            { cat: "MATÉRIEL RÉSERVE", name: "Terminaux Zebra / DT50" },
-            { cat: "PROCESS & DIVERS", name: "Utilisation de la PCA et Documentation" }
+        const stores = [
+            { "anabel": "6345", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "ARAMON -DE GAULLE", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "6266", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "MARSEILLE -LODI", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
+            { "anabel": "5569", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "MARSEILLE -TURCAT", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "2752", "dt": "LEROUX ARNOLD", "cdf": "GENSOLLEN MAELLE", "nom": "HYERES -TOULON", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "5280", "dt": "LEROUX ARNOLD", "cdf": "GENSOLLEN MAELLE", "nom": "JUAN LES PIN -WILSON", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "2896", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -BORRIGLIONE 73", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "A46S", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -LAMARTINE", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
+            { "anabel": "A46E", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -MEDECIN", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "8956", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -VILLERMONT", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "6617", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "SAINT-LAURENT-DU-VAR", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "8926", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "AJACCIO -DEL PELLEGR", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "5281", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "BEAUSOLEIL -MARCHE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "7207", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "MENTON -FAURE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "A5GU", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -DEROULEDE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "5982", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -MALAUSSENA", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
+            { "anabel": "5727", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -MEYERBEER", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "A5GW", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE-CORNICHE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "294", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "OTA- HAMEAU DE PORTO", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "6744", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "ROQUEBRUNE-CAP-MARTI", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "A4R6", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "SARROLA-CARCOPINO -B", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "1786", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "VENCE -RHIN DANUBE", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "6027", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "AIX EN P -CORDEL 63", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
+            { "anabel": "1076", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "FORCALQUIER", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
+            { "anabel": "2911", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "ORAISON -AILLAUD", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "3095", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "SAINTE-TULLE -PAUL", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "5332", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "TOULON -15E CORP 709", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "6193", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -BARA", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "5655", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -CAMOINS", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
+            { "anabel": "9467", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -MONTAIGNE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
+            { "anabel": "4825", "dt": "WELTER RONAN", "cdf": "MULLER HELENE", "nom": "MONTPELLIER -MILHAU", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "6260", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "CHAPONOST -CHAUSSE", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
+            { "anabel": "8850", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "ST ETIENNE -11 NOV", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "5311", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "ST ETIENNE -FRAISSIN", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "7273", "dt": "WELTER RONAN", "cdf": "GIRARDON THIERRY", "nom": "BEDOIN", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
+            { "anabel": "618", "dt": "WELTER RONAN", "cdf": "GIRARDON THIERRY", "nom": "CAROMB -CARPENTRAS", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
+            { "anabel": "A48H", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -EYCHART", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
+            { "anabel": "9485", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "LE COTEAU -LIBERATIO", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "7238", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "ST JUST EN CHEVALET", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
+            { "anabel": "5700", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "ST JUST LA PENDUE", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
+            { "anabel": "4988", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CHAMALIERES -ROYAT", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "5578", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -BLATN", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "5315", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -DELILLE", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "A5GP", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "ALLAN -MALATAVERNE", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
+            { "anabel": "1061", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "CHATILLON EN DIOIS", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
+            { "anabel": "6307", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "MOURS-SAINT-EUSEBE", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
+            { "anabel": "4686", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "VALENCE -LIBERATION", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
+            { "anabel": "6586", "dt": "CURT FLORIAN", "cdf": "BARRIOL AMELIE", "nom": "BRON -BROSSOLETTE", "enseigne": "CARREFOUR EXPRESS", "csi": "EMMANUEL" },
+            { "anabel": "1790", "dt": "CURT FLORIAN", "cdf": "BARRIOL AMELIE", "nom": "VILLEURBANNE -GENAS", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "1396", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "DIEMOZ -GR. NEUVE", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
+            { "anabel": "7258", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "LES GETS -TANINGES", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
+            { "anabel": "5627", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "ST-MARTIN-BELLEVUE", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
+            { "anabel": "6057", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "TALLOIRES", "enseigne": "8 A HUIT", "csi": "EMMANUEL" },
+            { "anabel": "A4XL", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "ANNEMASSE -GARE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "1081", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "HAUTELUCE L. SAISIES", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
+            { "anabel": "7259", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES HOUCHES", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
+            { "anabel": "8887", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES MENUIRES -CROISE", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
+            { "anabel": "6277", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES MENUIRES -PREYER", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
+            { "anabel": "7260", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "MEGEVE -RTE NATIONAL", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
+            { "anabel": "5591", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "VAL THORENS -ARCELLE", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
+            { "anabel": "6184", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "VAL THORENS -PORTILL", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
+            { "anabel": "8942", "dt": "PELLON RENAUD", "cdf": "GONCALVES ISABELLE", "nom": "GRENOBLE -FUSILLES", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "4644", "dt": "PELLON RENAUD", "cdf": "GONCALVES ISABELLE", "nom": "MONTBONNOT ST MARTIN", "enseigne": "CARREFOUR EXPRESS", "csi": "EMMANUEL" },
+            { "anabel": "4922", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -CREQUI", "enseigne": "CARREFOUR EXPRESS", "csi": "EMMANUEL" },
+            { "anabel": "5568", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -CROIX ROUSSE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "5321", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -DUQUESNE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "1649", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -JANIN", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "A4O2", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -VITTON 6", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "A5Z5", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON-FELIX FAURE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "5326", "dt": "PELLON RENAUD", "cdf": "ROBINET MANUEL", "nom": "CHAMBERY -MONTMELIAN", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
+            { "anabel": "1943", "dt": "PELLON RENAUD", "cdf": "ROBINET MANUEL", "nom": "FONTAINE -CURIE", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
+            { "anabel": "9566", "dt": "PELLON RENAUD", "cdf": "ROBINET MANUEL", "nom": "ST CHEF EN DAUP", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
+            { "anabel": "8636", "dt": "LEROUX ARNOLD", "cdf": "VASSON KEVIN", "nom": "AVIGNON -REPUBLIQUE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" }
         ];
 
-        const stores = [
-            { "anabel": "6345", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "ARAMON -DE GAULLE", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "6266", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "MARSEILLE -LODI", "enseigne": "CARREFOUR EXPRESS", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "5569", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "MARSEILLE -TURCAT", "enseigne": "CARREFOUR CITY", "prio": 1, "csi": "AMANDA" },
-            { "anabel": "2752", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "GENSOLLEN MAELLE", "nom": "HYERES -TOULON", "enseigne": "CARREFOUR CONTACT", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "5280", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "GENSOLLEN MAELLE", "nom": "JUAN LES PIN -WILSON", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "2896", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -BORRIGLIONE 73", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "A46S", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -LAMARTINE", "enseigne": "CARREFOUR EXPRESS", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "A46E", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -MEDECIN", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "8956", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -VILLERMONT", "enseigne": "CARREFOUR CITY", "prio": 2, "csi": "AMANDA" },
-            { "anabel": "6617", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "SAINT-LAURENT-DU-VAR", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "8926", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "AJACCIO -DEL PELLEGR", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "5281", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "BEAUSOLEIL -MARCHE", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "7207", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "MENTON -FAURE", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "A5GU", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -DEROULEDE", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "5982", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -MALAUSSENA", "enseigne": "CARREFOUR EXPRESS", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "5727", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -MEYERBEER", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "A5GW", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE-CORNICHE", "enseigne": "CARREFOUR CITY", "prio": 4, "CSI": "AMANDA" },
-            { "anabel": "294", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "OTA- HAMEAU DE PORTO", "enseigne": "CARREFOUR CONTACT", "prio": 2, "csi": "AMANDA" },
-            { "anabel": "6744", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "ROQUEBRUNE-CAP-MARTI", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "A4R6", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "SARROLA-CARCOPINO -B", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "1786", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "VENCE -RHIN DANUBE", "enseigne": "CARREFOUR CONTACT", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "6027", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "AIX EN P -CORDEL 63", "enseigne": "CARREFOUR EXPRESS", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "1076", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "FORCALQUIER", "enseigne": "CARREFOUR EXPRESS", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "2911", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "ORAISON -AILLAUD", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "3095", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "SAINTE-TULLE -PAUL", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "5332", "region": "SUD-EST", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "TOULON -15E CORP 709", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "6193", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -BARA", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "5655", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -CAMOINS", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "AMANDA" },
-            { "anabel": "9467", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -MONTAIGNE", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "AMANDA" },
-            { "anabel": "4825", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "MULLER HELENE", "nom": "MONTPELLIER -MILHAU", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "CHRISTOPHE" },
-            { "anabel": "6260", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "CHAPONOST -CHAUSSE", "enseigne": "CARREFOUR CONTACT", "prio": 2, "csi": "CHRISTOPHE" },
-            { "anabel": "8850", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "ST ETIENNE -11 NOV", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "CHRISTOPHE" },
-            { "anabel": "5311", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "ST ETIENNE -FRAISSIN", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "CHRISTOPHE" },
-            { "anabel": "7273", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "GIRARDON THIERRY", "nom": "BEDOIN", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "CHRISTOPHE" },
-            { "anabel": "618", "region": "SUD-EST", "dt": "WELTER RONAN", "cdf": "GIRARDON THIERRY", "nom": "CAROMB -CARPENTRAS", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "CHRISTOPHE" },
-            { "anabel": "A48H", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -EYCHART", "enseigne": "CARREFOUR EXPRESS", "prio": 4, "csi": "CHRISTOPHE" },
-            { "anabel": "9485", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "LE COTEAU -LIBERATIO", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "CHRISTOPHE" },
-            { "anabel": "7238", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "ST JUST EN CHEVALET", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "CHRISTOPHE" },
-            { "anabel": "5700", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "ST JUST LA PENDUE", "enseigne": "CARREFOUR EXPRESS", "prio": 4, "csi": "CHRISTOPHE" },
-            { "anabel": "4988", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CHAMALIERES -ROYAT", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "CHRISTOPHE" },
-            { "anabel": "5578", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -BLATN", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "CHRISTOPHE" },
-            { "anabel": "5315", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -DELILLE", "enseigne": "CARREFOUR CITY", "prio": 1, "csi": "CHRISTOPHE" },
-            { "anabel": "A5GP", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "ALLAN -MALATAVERNE", "enseigne": "CARREFOUR EXPRESS", "prio": 1, "csi": "CHRISTOPHE" },
-            { "anabel": "1061", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "CHATILLON EN DIOIS", "enseigne": "CARREFOUR EXPRESS", "prio": 2, "csi": "CHRISTOPHE" },
-            { "anabel": "6307", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "MOURS-SAINT-EUSEBE", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "CHRISTOPHE" },
-            { "anabel": "4686", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "VALENCE -LIBERATION", "enseigne": "CARREFOUR CITY", "prio": 2, "csi": "CHRISTOPHE" },
-            { "anabel": "6586", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "BARRIOL AMELIE", "nom": "BRON -BROSSOLETTE", "enseigne": "CARREFOUR EXPRESS", "prio": 1, "csi": "EMMANUEL" },
-            { "anabel": "1790", "region": "SUD-EST", "dt": "CURT FLORIAN", "cdf": "BARRIOL AMELIE", "nom": "VILLEURBANNE -GENAS", "enseigne": "CARREFOUR CITY", "prio": 3, "csi": "EMMANUEL" },
-            { "anabel": "1396", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "DIEMOZ -GR. NEUVE", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "EMMANUEL" },
-            { "anabel": "7258", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "LES GETS -TANINGES", "enseigne": "CARREFOUR MONTAGNE", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "5627", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "ST-MARTIN-BELLEVUE", "enseigne": "CARREFOUR CONTACT", "prio": 3, "csi": "EMMANUEL" },
-            { "anabel": "6057", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "TALLOIRES", "enseigne": "8 A HUIT", "prio": 1, "csi": "EMMANUEL" },
-            { "anabel": "A4XL", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "ANNEMASSE -GARE", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "1081", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "HAUTELUCE L. SAISIES", "enseigne": "CARREFOUR MONTAGNE", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "7259", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES HOUCHES", "enseigne": "CARREFOUR CONTACT", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "8887", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES MENUIRES -CROISE", "enseigne": "CARREFOUR MONTAGNE", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "6277", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES MENUIRES -PREYER", "enseigne": "CARREFOUR MONTAGNE", "prio": 3, "csi": "EMMANUEL" },
-            { "anabel": "7260", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "MEGEVE -RTE NATIONAL", "enseigne": "CARREFOUR CONTACT", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "5591", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "VAL THORENS -ARCELLE", "enseigne": "CARREFOUR MONTAGNE", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "6184", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "VAL THORENS -PORTILL", "enseigne": "CARREFOUR MONTAGNE", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "8942", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "GONCALVES ISABELLE", "nom": "GRENOBLE -FUSILLES", "enseigne": "CARREFOUR CITY", "prio": 4, "csi": "EMMANUEL" },
-            { "anabel": "4644", "region": "SUD-EST", "dt": "PELLON RENAUD", "cdf": "That appears to be an executed URL endpoint for a **Google Apps Script Web App**. 
+        let currentAnabel = null;
 
-As an AI, I cannot visit or fetch content directly from external URLs. Could you clarify what you'd like to do with this script or endpoint? For example, are you looking to:
+        document.addEventListener("DOMContentLoaded", () => {
+            initStoreSelect();
+            document.getElementById('form-date').valueAsDate = new Date();
+            chargerAuditsDepuisGoogle();
+        });
 
-* Send HTTP requests (`GET`/`POST`) to this endpoint using Python, JavaScript, or cURL?
-* Debug or write the underlying `doGet(e)` or `doPost(e)` Google Apps Script code?
-* Set up webhooks, authentication, or deployment permissions for the web app?
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if(tabId === 'tab-archives') chargerAuditsDepuisGoogle();
+        }
+
+        function initStoreSelect() {
+            const sel = document.getElementById('selectStore');
+            stores.forEach(s => {
+                sel.innerHTML += `<option value="${s.anabel}">${s.anabel} - ${s.nom}</option>`;
+            });
+        }
+
+        function trouverMagasin() {
+            const query = document.getElementById('searchAnabel').value.trim().toUpperCase();
+            if(query.length >= 3) {
+                const found = stores.find(s => s.anabel.toUpperCase() === query || s.nom.toUpperCase().includes(query));
+                if(found) {
+                    document.getElementById('selectStore').value = found.anabel;
+                    activerMagasin(found.anabel);
+                }
+            }
+        }
+
+        function activerMagasin(anabel) {
+            if(!anabel) return;
+            const store = stores.find(s => s.anabel === anabel);
+            currentAnabel = anabel;
+
+            document.getElementById('info-enseigne').textContent = store.enseigne;
+            document.getElementById('info-nom').textContent = store.nom;
+            document.getElementById('info-dt').textContent = store.dt;
+            document.getElementById('info-cdf').textContent = store.cdf;
+            document.getElementById('form-csi').value = store.csi || "AMANDA";
+            
+            document.getElementById('store-infos').style.display = 'block';
+            document.getElementById('auditFormArea').classList.add('active');
+            
+            resetForm(false);
+        }
+
+        async function validerAudit() {
+            if(!currentAnabel) return alert("Veuillez choisir un magasin.");
+            const note = document.getElementById('form-note').value;
+            if(!note) return alert("Veuillez saisir la note globale.");
+
+            const btnSave = document.getElementById('btnSave');
+            btnSave.disabled = true;
+            btnSave.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Transmission...`;
+
+            const payload = {
+                anabel: currentAnabel,
+                date: document.getElementById('form-date').value,
+                csi: document.getElementById('form-csi').value,
+                note: parseFloat(note),
+                comment: document.getElementById('form-comment').value
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                resetForm(true);
+
+                const toast = document.getElementById('toastMsg');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3500);
+
+                chargerAuditsDepuisGoogle();
+            } catch (err) {
+                alert("Erreur lors de la sauvegarde : " + err.message);
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Valider et Enregistrer`;
+            }
+        }
+
+        function resetForm(fullReset = false) {
+            document.getElementById('form-note').value = '';
+            document.getElementById('form-comment').value = '';
+
+            if(fullReset) {
+                currentAnabel = null;
+                document.getElementById('selectStore').value = '';
+                document.getElementById('searchAnabel').value = '';
+                document.getElementById('store-infos').style.display = 'none';
+                document.getElementById('auditFormArea').classList.remove('active');
+            }
+        }
+
+        async function chargerAuditsDepuisGoogle() {
+            const tbody = document.querySelector('#archivesTable tbody');
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>`;
+
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+
+                if (data.length <= 1) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Aucun audit enregistré pour l'instant.</td></tr>`;
+                    document.getElementById('kpi-faits').textContent = '0';
+                    document.getElementById('kpi-note').textContent = '- / 20';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                let totalNotes = 0;
+                let countNotes = 0;
+
+                // On boucle sur les lignes (en sautant l'en-tête)
+                for (let i = data.length - 1; i >= 1; i--) {
+                    const row = data[i];
+                    const horodatage = row[0] ? new Date(row[0]).toLocaleDateString() : '-';
+                    const anabel = row[1] || '-';
+                    const dateAudit = row[2] || '-';
+                    const csi = row[3] || '-';
+                    const note = row[4] !== "" ? parseFloat(row[4]) : '-';
+                    const comment = row[5] || '-';
+
+                    if (typeof note === 'number' && !isNaN(note)) {
+                        totalNotes += note;
+                        countNotes++;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${horodatage}</td>
+                            <td><b>${anabel}</b></td>
+                            <td>${dateAudit}</td>
+                            <td>${csi}</td>
+                            <td><strong style="color:var(--primary);">${note !== '-' ? note + ' / 20' : '-'}</strong></td>
+                            <td>${comment}</td>
+                        </tr>
+                    `;
+                }
+
+                document.getElementById('kpi-faits').textContent = data.length - 1;
+                if (countNotes > 0) {
+                    document.getElementById('kpi-note').textContent = (totalNotes / countNotes).toFixed(1) + ' / 20';
+                }
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Erreur de connexion avec Google Sheets.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
