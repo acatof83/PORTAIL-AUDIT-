@@ -72,12 +72,7 @@
         .leg.left { left: 11px; animation: runLegLeft 0.3s infinite alternate linear; background: #1e293b; }
         .leg.right { left: 13px; animation: runLegRight 0.3s infinite alternate linear; z-index: 3; }
 
-        .cart-emoji { 
-            font-size: 2.3rem; 
-            display: inline-block; 
-            animation: cartShake 0.2s infinite alternate; 
-            z-index: 4; 
-        }
+        .cart-emoji { font-size: 2.3rem; display: inline-block; animation: cartShake 0.2s infinite alternate; z-index: 4; }
 
         @keyframes runLegLeft { 0% { transform: rotate(-50deg); } 100% { transform: rotate(40deg); } }
         @keyframes runLegRight { 0% { transform: rotate(40deg); } 100% { transform: rotate(-50deg); } }
@@ -490,10 +485,10 @@
         // ==========================================
         // 2. INITIALISATION AU CHARGEMENT
         // ==========================================
-        window.onload = function() {
+        window.onload = async function() {
             chargerListeMagasins();
             chargerFiltres();
-            synchroniserEtChargerDonneesAirtable();
+            await synchroniserEtChargerDonneesAirtable(); // Attend le chargement complet des données avant d'afficher
         };
 
         function chargerListeMagasins() {
@@ -621,33 +616,27 @@
             btnValider.disabled = true;
 
             try {
-                // Vérifier si un enregistrement existe déjà pour ce magasin dans Airtable pour le mettre à jour ou en créer un nouveau
-                const existingRecord = airtableRecordsCache.find(r => r.fields.ANABEL === anabel);
+                const existingRecord = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(anabel).trim().toUpperCase());
                 let response;
 
                 if (existingRecord) {
-                    // Mise à jour (PATCH)
                     response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}/${existingRecord.id}`, {
                         method: "PATCH",
-                        headers: {
-                            "Authorization": `Bearer ${AIRTABLE_PAT}`,
-                            "Content-Type": "application/json"
-                        },
+                        headers: { "Authorization": `Bearer ${AIRTABLE_PAT}`, "Content-Type": "application/json" },
                         body: JSON.stringify(dataAirtable)
                     });
                 } else {
-                    // Création (POST)
                     response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`, {
                         method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${AIRTABLE_PAT}`,
-                            "Content-Type": "application/json"
-                        },
+                        headers: { "Authorization": `Bearer ${AIRTABLE_PAT}`, "Content-Type": "application/json" },
                         body: JSON.stringify({ records: [dataAirtable] })
                     });
                 }
 
-                if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+                if (!response.ok) {
+                    const errRes = await response.json();
+                    throw new Error(JSON.stringify(errRes));
+                }
 
                 afficherToast("✅ Audit enregistré et synchronisé !");
                 await synchroniserEtChargerDonneesAirtable();
@@ -655,7 +644,7 @@
 
             } catch (error) {
                 console.error("Erreur de synchronisation:", error);
-                alert("Erreur lors de l'enregistrement. Vérifiez vos clés et structures Airtable.");
+                alert("Erreur Airtable: " + error.message);
             } finally {
                 btnValider.innerHTML = originalText;
                 btnValider.disabled = false;
@@ -663,11 +652,11 @@
         }
 
         // ==========================================
-        // 5. SYNCHRONISATION AUTOMATIQUE DES CHAMPS DE LA GRILLE (Appel, Mail, Relance, Visite, Note, Commentaire)
+        // 5. SAUVEGARDE AUTOMATIQUE DES CHAMPS DE LA GRILLE (Appel, Mail, Relance, Visite, Note, Commentaire)
         // ==========================================
         async function sauvegarderChampGrille(anabel, champNom, valeur) {
             try {
-                let existingRecord = airtableRecordsCache.find(r => r.fields.ANABEL === anabel);
+                let existingRecord = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(anabel).trim().toUpperCase());
                 let payloadFields = {};
                 payloadFields[champNom] = valeur;
                 payloadFields["ANABEL"] = anabel;
@@ -692,13 +681,16 @@
                     });
                 }
 
-                if (response.ok) {
-                    afficherToast("⚡ Donnée synchronisée");
-                    // Rafraîchir silencieusement le cache local
-                    chargerDonneesAirtableSilencieux();
+                if (!response.ok) {
+                    const errRes = await response.json();
+                    throw new Error(JSON.stringify(errRes));
                 }
+
+                afficherToast("⚡ Donnée synchronisée");
+                await synchroniserEtChargerDonneesAirtable(); // Recharge proprement le cache et les KPI
             } catch (err) {
                 console.error("Erreur mise à jour automatique:", err);
+                alert("Erreur d'enregistrement Airtable (vérifiez que la colonne '" + champNom + "' existe bien dans Airtable) : " + err.message);
             }
         }
 
@@ -716,25 +708,11 @@
                     airtableRecordsCache = data.records || [];
                 }
             } catch (e) {
-                console.warn("Mode hors-ligne ou erreur de chargement Airtable:", e);
+                console.warn("Erreur de chargement Airtable:", e);
             }
             afficherGrille(storesData);
             majKPI();
             chargerHistorique();
-        }
-
-        async function chargerDonneesAirtableSilencieux() {
-            try {
-                const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`, {
-                    method: "GET",
-                    headers: { "Authorization": `Bearer ${AIRTABLE_PAT}` }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    airtableRecordsCache = data.records || [];
-                    majKPI();
-                }
-            } catch (e) {}
         }
 
         function afficherGrille(data) {
@@ -742,10 +720,9 @@
             tbody.innerHTML = "";
             
             data.forEach(store => {
-                let dtStyle = dtColors[store.DT] ? `background-color: ${dtColors[store.DT].bg}; color: ${dtColors.user ? '' : dtColors[store.DT].text}; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;` : "";
+                let dtStyle = dtColors[store.DT] ? `background-color: ${dtColors[store.DT].bg}; color: ${dtColors[store.DT].text}; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;` : "";
                 
-                // Retrouver l'enregistrement correspondant dans Airtable s'il existe
-                let record = airtableRecordsCache.find(r => r.fields.ANABEL === store.ANABEL);
+                let record = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(store.ANABEL).trim().toUpperCase());
                 let fields = record ? record.fields : {};
                 
                 let isAudited = fields["Note"] !== undefined || fields["Date Visite"] !== undefined;
@@ -781,7 +758,7 @@
             const fPrio = document.getElementById('g-filter-prio').value;
 
             let filtered = storesData.filter(s => {
-                let record = airtableRecordsCache.find(r => r.fields.ANABEL === s.ANABEL);
+                let record = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(s.ANABEL).trim().toUpperCase());
                 let isAudited = record && (record.fields["Note"] !== undefined || record.fields["Date Visite"]);
 
                 if (fStatus === "AUDITED" && !isAudited) return false;
@@ -802,7 +779,6 @@
             const totalStores = storesData.length;
             document.getElementById('kpi-total').textContent = totalStores;
 
-            // Compter les magasins audités (ayant une note ou une date de visite dans Airtable)
             let auditsFaitsList = airtableRecordsCache.filter(r => r.fields["Note"] !== undefined || r.fields["Date Visite"]);
             let auditsFaits = auditsFaitsList.length;
 
@@ -813,14 +789,12 @@
             document.getElementById('kpi-percent').textContent = percent + "%";
             document.getElementById('kpi-progress').style.width = percent + "%";
 
-            // Calcul de la note moyenne globale
             let notes = auditsFaitsList.map(r => parseFloat(r.fields["Note"])).filter(n => !isNaN(n));
             let sommeNotes = notes.reduce((acc, curr) => acc + curr, 0);
             let moyenne = notes.length > 0 ? (sommeNotes / notes.length).toFixed(1) : "-";
             
             document.getElementById('kpi-moyenne').innerHTML = `${moyenne} <span style="font-size:1rem; color:#94a3b8;">/ 20</span>`;
 
-            // Répartition des notes (Excellent >=15, Correct 10-14, Critique <10)
             let exc = notes.filter(n => n >= 15).length;
             let cor = notes.filter(n => n >= 10 && n < 15).length;
             let cri = notes.filter(n => n < 10).length;
@@ -829,7 +803,6 @@
             document.getElementById('kpi-cor').textContent = cor;
             document.getElementById('kpi-cri').textContent = cri;
 
-            // Meilleur auditeur
             let auditeursCount = {};
             airtableRecordsCache.forEach(r => {
                 let aud = r.fields["Auditeur CSI"];
@@ -848,7 +821,6 @@
             }
             document.getElementById('kpi-top-auditor').textContent = topAuditeur;
 
-            // Activité récente
             let auditsAvecDate = airtableRecordsCache
                 .filter(r => r.fields["Date Visite"])
                 .sort((a, b) => new Date(b.fields["Date Visite"]) - new Date(a.fields["Date Visite"]));
