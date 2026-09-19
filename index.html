@@ -3,337 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Audit & Conformité CSI | Carrefour Proximité</title>
+    <title>Portail Audit Magasins CSI — Carrefour Proximité</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #00387B;
-            --secondary: #F37021;
-            --success: #00A651;
-            --bg-body: #f4f7f9;
-            --bg-card: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --border: #e2e8f0;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --carrefour-green: #00A651;
+            --carrefour-green-dark: #00823F;
+            --carrefour-blue: #00387B;
+            --carrefour-orange: #F37021;
+            --bg-light: #eef4f8;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --danger-red: #dc2626;
+            --warning-orange: #f59e0b;
+            --success-green: #10b981;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 40px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); padding-bottom: 50px; }
 
-        header {
-            background: linear-gradient(135deg, var(--primary), #00224d);
-            color: white; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 5px solid var(--secondary); position: relative; overflow: hidden; min-height: 100px;
+        /* HEADER VERT CARREFOUR */
+        header { 
+            background: linear-gradient(135deg, var(--carrefour-green), var(--carrefour-green-dark)); 
+            color: white; padding: 18px 30px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 4px solid var(--carrefour-orange); overflow: hidden; position: relative;
+            min-height: 85px;
         }
-        
-        .header-content { position: relative; z-index: 10; }
-        .header-content h1 { font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .header-content p { font-size: 0.95rem; opacity: 0.9; margin-top: 5px; }
 
-        .runner-scene { position: absolute; bottom: 10px; display: flex; align-items: flex-end; gap: 2px; z-index: 1; opacity: 0.6; }
-        .runner-left { animation: runLeftToRight 15s linear infinite; }
-        .runner-right { animation: runRightToLeft 18s linear infinite 7s; transform: scaleX(-1); }
-        
-        .stickman { position: relative; width: 35px; height: 50px; transform: rotate(12deg); margin-right: -4px; }
-        .head { width: 15px; height: 15px; border-radius: 50%; background: #ffccb3; position: absolute; left: 14px; top: -2px; animation: bob 0.3s infinite alternate ease-in-out; }
-        .head::before { content: ''; position: absolute; top: -3px; left: -2px; width: 19px; height: 8px; background: var(--secondary); border-radius: 10px 10px 2px 2px; }
-        .torso { width: 13px; height: 22px; background: #fff; position: absolute; left: 10px; top: 13px; border-radius: 6px; }
-        .arm { width: 16px; height: 4.5px; background: #ffccb3; position: absolute; border-radius: 3px; transform-origin: left center; }
-        .arm.left { left: 15px; top: 17px; transform: rotate(-15deg); background: #eba988; }
-        .arm.right { left: 17px; top: 15px; transform: rotate(-30deg); }
-        .leg { width: 5.5px; height: 20px; background: #fff; position: absolute; top: 31px; border-radius: 3px; transform-origin: top center; }
-        .leg.left { left: 11px; animation: runLeg 0.3s infinite alternate linear; background: #e2e8f0; }
-        .leg.right { left: 13px; animation: runLeg 0.3s infinite alternate-reverse linear; }
-        .cart-emoji { font-size: 2.3rem; display: inline-block; animation: cartShake 0.2s infinite alternate; }
+        .header-title { z-index: 2; position: relative; }
+        .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        @keyframes runLeg { 0% { transform: rotate(-50deg); } 100% { transform: rotate(40deg); } }
-        @keyframes bob { 0% { transform: translateY(0px); } 100% { transform: translateY(2.5px); } }
-        @keyframes cartShake { 0% { transform: scaleX(-1) translateY(4px); } 100% { transform: scaleX(-1) translateY(5px) translateX(-2px); } }
-        @keyframes runLeftToRight { 0% { left: -100px; } 100% { left: 110%; } }
-        @keyframes runRightToLeft { 0% { right: -100px; } 100% { right: 110%; } }
-
-        nav {
-            background-color: white; padding: 0 40px; display: flex; gap: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;
+        /* ANIMATION RUNNER & CADDIE */
+        .runner-scene-left {
+            position: absolute; bottom: 6px; display: flex; align-items: flex-end; gap: 2px;
+            animation: runFromLeft 14s linear infinite; z-index: 1; opacity: 0.85;
         }
+        .runner-scene-right {
+            position: absolute; bottom: 6px; display: flex; align-items: flex-end; gap: 2px;
+            transform: scaleX(-1); animation: runFromRight 14s linear infinite 7s; z-index: 1; opacity: 0.85;
+        }
+        .stickman { position: relative; width: 30px; height: 42px; transform: rotate(10deg); margin-right: -4px; }
+        .head { width: 13px; height: 13px; border-radius: 50%; background: #ffccb3; position: absolute; left: 12px; top: -2px; animation: bob 0.3s infinite alternate ease-in-out; }
+        .head::before { content: ''; position: absolute; top: -3px; left: -2px; width: 17px; height: 7px; background: var(--carrefour-orange); border-radius: 8px 8px 2px 2px; }
+        .torso { width: 11px; height: 19px; background: var(--carrefour-blue); position: absolute; left: 9px; top: 11px; border-radius: 5px; }
+        .arm { width: 14px; height: 4px; background: #ffccb3; position: absolute; border-radius: 3px; transform-origin: left center; }
+        .arm.left { left: 13px; top: 14px; transform: rotate(-15deg); background: #eba988; }
+        .arm.right { left: 15px; top: 13px; transform: rotate(-30deg); }
+        .leg { width: 5px; height: 18px; background: #334155; position: absolute; top: 27px; border-radius: 3px; transform-origin: top center; }
+        .leg.left { left: 10px; animation: runLegLeft 0.3s infinite alternate linear; }
+        .leg.right { left: 12px; animation: runLegRight 0.3s infinite alternate linear; }
+        .cart-emoji { font-size: 2rem; display: inline-block; animation: cartShake 0.2s infinite alternate; }
+
+        @keyframes runLegLeft { 0% { transform: rotate(-45deg); } 100% { transform: rotate(35deg); } }
+        @keyframes runLegRight { 0% { transform: rotate(35deg); } 100% { transform: rotate(-45deg); } }
+        @keyframes bob { 0% { transform: translateY(0px); } 100% { transform: translateY(2px); } }
+        @keyframes cartShake { 0% { transform: scaleX(-1) translateY(3px); } 100% { transform: scaleX(-1) translateY(4px) translateX(-2px); } }
+        @keyframes runFromLeft { 0% { left: -100px; } 100% { left: 110%; } }
+        @keyframes runFromRight { 0% { right: -100px; } 100% { right: 110%; } }
+
+        /* NAVIGATION BLEU MARINE */
+        nav { background-color: var(--carrefour-blue); padding: 0 30px; display: flex; gap: 5px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15); }
         .tab-btn {
-            padding: 18px 24px; background: none; border: none; font-size: 1rem; font-weight: 600;
-            color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s ease;
+            padding: 14px 20px; color: rgba(255,255,255,0.75); background: none; border: none;
+            font-size: 0.92rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease;
         }
-        .tab-btn i { margin-right: 8px; }
-        .tab-btn:hover { color: var(--primary); background-color: #f8fafc; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--secondary); }
+        .tab-btn i { margin-right: 6px; }
+        .tab-btn:hover { color: white; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { color: white; border-bottom-color: var(--carrefour-orange); background: rgba(255,255,255,0.08); }
 
-        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* CONTENEUR ET CARTES */
+        .container { max-width: 100%; margin: 20px auto; padding: 0 20px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--bg-card); border-radius: var(--radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid var(--border); }
-        .card-header { font-size: 1.25rem; color: var(--primary); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
-        
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: #00224d; transform: translateY(-1px); }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-success:hover { background-color: #00823F; transform: translateY(-1px); }
-        .btn-outline { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        
-        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .input-group input, .input-group select, .input-group textarea { 
-            padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; transition: 0.3s; 
-            background-color: #f8fafc;
+        .card { 
+            background: var(--card-bg); padding: 25px; border-radius: 10px; 
+            border: 1px solid var(--border); margin-bottom: 20px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
         }
-        .input-group input:focus, .input-group select:focus { background-color: white; border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0, 56, 123, 0.1); }
 
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: white; border-radius: var(--radius); padding: 25px; border: 1px solid var(--border); border-left: 5px solid var(--primary); box-shadow: var(--shadow); }
-        .kpi-card.orange { border-left-color: var(--secondary); }
-        .kpi-card.green { border-left-color: var(--success); }
-        .kpi-title { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 10px; }
-        .kpi-value { font-size: 2.2rem; font-weight: 800; color: var(--primary); line-height: 1; }
-        .progress-bar-container { height: 8px; background: #edf2f7; border-radius: 4px; margin-top: 15px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; background: var(--success); width: 0%; transition: width 1s ease-in-out; }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem; }
+        .btn-primary { background-color: var(--carrefour-orange); color: white; }
+        .btn-primary:hover { background-color: #d55c19; }
+        .btn-secondary { background-color: white; color: #333; }
+        .btn-danger { background-color: var(--danger-red); color: white; }
 
-        .audit-layout { display: grid; grid-template-columns: 320px 1fr; gap: 25px; align-items: start; }
-        .store-selector { background: #f8fafc; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
-        .audit-form-container { opacity: 0.5; pointer-events: none; transition: 0.3s; }
-        .audit-form-container.active { opacity: 1; pointer-events: auto; }
+        /* KPI CARDS (ONGLET 2) */
+        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 20px; }
+        .kpi-card { background: white; border-radius: 10px; padding: 18px 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; }
+        .kpi-card.blue::before { background: var(--carrefour-blue); }
+        .kpi-card.green::before { background: var(--carrefour-green); }
+        .kpi-card.orange::before { background: var(--carrefour-orange); }
+        .kpi-card.purple::before { background: #8b5cf6; }
 
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); }
-        td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        .cat-row { background: #f1f5f9; font-weight: bold; color: var(--primary); }
+        .kpi-card h3 { font-size: 0.78rem; color: #64748b; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .kpi-card .value { font-size: 1.8rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px; }
 
-        .toast {
-            position: fixed; bottom: 30px; right: 30px; background: #10b981; color: white; padding: 15px 25px;
-            border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px;
-            transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000;
-        }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        .progress-bg { width: 100%; height: 7px; background: #e2e8f0; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--carrefour-green); transition: width 0.5s; border-radius: 4px; }
+
+        .stats-mini { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; font-weight: bold; }
+        .badge-stat { padding: 3px 8px; border-radius: 5px; color: white; font-weight: 600; }
+        .badge-stat.badge-exc { background: var(--success-green); }
+        .badge-stat.badge-cor { background: var(--warning-orange); }
+        .badge-stat.badge-cri { background: var(--danger-red); }
+
+        /* RECHERCHE ET FILTRES */
+        .search-container { display: flex; gap: 15px; align-items: flex-end; background: #e8f5e9; padding: 16px 20px; border-radius: 8px; border: 1px solid #bbf7d0; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-container { background: #f8fafc; border-color: #cbd5e1; }
+
+        .input-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+        .input-group label { font-size: 0.8rem; font-weight: 700; color: var(--carrefour-blue); }
+        .input-group input, .input-group select { padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; background-color: #ffffff; font-size: 0.88rem; }
+        .input-group input:focus, .input-group select:focus { border-color: var(--carrefour-blue); outline: none; box-shadow: 0 0 0 2px rgba(0,56,123,0.1); }
+
+        /* BANNIÈRE MAGASIN ACTIF */
+        .store-info-badge { background: linear-gradient(135deg, var(--carrefour-blue), #00224d); color: white; padding: 18px 22px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--carrefour-orange); }
+        .store-info-badge .nom { font-size: 1.35rem; font-weight: bold; margin: 4px 0; }
+
+        /* TABLEAUX */
+        .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; max-height: 68vh; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+        th { background: #f1f5f9; padding: 12px 14px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border); color: var(--carrefour-blue); font-weight: 700; text-transform: uppercase; font-size: 0.76rem; letter-spacing: 0.5px; }
+        td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+        tbody tr:hover td { background-color: #f8fafc; }
+
+        table.excel-table { width: max-content; min-width: 100%; font-size: 12px; }
+        table.excel-table th, table.excel-table td { border: 1px solid #cbd5e1; padding: 5px 8px; }
+        table.excel-table input, table.excel-table select { width: 100%; border: 1px solid transparent; background: transparent; font-size: 12px; padding: 3px; border-radius: 4px; }
+        table.excel-table input:focus, table.excel-table select:focus { border-color: var(--carrefour-blue); background-color: #fff; outline:none; }
+
+        .cat-header { background-color: #e2e8f0; font-weight: bold; color: var(--carrefour-blue); text-transform: uppercase; font-size: 0.78rem; }
+
+        /* BADGES STATUT */
+        .badge-status-audited { background-color: #dcfce7; color: #166534; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 0.74rem; border: 1px solid #bbf7d0; }
+        .badge-status-pending { background-color: #fef3c7; color: #92400e; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 0.74rem; border: 1px solid #fde68a; }
+
+        /* LÉGENDE DT */
+        .legend-dt-item { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.78rem; border: 1px solid transparent; }
+
+        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--carrefour-green-dark); color: white; padding: 12px 24px; border-radius: 6px; font-weight: bold; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
         @media print {
-            body { background: white; }
-            header, nav, .store-selector, .btn { display: none !important; }
-            .audit-layout { grid-template-columns: 1fr; }
-            .card { box-shadow: none; border: none; padding: 0; }
+            header, nav, .no-print, .search-container { display: none !important; }
+            .container { padding: 0 !important; margin: 0 !important; }
+            .card { border: none !important; box-shadow: none !important; padding: 0 !important; }
+            .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
+            th, td { border: 1px solid #94a3b8 !important; padding: 4px !important; }
+            input, select { border: none !important; background: transparent !important; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="runner-scene runner-left">
-            <div class="stickman"><div class="head"></div><div class="torso"></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
+        <div class="runner-scene-left">
+            <div class="stickman"><div class="head"></div><div class="arm left"></div><div class="torso"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
             <div class="cart-emoji">🛒</div>
         </div>
-        <div class="runner-scene runner-right">
-            <div class="stickman"><div class="head"></div><div class="torso"></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
+        <div class="runner-scene-right">
+            <div class="stickman"><div class="head"></div><div class="arm left"></div><div class="torso"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
             <div class="cart-emoji">🛒</div>
         </div>
 
-        <div class="header-content">
-            <h1><i class="fas fa-clipboard-check"></i> Portail Audit & Conformité CSI</h1>
-            <p>Carrefour Proximité - Multi-utilisateurs Sync Google Sheets 🟢</p>
+        <div class="header-title">
+            <h1>🛒 Portail Audit Magasins CSI</h1>
+            <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
+        <button class="btn btn-secondary no-print" onclick="window.print()">🖨️ Imprimer</button>
     </header>
 
-    <nav>
-        <button class="tab-btn active" onclick="switchTab('tab-synthese', this)"><i class="fas fa-chart-pie"></i> Synthèse & Stats</button>
-        <button class="tab-btn" onclick="switchTab('tab-saisie', this)"><i class="fas fa-pen-to-square"></i> Grille d'Audit</button>
-        <button class="tab-btn" onclick="switchTab('tab-archives', this)"><i class="fas fa-folder-open"></i> Archives & Historique</button>
+    <nav class="no-print">
+        <button class="tab-btn" onclick="switchTab('tab-saisie', this)"><i class="fas fa-edit"></i> Saisie de l'Audit (Détaillé)</button>
+        <button class="tab-btn active" onclick="switchTab('tab-grille', this)"><i class="fas fa-chart-bar"></i> Grille & Statistiques</button>
+        <button class="tab-btn" onclick="switchTab('tab-archives', this)"><i class="fas fa-folder"></i> Historique Global</button>
     </nav>
 
     <div class="container">
         
-        <!-- ONGLET 1 : SYNTHÈSE -->
-        <div id="tab-synthese" class="tab-content active">
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-title">Audits Enregistrés</div>
-                    <div class="kpi-value" id="kpi-faits">0</div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Centralisés dans Google Sheets</p>
-                </div>
-                <div class="kpi-card green">
-                    <div class="kpi-title">Note Moyenne</div>
-                    <div class="kpi-value" id="kpi-note">- / 20</div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Calculée sur les audits récents</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="card-header">Base de données d'équipe centralisée</h2>
-                <p style="color: var(--text-muted); font-size: 0.95rem;">
-                    Les audits validés par Amanda, Christophe et Emmanuel sont stockés en temps réel sur le Google Sheet partagé.
-                </p>
-            </div>
-        </div>
-
-        <!-- ONGLET 2 : SAISIE D'AUDIT -->
+        <!-- ONGLET 1 : SAISIE DE L'AUDIT -->
         <div id="tab-saisie" class="tab-content">
-            <div class="audit-layout">
-                
-                <div class="store-selector">
-                    <h3 style="margin-bottom: 15px; color: var(--primary);"><i class="fas fa-search"></i> Cibler un magasin</h3>
+            <div class="card">
+                <div class="search-container no-print">
                     <div class="input-group">
-                        <label>Code Anabel</label>
-                        <input type="text" id="searchAnabel" placeholder="Ex: 6345" oninput="trouverMagasin()">
+                        <label>Code ANABEL ou Ville</label>
+                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, LYON..." onkeyup="if(event.key==='Enter') chercherMagasin()">
                     </div>
-                    <div class="input-group">
-                        <label>Ou choisir dans la liste</label>
-                        <select id="selectStore" onchange="activerMagasin(this.value)">
-                            <option value="">-- Sélectionner --</option>
+                    <div class="input-group" style="flex: 2;">
+                        <label>Ou choisir dans la liste complète</label>
+                        <select id="storeSelect" onchange="activerMagasin(this.value)">
+                            <option value="">-- Chargement des 72 magasins --</option>
                         </select>
                     </div>
-
-                    <div id="store-infos" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); display: none;">
-                        <span style="background: var(--primary); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;" id="info-enseigne"></span>
-                        <h4 style="margin: 10px 0; font-size: 1.1rem;" id="info-nom"></h4>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">
-                            <strong>DT :</strong> <span id="info-dt"></span><br>
-                            <strong>CDF :</strong> <span id="info-cdf"></span>
-                        </p>
-                    </div>
+                    <button class="btn btn-primary" onclick="chercherMagasin()">🔍 Démarrer l'audit</button>
                 </div>
 
-                <div class="audit-form-container card" id="auditFormArea">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 class="card-header" style="margin: 0; border: none; padding: 0;">Grille d'Audit Magasin</h2>
-                        <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Imprimer</button>
+                <div id="activeStoreInfo" style="display: none;">
+                    <div class="store-info-badge">
+                        <span id="dispEnseigne" style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; background: var(--carrefour-orange); padding: 2px 8px; border-radius: 4px;">-</span>
+                        <div class="nom"><span id="dispAnabel">-</span> - <span id="dispStore">-</span></div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Directeur Territorial : <strong id="dispDT">-</strong> | Chef de Secteur : <strong id="dispCDF">-</strong></div>
                     </div>
                     
-                    <div class="form-grid">
-                        <div class="input-group"><label>Date de l'audit</label><input type="date" id="form-date"></div>
-                        <div class="input-group"><label>Auditeur (CSI)</label>
-                            <select id="form-csi"><option>AMANDA</option><option>CHRISTOPHE</option><option>EMMANUEL</option></select>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <div class="input-group">
+                            <label>Auditeur CSI</label>
+                            <select id="auditCSI">
+                                <option value="AMANDA">AMANDA</option>
+                                <option value="CHRISTOPHE">CHRISTOPHE</option>
+                                <option value="EMMANUEL">EMMANUEL</option>
+                            </select>
                         </div>
-                        <div class="input-group"><label>Note Globale / 20</label><input type="number" id="form-note" min="0" max="20" placeholder="Ex: 15"></div>
-                        <div class="input-group full-width" style="grid-column: 1 / -1;"><label>Conclusion / Plan d'action</label><textarea id="form-comment" rows="3" placeholder="Saisir le bilan de la visite..."></textarea></div>
+                        <div class="input-group"><label>Date de visite</label><input type="date" id="auditDate"></div>
+                        <div class="input-group"><label>Note Globale /20</label><input type="number" id="auditNote" max="20" min="0" placeholder="Ex: 14"></div>
+                        <div class="input-group" style="flex: 2;"><label>Conclusion / Commentaire Général</label><input type="text" id="auditCommentaire" placeholder="Bilan global de la visite..."></div>
                     </div>
 
-                    <div style="margin-top: 30px; text-align: right; border-top: 1px solid var(--border); padding-top: 20px;">
-                        <button class="btn btn-outline" style="margin-right: 15px;" onclick="resetForm(true)">Annuler</button>
-                        <button class="btn btn-success" id="btnSave" onclick="validerAudit()"><i class="fas fa-cloud-upload-alt"></i> Valider et Enregistrer</button>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 45%;">ÉQUIPEMENT / POINT DE CONTRÔLE</th>
+                                    <th style="width: 30%;">QUANTITÉ / MODÈLE / VALEUR</th>
+                                    <th style="width: 25%;">ÉTAT / CONFORMITÉ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditGridBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: right;" class="no-print">
+                        <button class="btn btn-danger" style="font-size: 1rem; padding: 10px 22px;" id="btnSaveAudit" onclick="archiverAudit()">💾 Valider et Enregistrer l'Audit</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ONGLET 3 : ARCHIVES -->
-        <div id="tab-archives" class="tab-content">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="card-header" style="margin: 0; border: none; padding: 0;">Historique des Audits</h2>
-                    <button class="btn btn-primary" onclick="chargerAuditsDepuisGoogle()"><i class="fas fa-sync"></i> Rafraîchir les données</button>
+        <!-- ONGLET 2 : GRILLE & STATISTIQUES -->
+        <div id="tab-grille" class="tab-content active">
+            
+            <div class="kpi-container no-print">
+                <div class="kpi-card blue">
+                    <h3>Couverture du Parc</h3>
+                    <div class="value"><span id="kpi-audits">0</span> / <span id="kpi-total" style="font-size: 1.1rem; color: #94a3b8;">72</span></div>
+                    <div class="progress-bg"><div class="progress-bar" id="kpi-progress" style="width: 0%;"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-size: 0.78rem; margin-top:6px; font-weight:bold;">
+                        <span style="color:#64748b;">Reste à auditer: <b id="kpi-reste">72</b></span>
+                        <span style="color:var(--carrefour-green);" id="kpi-percent">0%</span>
+                    </div>
                 </div>
                 
-                <div style="overflow-x: auto;">
-                    <table id="archivesTable">
+                <div class="kpi-card green">
+                    <h3>Note Moyenne Globale</h3>
+                    <div class="value" id="kpi-moyenne">- <span style="font-size: 0.95rem; color: #94a3b8;">/ 20</span></div>
+                    <div class="stats-mini">
+                        <span class="badge-stat badge-exc"><span id="kpi-exc">0</span> Excellent</span>
+                        <span class="badge-stat badge-cor"><span id="kpi-cor">0</span> Correct</span>
+                        <span class="badge-stat badge-cri"><span id="kpi-cri">0</span> Critique</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card orange">
+                    <h3>Meilleur Contributeur</h3>
+                    <div class="value">🏆 <span id="kpi-top-auditor">-</span></div>
+                    <div class="stats-mini" id="kpi-csi-details" style="display:flex; flex-direction:column; gap:3px; margin-top:6px; font-weight: normal; color: #475569;"></div>
+                </div>
+                
+                <div class="kpi-card purple">
+                    <h3>Activité Récente</h3>
+                    <div class="value" style="font-size: 1.15rem; margin-top: 6px;" id="kpi-last-date">-</div>
+                    <div style="font-size: 0.82rem; color: #64748b; margin-top: 6px;" id="kpi-last-store">Aucun audit récent</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="search-container filter-container no-print" style="padding: 12px 16px;">
+                    <div class="input-group"><label>Filtrer par Statut Audit</label>
+                        <select id="g-filter-status" onchange="filtrerGrille()">
+                            <option value="ALL">Tous les magasins</option>
+                            <option value="AUDITED">Magasins Audités</option>
+                            <option value="NOT_AUDITED">Magasins Non Audités</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Filtrer par DT</label><select id="g-filter-dt" onchange="filtrerGrille()"><option value="ALL">Tous les DT</option></select></div>
+                    <div class="input-group"><label>Filtrer par Chef de Secteur</label><select id="g-filter-cdf" onchange="filtrerGrille()"><option value="ALL">Tous les CDF</option></select></div>
+                    <div class="input-group"><label>Filtrer par CSI Assigné</label><select id="g-filter-csi" onchange="filtrerGrille()"><option value="ALL">Tous les CSI</option></select></div>
+                    <div class="input-group"><label>Filtrer par Priorité (PRIO)</label><select id="g-filter-prio" onchange="filtrerGrille()"><option value="ALL">Tous</option><option value="1">P1</option><option value="2">P2</option><option value="3">P3</option><option value="4">P4</option></select></div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; font-size: 0.78rem; font-weight: bold; align-items: center;" class="no-print">
+                    <span style="color: var(--carrefour-blue);">Légende DT :</span>
+                    <span class="legend-dt-item" style="background:#fef08a; border-color:#fde047; color:#854d0e;">WELTER RONAN</span>
+                    <span class="legend-dt-item" style="background:#fbcfe8; border-color:#f472b6; color:#9d174d;">LEROUX ARNOLD</span>
+                    <span class="legend-dt-item" style="background:#bfdbfe; border-color:#60a5fa; color:#1e40af;">CURT FLORIAN</span>
+                    <span class="legend-dt-item" style="background:#bbf7d0; border-color:#4ade80; color:#166534;">PELLON RENAUD</span>
+                </div>
+
+                <div class="table-container">
+                    <table class="excel-table">
                         <thead>
-                            <tr><th>Horodatage</th><th>Anabel</th><th>Date Audit</th><th>CSI</th><th>Note</th><th>Commentaire</th></tr>
+                            <tr>
+                                <th>STATUT</th><th>ANABEL</th><th>RÉGION</th><th>DT</th><th>CDF</th><th>STORE</th><th>ENSEIGNE</th>
+                                <th>PRIO</th><th>CSI</th><th>APPEL ✏️</th><th>MAIL ✏️</th>
+                                <th>RELANCE ✏️</th><th>VISITE ✏️</th><th>NOTE ✏️</th><th>COMMENTAIRE ✏️</th>
+                            </tr>
                         </thead>
-                        <tbody><tr><td colspan="6" style="text-align:center;">Cliquer sur Rafraîchir pour charger...</td></tr></tbody>
+                        <tbody id="grilleTableBody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-    </div>
+        <!-- ONGLET 3 : HISTORIQUE GLOBAL -->
+        <div id="tab-archives" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div>
+                        <h2 style="color: var(--carrefour-blue); font-size: 1.3rem;"><i class="fas fa-folder-open"></i> Historique Global des Audits</h2>
+                        <p style="color: #64748b; font-size: 0.88rem; margin-top: 2px;">Retrouvez l'ensemble des visites de parcs informatiques enregistrées et synchronisées.</p>
+                    </div>
+                    <button class="btn btn-primary no-print" onclick="chargerAuditsDepuisGoogle()"><i class="fas fa-sync"></i> Rafraîchir</button>
+                </div>
 
-    <div class="toast" id="toastMsg">
-        <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
-        <div>
-            <strong style="display: block;">Audit transmis au Google Sheet !</strong>
-            <span style="font-size: 0.9rem;">La grille a été réinitialisée.</span>
+                <div class="table-container" style="margin-top: 15px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>DATE VISITE</th>
+                                <th>ANABEL</th>
+                                <th>MAGASIN</th>
+                                <th>AUDITEUR CSI</th>
+                                <th>NOTE /20</th>
+                                <th>COMMENTAIRE GLOBAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+    
+    <div id="toast">✅ Enregistré avec succès</div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTPwnh-BXhJu-PlXhvfu4xgNnZ-abgftqIFLG_lZ7rb02HANtIVsrIPmWMY2g1ootf/exec";
 
-        const stores = [
-            { "anabel": "6345", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "ARAMON -DE GAULLE", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "6266", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "MARSEILLE -LODI", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
-            { "anabel": "5569", "dt": "WELTER RONAN", "cdf": "BOURDOT DAVID", "nom": "MARSEILLE -TURCAT", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "2752", "dt": "LEROUX ARNOLD", "cdf": "GENSOLLEN MAELLE", "nom": "HYERES -TOULON", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "5280", "dt": "LEROUX ARNOLD", "cdf": "GENSOLLEN MAELLE", "nom": "JUAN LES PIN -WILSON", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "2896", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -BORRIGLIONE 73", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "A46S", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -LAMARTINE", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
-            { "anabel": "A46E", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -MEDECIN", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "8956", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "NICE -VILLERMONT", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "6617", "dt": "LEROUX ARNOLD", "cdf": "LOZA NATHALIE", "nom": "SAINT-LAURENT-DU-VAR", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "8926", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "AJACCIO -DEL PELLEGR", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "5281", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "BEAUSOLEIL -MARCHE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "7207", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "MENTON -FAURE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "A5GU", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -DEROULEDE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "5982", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -MALAUSSENA", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
-            { "anabel": "5727", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE -MEYERBEER", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "A5GW", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "NICE-CORNICHE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "294", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "OTA- HAMEAU DE PORTO", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "6744", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "ROQUEBRUNE-CAP-MARTI", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "A4R6", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "SARROLA-CARCOPINO -B", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "1786", "dt": "LEROUX ARNOLD", "cdf": "MALOT STEPHANE", "nom": "VENCE -RHIN DANUBE", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "6027", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "AIX EN P -CORDEL 63", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
-            { "anabel": "1076", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "FORCALQUIER", "enseigne": "CARREFOUR EXPRESS", "csi": "AMANDA" },
-            { "anabel": "2911", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "ORAISON -AILLAUD", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "3095", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "SAINTE-TULLE -PAUL", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "5332", "dt": "LEROUX ARNOLD", "cdf": "NEGREL NICOLAS", "nom": "TOULON -15E CORP 709", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "6193", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -BARA", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "5655", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -CAMOINS", "enseigne": "CARREFOUR CONTACT", "csi": "AMANDA" },
-            { "anabel": "9467", "dt": "WELTER RONAN", "cdf": "VINCENT AYMERIC", "nom": "MARSEILLE -MONTAIGNE", "enseigne": "CARREFOUR CITY", "csi": "AMANDA" },
-            { "anabel": "4825", "dt": "WELTER RONAN", "cdf": "MULLER HELENE", "nom": "MONTPELLIER -MILHAU", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "6260", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "CHAPONOST -CHAUSSE", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
-            { "anabel": "8850", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "ST ETIENNE -11 NOV", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "5311", "dt": "CURT FLORIAN", "cdf": "DUMONT HERVE", "nom": "ST ETIENNE -FRAISSIN", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "7273", "dt": "WELTER RONAN", "cdf": "GIRARDON THIERRY", "nom": "BEDOIN", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
-            { "anabel": "618", "dt": "WELTER RONAN", "cdf": "GIRARDON THIERRY", "nom": "CAROMB -CARPENTRAS", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
-            { "anabel": "A48H", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -EYCHART", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
-            { "anabel": "9485", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "LE COTEAU -LIBERATIO", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "7238", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "ST JUST EN CHEVALET", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
-            { "anabel": "5700", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "ST JUST LA PENDUE", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
-            { "anabel": "4988", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CHAMALIERES -ROYAT", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "5578", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -BLATN", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "5315", "dt": "CURT FLORIAN", "cdf": "JOBERT EMMANUEL", "nom": "CLERMONT FD -DELILLE", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "A5GP", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "ALLAN -MALATAVERNE", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
-            { "anabel": "1061", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "CHATILLON EN DIOIS", "enseigne": "CARREFOUR EXPRESS", "csi": "CHRISTOPHE" },
-            { "anabel": "6307", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "MOURS-SAINT-EUSEBE", "enseigne": "CARREFOUR CONTACT", "csi": "CHRISTOPHE" },
-            { "anabel": "4686", "dt": "PELLON RENAUD", "cdf": "MAGNY CHRISTOPHE", "nom": "VALENCE -LIBERATION", "enseigne": "CARREFOUR CITY", "csi": "CHRISTOPHE" },
-            { "anabel": "6586", "dt": "CURT FLORIAN", "cdf": "BARRIOL AMELIE", "nom": "BRON -BROSSOLETTE", "enseigne": "CARREFOUR EXPRESS", "csi": "EMMANUEL" },
-            { "anabel": "1790", "dt": "CURT FLORIAN", "cdf": "BARRIOL AMELIE", "nom": "VILLEURBANNE -GENAS", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "1396", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "DIEMOZ -GR. NEUVE", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
-            { "anabel": "7258", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "LES GETS -TANINGES", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
-            { "anabel": "5627", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "ST-MARTIN-BELLEVUE", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
-            { "anabel": "6057", "dt": "PELLON RENAUD", "cdf": "BRICOUT NICOLAS", "nom": "TALLOIRES", "enseigne": "8 A HUIT", "csi": "EMMANUEL" },
-            { "anabel": "A4XL", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "ANNEMASSE -GARE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "1081", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "HAUTELUCE L. SAISIES", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
-            { "anabel": "7259", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES HOUCHES", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
-            { "anabel": "8887", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES MENUIRES -CROISE", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
-            { "anabel": "6277", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "LES MENUIRES -PREYER", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
-            { "anabel": "7260", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "MEGEVE -RTE NATIONAL", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
-            { "anabel": "5591", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "VAL THORENS -ARCELLE", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
-            { "anabel": "6184", "dt": "PELLON RENAUD", "cdf": "GALLIOT SANDRINE", "nom": "VAL THORENS -PORTILL", "enseigne": "CARREFOUR MONTAGNE", "csi": "EMMANUEL" },
-            { "anabel": "8942", "dt": "PELLON RENAUD", "cdf": "GONCALVES ISABELLE", "nom": "GRENOBLE -FUSILLES", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "4644", "dt": "PELLON RENAUD", "cdf": "GONCALVES ISABELLE", "nom": "MONTBONNOT ST MARTIN", "enseigne": "CARREFOUR EXPRESS", "csi": "EMMANUEL" },
-            { "anabel": "4922", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -CREQUI", "enseigne": "CARREFOUR EXPRESS", "csi": "EMMANUEL" },
-            { "anabel": "5568", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -CROIX ROUSSE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "5321", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -DUQUESNE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "1649", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -JANIN", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "A4O2", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON -VITTON 6", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "A5Z5", "dt": "CURT FLORIAN", "cdf": "RENAUD STEPHANE", "nom": "LYON-FELIX FAURE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "5326", "dt": "PELLON RENAUD", "cdf": "ROBINET MANUEL", "nom": "CHAMBERY -MONTMELIAN", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" },
-            { "anabel": "1943", "dt": "PELLON RENAUD", "cdf": "ROBINET MANUEL", "nom": "FONTAINE -CURIE", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
-            { "anabel": "9566", "dt": "PELLON RENAUD", "cdf": "ROBINET MANUEL", "nom": "ST CHEF EN DAUP", "enseigne": "CARREFOUR CONTACT", "csi": "EMMANUEL" },
-            { "anabel": "8636", "dt": "LEROUX ARNOLD", "cdf": "VASSON KEVIN", "nom": "AVIGNON -REPUBLIQUE", "enseigne": "CARREFOUR CITY", "csi": "EMMANUEL" }
+        const dtColors = {
+            "WELTER RONAN": { bg: "#fef08a", text: "#854d0e" },
+            "LEROUX ARNOLD": { bg: "#fbcfe8", text: "#9d174d" },
+            "CURT FLORIAN": { bg: "#bfdbfe", text: "#1e40af" },
+            "PELLON RENAUD": { bg: "#bbf7d0", text: "#166534" }
+        };
+
+        const defaultAuditItems = [
+            { cat: "CONFORMITÉ GLOBALE", name: "Base magasin conforme aux équipements ?", qty: "OUI", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Nombre de caisses", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Type de caisses", qty: "TPV Standard", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Écrans Caisse", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Scanners", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Douchettes", qty: "2", state: "BON" },
+            { cat: "LIGNE DE CAISSE", name: "Meti en caisse", qty: "Oui", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Switch", qty: "1", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Baie de brassage & État", qty: "1", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne ADSL", qty: "Oui", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne FIBRE", qty: "Oui", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Opérateur Réseau", qty: "Orange", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Routeur de secours", qty: "4G", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Onduleur", qty: "1", state: "BON" },
+            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Imprimante (Marque/État)", qty: "HP Laser", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Terminaux Zebra / DT50", qty: "2", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Batterie de secours DT50", qty: "2", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "PC BOI & Écran", qty: "1 PC / 1 Écran", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "PC MUSE & Écran", qty: "1 PC / 1 Écran", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Autre PC", qty: "0", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Imprimante Deava", qty: "1", state: "BON" },
+            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Terminaux MC 3100 / 3200", qty: "0", state: "BON" },
+            { cat: "PROCESS & DIVERS", name: "Utilisation de la PCA", qty: "Oui", state: "BON" },
+            { cat: "PROCESS & DIVERS", name: "Documentation de formation", qty: "Présente", state: "BON" }
         ];
 
-        let currentAnabel = null;
+        const storesData = [
+            { "ANABEL": "6345", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "ARAMON -DE GAULLE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "6266", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -LODI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5569", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -TURCAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "AMANDA" },
+            { "ANABEL": "2752", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "HYERES -TOULON", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5280", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "JUAN LES PIN -WILSON", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "2896", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -BORRIGLIONE 73", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "A46S", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -LAMARTINE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A46E", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -MEDECIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "8956", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -VILLERMONT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "AMANDA" },
+            { "ANABEL": "6617", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "SAINT-LAURENT-DU-VAR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "8926", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "AJACCIO -DEL PELLEGR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5281", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "BEAUSOLEIL -MARCHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "7207", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "MENTON -FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "A5GU", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -DEROULEDE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5982", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MALAUSSENA", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5727", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MEYERBEER", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A5GW", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE-CORNICHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "294", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "OTA- HAMEAU DE PORTO", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "AMANDA" },
+            { "ANABEL": "6744", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "ROQUEBRUNE-CAP-MARTI", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A4R6", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "SARROLA-CARCOPINO -B", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "1786", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "VENCE -RHIN DANUBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "6027", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "AIX EN P -CORDEL 63", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "1076", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "FORCALQUIER", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "2911", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "ORAISON -AILLAUD", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "3095", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "SAINTE-TULLE -PAUL", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5332", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "TOULON -15E CORP 709", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "6193", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -BARA", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5655", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -CAMOINS", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "9467", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -MONTAIGNE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "4825", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "MULLER HELENE", "STORE": "MONTPELLIER -MILHAU", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6260", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "CHAPONOST -CHAUSSE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "8850", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "ST ETIENNE -11 NOV", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5311", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "ST ETIENNE -FRAISSIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "7273", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "GIRARDON THIERRY", "STORE": "BEDOIN", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "618", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "GIRARDON THIERRY", "STORE": "CAROMB -CARPENTRAS", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "A48H", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -EYCHART", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "9485", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "LE COTEAU -LIBERATIO", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "7238", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "ST JUST EN CHEVALET", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5700", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "ST JUST LA PENDUE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "4988", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CHAMALIERES -ROYAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5578", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -BLATN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5315", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -DELILLE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "A5GP", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "ALLAN -MALATAVERNE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 1, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "1061", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "CHATILLON EN DIOIS", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6307", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "MOURS-SAINT-EUSEBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "4686", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "VALENCE -LIBERATION", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6586", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "BARRIOL AMELIE", "STORE": "BRON -BROSSOLETTE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "1790", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "BARRIOL AMELIE", "STORE": "VILLEURBANNE -GENAS", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "1396", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "DIEMOZ -GR. NEUVE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "7258", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "LES GETS -TANINGES", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5627", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "ST-MARTIN-BELLEVUE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "6057", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "TALLOIRES", "ENSEIGNE": "8 A HUIT", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "A4XL", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "ANNEMASSE -GARE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "1081", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "HAUTELUCE L. SAISIES", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "7259", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES HOUCHES", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "8887", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES MENUIRES -CROISE", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "6277", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES MENUIRES -PREYER", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "7260", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "MEGEVE -RTE NATIONAL", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5591", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "VAL THORENS -ARCELLE", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "6184", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "VAL THORENS -PORTILL", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "8942", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GONCALVES ISABELLE", "STORE": "GRENOBLE -FUSILLES", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "4644", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GONCALVES ISABELLE", "STORE": "MONTBONNOT ST MARTIN", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "4922", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -CREQUI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5568", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -CROIX ROUSSE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "5321", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -DUQUESNE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "EMMANUEL" },
+            { "ANABEL": "1649", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -JANIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "A4O2", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -VITTON 6", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "A5Z5", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON-FELIX FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "EMMANUEL" },
+            { "ANABEL": "5326", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "CHAMBERY -MONTMELIAN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "1943", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "FONTAINE -CURIE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "9566", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "ST CHEF EN DAUP", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "8636", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "VASSON KEVIN", "STORE": "AVIGNON -REPUBLIQUE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" }
+        ];
+
+        let auditsHistory = JSON.parse(localStorage.getItem('auditsHistory_csi_v5')) || {};
+        let currentActiveStore = null;
 
         document.addEventListener("DOMContentLoaded", () => {
             initStoreSelect();
-            document.getElementById('form-date').valueAsDate = new Date();
+            initFilterSelects();
+            renderGrille();
+            renderHistory();
+            updateKPIs();
+            document.getElementById('auditDate').valueAsDate = new Date();
             chargerAuditsDepuisGoogle();
         });
 
@@ -341,152 +480,385 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
-            if(tabId === 'tab-archives') chargerAuditsDepuisGoogle();
+            if (btn) btn.classList.add('active');
         }
 
         function initStoreSelect() {
-            const sel = document.getElementById('selectStore');
-            stores.forEach(s => {
-                sel.innerHTML += `<option value="${s.anabel}">${s.anabel} - ${s.nom}</option>`;
+            const select = document.getElementById('storeSelect');
+            select.innerHTML = '<option value="">-- Sélectionner un magasin (' + storesData.length + ') --</option>';
+            storesData.sort((a,b) => a.STORE.localeCompare(b.STORE)).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.ANABEL;
+                opt.textContent = `${s.ANABEL} - ${s.STORE} (${s.ENSEIGNE})`;
+                select.appendChild(opt);
             });
         }
 
-        function trouverMagasin() {
-            const query = document.getElementById('searchAnabel').value.trim().toUpperCase();
-            if(query.length >= 3) {
-                const found = stores.find(s => s.anabel.toUpperCase() === query || s.nom.toUpperCase().includes(query));
-                if(found) {
-                    document.getElementById('selectStore').value = found.anabel;
-                    activerMagasin(found.anabel);
-                }
+        function initFilterSelects() {
+            const dts = [...new Set(storesData.map(s => s.DT))].sort();
+            const cdfs = [...new Set(storesData.map(s => s.CDF))].sort();
+            const csis = [...new Set(storesData.map(s => s.CSI))].sort();
+
+            const dtSel = document.getElementById('g-filter-dt');
+            const cdfSel = document.getElementById('g-filter-cdf');
+            const csiSel = document.getElementById('g-filter-csi');
+
+            dts.forEach(dt => dtSel.innerHTML += `<option value="${dt}">${dt}</option>`);
+            cdfs.forEach(cdf => cdfSel.innerHTML += `<option value="${cdf}">${cdf}</option>`);
+            csis.forEach(csi => csiSel.innerHTML += `<option value="${csi}">${csi}</option>`);
+        }
+
+        function chercherMagasin() {
+            const query = document.getElementById('anabelSearch').value.trim().toLowerCase();
+            if (!query) return;
+            const found = storesData.find(s => s.ANABEL.toLowerCase() === query || s.STORE.toLowerCase().includes(query));
+            if (found) {
+                document.getElementById('storeSelect').value = found.ANABEL;
+                activerMagasin(found.ANABEL);
+            } else {
+                alert("Aucun magasin trouvé pour cette recherche.");
             }
         }
 
         function activerMagasin(anabel) {
-            if(!anabel) return;
-            const store = stores.find(s => s.anabel === anabel);
-            currentAnabel = anabel;
+            if (!anabel) return;
+            currentActiveStore = storesData.find(s => s.ANABEL === anabel);
+            if (!currentActiveStore) return;
 
-            document.getElementById('info-enseigne').textContent = store.enseigne;
-            document.getElementById('info-nom').textContent = store.nom;
-            document.getElementById('info-dt').textContent = store.dt;
-            document.getElementById('info-cdf').textContent = store.cdf;
-            document.getElementById('form-csi').value = store.csi || "AMANDA";
-            
-            document.getElementById('store-infos').style.display = 'block';
-            document.getElementById('auditFormArea').classList.add('active');
-            
-            resetForm(false);
+            document.getElementById('dispEnseigne').textContent = currentActiveStore.ENSEIGNE;
+            document.getElementById('dispAnabel').textContent = currentActiveStore.ANABEL;
+            document.getElementById('dispStore').textContent = currentActiveStore.STORE;
+            document.getElementById('dispDT').textContent = currentActiveStore.DT;
+            document.getElementById('dispCDF').textContent = currentActiveStore.CDF;
+            document.getElementById('auditCSI').value = currentActiveStore.CSI || "AMANDA";
+
+            document.getElementById('activeStoreInfo').style.display = 'block';
+
+            const existing = auditsHistory[anabel];
+            if (existing) {
+                document.getElementById('auditDate').value = existing.date || new Date().toISOString().split('T')[0];
+                document.getElementById('auditNote').value = existing.note !== undefined && existing.note !== null ? existing.note : '';
+                document.getElementById('auditCommentaire').value = existing.comment || '';
+                renderAuditGridBody(existing.items || defaultAuditItems);
+            } else {
+                document.getElementById('auditNote').value = '';
+                document.getElementById('auditCommentaire').value = '';
+                renderAuditGridBody(defaultAuditItems);
+            }
         }
 
-        async function validerAudit() {
-            if(!currentAnabel) return alert("Veuillez choisir un magasin.");
-            const note = document.getElementById('form-note').value;
-            if(!note) return alert("Veuillez saisir la note globale.");
+        function renderAuditGridBody(items) {
+            const tbody = document.getElementById('auditGridBody');
+            tbody.innerHTML = '';
+            let currentCat = '';
 
-            const btnSave = document.getElementById('btnSave');
+            items.forEach((item, index) => {
+                if (item.cat !== currentCat) {
+                    currentCat = item.cat;
+                    const catTr = document.createElement('tr');
+                    catTr.className = 'cat-header';
+                    catTr.innerHTML = `<td colspan="3">${currentCat}</td>`;
+                    tbody.appendChild(catTr);
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${item.name}</b></td>
+                    <td><input type="text" class="audit-item-qty" data-index="${index}" value="${item.qty || ''}" style="width:100%; padding:5px 8px; border:1px solid #cbd5e1; border-radius:4px;"></td>
+                    <td>
+                        <select class="audit-item-state" data-index="${index}" style="width:100%; padding:5px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:bold;">
+                            <option value="BON" ${item.state === 'BON' ? 'selected' : ''}>🟢 Conforme / Bon</option>
+                            <option value="MOYEN" ${item.state === 'MOYEN' ? 'selected' : ''}>🟠 À corriger / Moyen</option>
+                            <option value="CRITIQUE" ${item.state === 'CRITIQUE' ? 'selected' : ''}>🔴 Non conforme / Critique</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function archiverAudit() {
+            if (!currentActiveStore) return alert("Veuillez sélectionner un magasin d'abord.");
+            const noteVal = document.getElementById('auditNote').value;
+            if (!noteVal) return alert("Veuillez saisir la note globale.");
+
+            const btnSave = document.getElementById('btnSaveAudit');
             btnSave.disabled = true;
-            btnSave.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Transmission...`;
+            btnSave.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Enregistrement...`;
 
-            const payload = {
-                anabel: currentAnabel,
-                date: document.getElementById('form-date').value,
-                csi: document.getElementById('form-csi').value,
-                note: parseFloat(note),
-                comment: document.getElementById('form-comment').value
+            const csi = document.getElementById('auditCSI').value;
+            const date = document.getElementById('auditDate').value;
+            const comment = document.getElementById('auditCommentaire').value;
+
+            const qtyInputs = document.querySelectorAll('.audit-item-qty');
+            const stateInputs = document.querySelectorAll('.audit-item-state');
+            const items = [];
+
+            qtyInputs.forEach((input, idx) => {
+                const defaultItem = defaultAuditItems[idx];
+                items.push({
+                    cat: defaultItem.cat,
+                    name: defaultItem.name,
+                    qty: input.value,
+                    state: stateInputs[idx].value
+                });
+            });
+
+            auditsHistory[currentActiveStore.ANABEL] = {
+                anabel: currentActiveStore.ANABEL,
+                store: currentActiveStore.STORE,
+                enseigne: currentActiveStore.ENSEIGNE,
+                csi: csi,
+                date: date,
+                note: parseFloat(noteVal),
+                comment: comment,
+                items: items,
+                updatedAt: new Date().toISOString()
             };
 
+            localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+
+            // TRANSMISSION AU GOOGLE SHEET
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        anabel: currentActiveStore.ANABEL,
+                        date: date,
+                        csi: csi,
+                        note: parseFloat(noteVal),
+                        comment: comment
+                    })
                 });
-
-                resetForm(true);
-
-                const toast = document.getElementById('toastMsg');
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3500);
-
-                chargerAuditsDepuisGoogle();
-            } catch (err) {
-                alert("Erreur lors de la sauvegarde : " + err.message);
-            } finally {
-                btnSave.disabled = false;
-                btnSave.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Valider et Enregistrer`;
+            } catch(e) {
+                console.log("Transmission Sheet directe passée", e);
             }
+
+            showToast("💾 Audit enregistré et synchronisé !");
+            renderGrille();
+            renderHistory();
+            updateKPIs();
+
+            btnSave.disabled = false;
+            btnSave.innerHTML = `💾 Valider et Enregistrer l'Audit`;
         }
 
-        function resetForm(fullReset = false) {
-            document.getElementById('form-note').value = '';
-            document.getElementById('form-comment').value = '';
+        function renderGrille() {
+            const tbody = document.getElementById('grilleTableBody');
+            tbody.innerHTML = '';
 
-            if(fullReset) {
-                currentAnabel = null;
-                document.getElementById('selectStore').value = '';
-                document.getElementById('searchAnabel').value = '';
-                document.getElementById('store-infos').style.display = 'none';
-                document.getElementById('auditFormArea').classList.remove('active');
+            const statusFilter = document.getElementById('g-filter-status').value;
+            const dtFilter = document.getElementById('g-filter-dt').value;
+            const cdfFilter = document.getElementById('g-filter-cdf').value;
+            const csiFilter = document.getElementById('g-filter-csi').value;
+            const prioFilter = document.getElementById('g-filter-prio').value;
+
+            storesData.forEach(store => {
+                const audit = auditsHistory[store.ANABEL];
+                const isAudited = !!(audit && (audit.date || audit.note !== null));
+
+                if (statusFilter === 'AUDITED' && !isAudited) return;
+                if (statusFilter === 'NOT_AUDITED' && isAudited) return;
+                if (dtFilter !== 'ALL' && store.DT !== dtFilter) return;
+                if (cdfFilter !== 'ALL' && store.CDF !== cdfFilter) return;
+                if (csiFilter !== 'ALL' && store.CSI !== csiFilter) return;
+                if (prioFilter !== 'ALL' && String(store.PRIO) !== prioFilter) return;
+
+                const tr = document.createElement('tr');
+                const dtStyle = dtColors[store.DT] ? `style="background:${dtColors[store.DT].bg}; color:${dtColors[store.DT].text}; font-weight:bold;"` : '';
+
+                const statusBadge = isAudited 
+                    ? `<span class="badge-status-audited">REALISE</span>`
+                    : `<span class="badge-status-pending">A FAIRE</span>`;
+
+                tr.innerHTML = `
+                    <td style="text-align:center;">${statusBadge}</td>
+                    <td><b>${store.ANABEL}</b></td>
+                    <td>${store.region}</td>
+                    <td ${dtStyle}>${store.DT}</td>
+                    <td>${store.CDF}</td>
+                    <td><b>${store.STORE}</b></td>
+                    <td>${store.ENSEIGNE}</td>
+                    <td style="text-align:center;"><b>P${store.PRIO}</b></td>
+                    <td>${store.CSI}</td>
+                    <td><input type="date" value="${audit?.callDate || ''}" onchange="updateGridField('${store.ANABEL}', 'callDate', this.value)"></td>
+                    <td><input type="date" value="${audit?.mailDate || ''}" onchange="updateGridField('${store.ANABEL}', 'mailDate', this.value)"></td>
+                    <td><input type="date" value="${audit?.relanceDate || ''}" onchange="updateGridField('${store.ANABEL}', 'relanceDate', this.value)"></td>
+                    <td><input type="date" value="${audit?.date || ''}" onchange="updateGridField('${store.ANABEL}', 'date', this.value)"></td>
+                    <td><input type="number" min="0" max="20" style="width:55px; font-weight:bold;" value="${audit?.note !== undefined && audit?.note !== null ? audit.note : ''}" onchange="updateGridField('${store.ANABEL}', 'note', this.value)"></td>
+                    <td><input type="text" style="width:100%; min-width:140px;" value="${audit?.comment || ''}" onchange="updateGridField('${store.ANABEL}', 'comment', this.value)"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateGridField(anabel, field, value) {
+            if (!auditsHistory[anabel]) {
+                const store = storesData.find(s => s.ANABEL === anabel);
+                auditsHistory[anabel] = {
+                    anabel: store.ANABEL,
+                    store: store.STORE,
+                    enseigne: store.ENSEIGNE,
+                    csi: store.CSI,
+                    date: '',
+                    note: null,
+                    comment: '',
+                    items: defaultAuditItems
+                };
+            }
+
+            if (field === 'note') {
+                auditsHistory[anabel][field] = value !== '' ? parseFloat(value) : null;
+            } else {
+                auditsHistory[anabel][field] = value;
+            }
+
+            localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+            renderHistory();
+            updateKPIs();
+            showToast("💾 Champ mis à jour");
+        }
+
+        function filtrerGrille() {
+            renderGrille();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            const auditedList = Object.values(auditsHistory).filter(a => a.date || a.note !== null || a.comment);
+
+            if (auditedList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">Aucun audit enregistré pour le moment.</td></tr>`;
+                return;
+            }
+
+            auditedList.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(audit => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${audit.date || '-'}</b></td>
+                    <td>${audit.anabel}</td>
+                    <td><b>${audit.store}</b> (${audit.enseigne})</td>
+                    <td>${audit.csi || '-'}</td>
+                    <td><b style="color:var(--carrefour-green-dark);">${audit.note !== null && audit.note !== undefined ? audit.note + ' / 20' : '-'}</b></td>
+                    <td>${audit.comment || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateKPIs() {
+            const totalStores = storesData.length;
+            const auditedStores = Object.values(auditsHistory).filter(a => a.date || a.note !== null);
+            const countAudited = auditedStores.length;
+            const reste = totalStores - countAudited;
+            const percent = Math.round((countAudited / totalStores) * 100);
+
+            document.getElementById('kpi-audits').textContent = countAudited;
+            document.getElementById('kpi-total').textContent = totalStores;
+            document.getElementById('kpi-reste').textContent = reste;
+            document.getElementById('kpi-percent').textContent = percent + '%';
+            document.getElementById('kpi-progress').style.width = percent + '%';
+
+            const notes = auditedStores.map(a => a.note).filter(n => n !== null && !isNaN(n));
+            if (notes.length > 0) {
+                const avg = (notes.reduce((a,b) => a + b, 0) / notes.length).toFixed(1);
+                document.getElementById('kpi-moyenne').childNodes[0].nodeValue = avg + ' ';
+            } else {
+                document.getElementById('kpi-moyenne').childNodes[0].nodeValue = '- ';
+            }
+
+            let exc = 0, cor = 0, cri = 0;
+            notes.forEach(n => {
+                if (n >= 15) exc++;
+                else if (n >= 10) cor++;
+                else cri++;
+            });
+            document.getElementById('kpi-exc').textContent = exc;
+            document.getElementById('kpi-cor').textContent = cor;
+            document.getElementById('kpi-cri').textContent = cri;
+
+            const csiCounts = {};
+            auditedStores.forEach(a => {
+                if (a.csi) csiCounts[a.csi] = (csiCounts[a.csi] || 0) + 1;
+            });
+
+            let topCsi = '-';
+            let maxCount = 0;
+            for (const [csi, count] of Object.entries(csiCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    topCsi = csi;
+                }
+            }
+            document.getElementById('kpi-top-auditor').textContent = topCsi;
+
+            const csiDetailsDiv = document.getElementById('kpi-csi-details');
+            csiDetailsDiv.innerHTML = '';
+            ['AMANDA', 'CHRISTOPHE', 'EMMANUEL'].forEach(csi => {
+                const count = csiCounts[csi] || 0;
+                csiDetailsDiv.innerHTML += `<div>• <b>${csi}</b> : ${count} audits</div>`;
+            });
+
+            if (auditedStores.length > 0) {
+                const sorted = [...auditedStores].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+                const last = sorted[0];
+                document.getElementById('kpi-last-date').textContent = last.date || 'Récemment';
+                document.getElementById('kpi-last-store').textContent = `${last.store} (${last.csi || 'CSI'})`;
+            } else {
+                document.getElementById('kpi-last-date').textContent = '-';
+                document.getElementById('kpi-last-store').textContent = 'Aucun audit récent';
             }
         }
 
         async function chargerAuditsDepuisGoogle() {
-            const tbody = document.querySelector('#archivesTable tbody');
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>`;
-
             try {
                 const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
 
-                if (data.length <= 1) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Aucun audit enregistré pour l'instant.</td></tr>`;
-                    document.getElementById('kpi-faits').textContent = '0';
-                    document.getElementById('kpi-note').textContent = '- / 20';
-                    return;
-                }
-
-                tbody.innerHTML = '';
-                let totalNotes = 0;
-                let countNotes = 0;
-
-                // On boucle sur les lignes (en sautant l'en-tête)
-                for (let i = data.length - 1; i >= 1; i--) {
-                    const row = data[i];
-                    const horodatage = row[0] ? new Date(row[0]).toLocaleDateString() : '-';
-                    const anabel = row[1] || '-';
-                    const dateAudit = row[2] || '-';
-                    const csi = row[3] || '-';
-                    const note = row[4] !== "" ? parseFloat(row[4]) : '-';
-                    const comment = row[5] || '-';
-
-                    if (typeof note === 'number' && !isNaN(note)) {
-                        totalNotes += note;
-                        countNotes++;
+                if (Array.isArray(data) && data.length > 1) {
+                    for (let i = 1; i < data.length; i++) {
+                        const row = data[i];
+                        const anabel = row[1];
+                        if (anabel) {
+                            if (!auditsHistory[anabel]) {
+                                const store = storesData.find(s => s.ANABEL === anabel) || {};
+                                auditsHistory[anabel] = {
+                                    anabel: anabel,
+                                    store: store.STORE || '',
+                                    enseigne: store.ENSEIGNE || '',
+                                    csi: row[3] || store.CSI || '',
+                                    date: row[2] || '',
+                                    note: row[4] !== "" ? parseFloat(row[4]) : null,
+                                    comment: row[5] || '',
+                                    items: defaultAuditItems
+                                };
+                            } else {
+                                if (row[2]) auditsHistory[anabel].date = row[2];
+                                if (row[3]) auditsHistory[anabel].csi = row[3];
+                                if (row[4] !== "") auditsHistory[anabel].note = parseFloat(row[4]);
+                                if (row[5]) auditsHistory[anabel].comment = row[5];
+                            }
+                        }
                     }
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${horodatage}</td>
-                            <td><b>${anabel}</b></td>
-                            <td>${dateAudit}</td>
-                            <td>${csi}</td>
-                            <td><strong style="color:var(--primary);">${note !== '-' ? note + ' / 20' : '-'}</strong></td>
-                            <td>${comment}</td>
-                        </tr>
-                    `;
+                    localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+                    renderGrille();
+                    renderHistory();
+                    updateKPIs();
                 }
-
-                document.getElementById('kpi-faits').textContent = data.length - 1;
-                if (countNotes > 0) {
-                    document.getElementById('kpi-note').textContent = (totalNotes / countNotes).toFixed(1) + ' / 20';
-                }
-
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Erreur de connexion avec Google Sheets.</td></tr>`;
+                console.log("Erreur rafraîchissement Google Sheets", err);
             }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
         }
     </script>
 </body>
