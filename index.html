@@ -127,7 +127,53 @@
         .store-info-badge { background: linear-gradient(135deg, var(--carrefour-blue), #00224d); color: white; padding: 18px 22px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--carrefour-orange); }
         .store-info-badge .nom { font-size: 1.35rem; font-weight: bold; margin: 4px 0; }
 
-        /* TABLEAUX */
+        /* GRILLE DE SAISIE COMPACTE (2 COLONNES) */
+        .audit-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 992px) {
+            .audit-grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cat-header-row {
+            grid-column: 1 / -1;
+            background: #e2e8f0;
+            color: var(--carrefour-blue);
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            font-size: 0.82rem;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            border-left: 4px solid var(--carrefour-orange);
+        }
+
+        .audit-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr 1fr;
+            gap: 8px;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .audit-item-card:hover {
+            border-color: var(--carrefour-blue);
+            background-color: #f8fafc;
+        }
+
+        /* TABLEAUX GRILLE & HISTORIQUE */
         .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; max-height: 68vh; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th { background: #f1f5f9; padding: 12px 14px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border); color: var(--carrefour-blue); font-weight: 700; text-transform: uppercase; font-size: 0.76rem; letter-spacing: 0.5px; }
@@ -138,8 +184,6 @@
         table.excel-table th, table.excel-table td { border: 1px solid #cbd5e1; padding: 5px 8px; }
         table.excel-table input, table.excel-table select { width: 100%; border: 1px solid transparent; background: transparent; font-size: 12px; padding: 3px; border-radius: 4px; }
         table.excel-table input:focus, table.excel-table select:focus { border-color: var(--carrefour-blue); background-color: #fff; outline:none; }
-
-        .cat-header { background-color: #e2e8f0; font-weight: bold; color: var(--carrefour-blue); text-transform: uppercase; font-size: 0.78rem; }
 
         /* BADGES STATUT */
         .badge-status-audited { background-color: #dcfce7; color: #166534; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 0.74rem; border: 1px solid #bbf7d0; }
@@ -225,20 +269,10 @@
                         <div class="input-group" style="flex: 2;"><label>Conclusion / Commentaire Général</label><input type="text" id="auditCommentaire" placeholder="Bilan global de la visite..."></div>
                     </div>
 
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 45%;">ÉQUIPEMENT / POINT DE CONTRÔLE</th>
-                                    <th style="width: 30%;">QUANTITÉ / MODÈLE / VALEUR</th>
-                                    <th style="width: 25%;">ÉTAT / CONFORMITÉ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="auditGridBody"></tbody>
-                        </table>
-                    </div>
+                    <!-- GRILLE EN 2 COLONNES PAR LIGNE -->
+                    <div class="audit-grid-layout" id="auditGridBody"></div>
                     
-                    <div style="margin-top: 20px; text-align: right;" class="no-print">
+                    <div style="margin-top: 25px; text-align: right;" class="no-print">
                         <button class="btn btn-danger" style="font-size: 1rem; padding: 10px 22px;" id="btnSaveAudit" onclick="archiverAudit()">💾 Valider et Enregistrer l'Audit</button>
                     </div>
                 </div>
@@ -259,7 +293,6 @@
                     </div>
                 </div>
 
-                <!-- NOUVELLE CASE : TAUX PAR DT -->
                 <div class="kpi-card teal">
                     <h3>Taux par DT</h3>
                     <div id="kpi-dt-details" style="display:flex; flex-direction:column; gap:5px; margin-top:6px;"></div>
@@ -589,32 +622,33 @@
         }
 
         function renderAuditGridBody(items) {
-            const tbody = document.getElementById('auditGridBody');
-            tbody.innerHTML = '';
+            const container = document.getElementById('auditGridBody');
+            container.innerHTML = '';
             let currentCat = '';
 
             items.forEach((item, index) => {
                 if (item.cat !== currentCat) {
                     currentCat = item.cat;
-                    const catTr = document.createElement('tr');
-                    catTr.className = 'cat-header';
-                    catTr.innerHTML = `<td colspan="3">${currentCat}</td>`;
-                    tbody.appendChild(catTr);
+                    const catDiv = document.createElement('div');
+                    catDiv.className = 'cat-header-row';
+                    catDiv.textContent = currentCat;
+                    container.appendChild(catDiv);
                 }
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><b>${item.name}</b></td>
-                    <td><input type="text" class="audit-item-qty" data-index="${index}" value="${item.qty || ''}" style="width:100%; padding:5px 8px; border:1px solid #cbd5e1; border-radius:4px;"></td>
-                    <td>
-                        <select class="audit-item-state" data-index="${index}" style="width:100%; padding:5px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:bold;">
-                            <option value="BON" ${item.state === 'BON' ? 'selected' : ''}>🟢 Conforme / Bon</option>
-                            <option value="MOYEN" ${item.state === 'MOYEN' ? 'selected' : ''}>🟠 À corriger / Moyen</option>
-                            <option value="CRITIQUE" ${item.state === 'CRITIQUE' ? 'selected' : ''}>🔴 Non conforme / Critique</option>
+                const card = document.createElement('div');
+                card.className = 'audit-item-card';
+                card.innerHTML = `
+                    <div style="font-size:0.84rem; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.name}">${item.name}</div>
+                    <div><input type="text" class="audit-item-qty" data-index="${index}" value="${item.qty || ''}" placeholder="Qté/Valeur" style="width:100%; padding:5px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.82rem;"></div>
+                    <div>
+                        <select class="audit-item-state" data-index="${index}" style="width:100%; padding:5px 6px; border:1px solid #cbd5e1; border-radius:4px; font-weight:bold; font-size:0.8rem;">
+                            <option value="BON" ${item.state === 'BON' ? 'selected' : ''}>🟢 Bon</option>
+                            <option value="MOYEN" ${item.state === 'MOYEN' ? 'selected' : ''}>🟠 Moyen</option>
+                            <option value="CRITIQUE" ${item.state === 'CRITIQUE' ? 'selected' : ''}>🔴 Critique</option>
                         </select>
-                    </td>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                container.appendChild(card);
             });
         }
 
@@ -805,7 +839,6 @@
             document.getElementById('kpi-percent').textContent = percent + '%';
             document.getElementById('kpi-progress').style.width = percent + '%';
 
-            // CALCUL DU TAUX DE REMPLISSAGE PAR DT
             const dtStats = {};
             storesData.forEach(s => {
                 if (!dtStats[s.DT]) {
