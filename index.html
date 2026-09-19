@@ -26,19 +26,20 @@
             align-items: center;
         }
         .header-title { font-size: 1.2rem; font-weight: bold; }
-        .nav-bar { background-color: var(--carrefour-blue); color: white; padding: 10px 20px; }
+        .nav-bar { background-color: var(--carrefour-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;}
         .container { padding: 20px; }
         
-        .btn-print {
+        .btn-action {
             background-color: white;
             color: #333;
             border: none;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 12px;
         }
-        .btn-print:hover { background-color: #f1f1f1; }
+        .btn-action:hover { background-color: #f1f1f1; }
 
         .stats-grid {
             display: grid;
@@ -66,10 +67,7 @@
             flex-wrap: wrap;
             margin-bottom: 20px;
         }
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
+        .filter-group { flex: 1; min-width: 150px; }
         .filter-group label { display: block; font-size: 11px; color: #6c757d; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
         .filter-group select {
             width: 100%;
@@ -84,61 +82,25 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             overflow-x: auto;
+            max-height: 650px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-        }
-        th {
-            background-color: #e9ecef;
-            color: var(--carrefour-blue);
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-        .editable {
-            background-color: #fffbdd;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 10px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); }
+        th { background-color: #e9ecef; color: var(--carrefour-blue); font-weight: 600; font-size: 11px; text-transform: uppercase; position: sticky; top: 0; z-index: 10; }
+        .editable { background-color: #fffbdd; cursor: pointer; transition: background 0.2s; }
         .editable:hover { background-color: #fff3cd; }
-        .editable:focus {
-            background-color: #fff;
-            outline: 2px solid var(--carrefour-blue);
-        }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: #ffeeba;
-            color: #856404;
-            font-weight: bold;
-            font-size: 11px;
-        }
+        .editable:focus { background-color: #fff; outline: 2px solid var(--carrefour-blue); }
+        .status-badge { padding: 4px 8px; border-radius: 4px; background: #ffeeba; color: #856404; font-weight: bold; font-size: 11px; }
 
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #28a745;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 12px;
-            position: fixed;
-            z-index: 1000;
-            right: 20px;
-            bottom: 20px;
-            font-size: 14px;
+            visibility: hidden; min-width: 250px; background-color: #28a745; color: #fff;
+            text-align: center; border-radius: 4px; padding: 12px; position: fixed;
+            z-index: 1000; right: 20px; bottom: 20px; font-size: 14px;
         }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
         @media print {
-            .filters-bar, header, .nav-bar, .btn-print, th:nth-last-child(-n+6) { display: none; }
+            .filters-bar, header, .nav-bar, .btn-action, th:nth-last-child(-n+6) { display: none; }
         }
     </style>
 </head>
@@ -146,10 +108,14 @@
 
     <header>
         <div class="header-title">💻 Portail Audit Magasins CSI</div>
-        <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+        <div>
+            <button class="btn-action" onclick="resetData()" style="margin-right: 10px; background-color: #dc3545; color: white;">🔄 Réinitialiser</button>
+            <button class="btn-action" onclick="window.print()">🖨️ Imprimer</button>
+        </div>
     </header>
     <div class="nav-bar">
-        Saisie de l'Audit (Détaillé) | <strong>Grille & Statistiques</strong>
+        <span>Grille de Suivi & Saisie des Audits (72 Magasins)</span>
+        <span id="save-status" style="font-size: 11px; opacity: 0.8;">100% Opérationnel 🚀</span>
     </div>
 
     <div class="container">
@@ -163,12 +129,12 @@
                 <div class="stat-value" id="stat-moyenne">- / 20</div>
             </div>
             <div class="stat-card">
-                <h4>Meilleur Contributeur</h4>
-                <div class="stat-value" id="stat-contributeur" style="font-size: 1.1rem; padding-top: 5px;">-</div>
+                <h4>Magasins Audités</h4>
+                <div class="stat-value" id="stat-audites">0</div>
             </div>
             <div class="stat-card">
-                <h4>Activité Récente</h4>
-                <div class="stat-value" id="stat-activite" style="font-size: 1rem; color: #6c757d; padding-top: 5px;">Aucun audit récent</div>
+                <h4>Disponibilité</h4>
+                <div class="stat-value" id="stat-activite" style="font-size: 1rem; color: var(--carrefour-green); padding-top: 5px;">Prêt pour les collègues</div>
             </div>
         </div>
 
@@ -227,44 +193,128 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="15" style="text-align:center;">Chargement des données Airtable...</td></tr>
+                    <tr><td colspan="15" style="text-align:center;">Chargement de la grille...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="toast">Enregistré dans Airtable ! ✅</div>
+    <div id="toast">Modifications enregistrées ! ✅</div>
 
     <script>
-        const AIRTABLE_PAT = "patIzjfTlwG25KRPn.0afbc4ad5fcb497a11612a20b9537e02f2b413540d1ffac83ac0338005c9a5ee";
-        const BASE_ID = "appgnEwxlkcToFDhV";
-        const TABLE_ID = "tblliNWMvRXdSlNZg";
-        
-        const API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
-        const HEADERS = {
-            "Authorization": `Bearer ${AIRTABLE_PAT}`,
-            "Content-Type": "application/json"
-        };
+        const rawStoresData = [
+            { "ANABEL": "6345", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "ARAMON -DE GAULLE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "6266", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -LODI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5569", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -TURCAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "AMANDA" },
+            { "ANABEL": "2752", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "HYERES -TOULON", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5280", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "JUAN LES PIN -WILSON", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "2896", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -BORRIGLIONE 73", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "A46S", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -LAMARTINE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A46E", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -MEDECIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "8956", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -VILLERMONT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "AMANDA" },
+            { "ANABEL": "6617", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "SAINT-LAURENT-DU-VAR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "8926", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "AJACCIO -DEL PELLEGR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5281", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "BEAUSOLEIL -MARCHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "7207", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "MENTON -FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "A5GU", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -DEROULEDE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5982", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MALAUSSENA", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "5727", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MEYERBEER", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A5GW", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE-CORNICHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "294", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "OTA- HAMEAU DE PORTO", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "AMANDA" },
+            { "ANABEL": "6744", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "ROQUEBRUNE-CAP-MARTI", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "A4R6", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "SARROLA-CARCOPINO -B", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "1786", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "VENCE -RHIN DANUBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "6027", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "AIX EN P -CORDEL 63", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "1076", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "FORCALQUIER", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "2911", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "ORAISON -AILLAUD", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "3095", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "SAINTE-TULLE -PAUL", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5332", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "TOULON -15E CORP 709", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "6193", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -BARA", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "5655", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -CAMOINS", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
+            { "ANABEL": "9467", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "VINCENT AYMERIC", "STORE": "MARSEILLE -MONTAIGNE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
+            { "ANABEL": "4825", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "MULLER HELENE", "STORE": "MONTPELLIER -MILHAU", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6260", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "CHAPONOST -CHAUSSE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "8850", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "ST ETIENNE -11 NOV", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5311", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "DUMONT HERVE", "STORE": "ST ETIENNE -FRAISSIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "7273", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "GIRARDON THIERRY", "STORE": "BEDOIN", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "618", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "GIRARDON THIERRY", "STORE": "CAROMB -CARPENTRAS", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "A48H", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -EYCHART", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "9485", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "LE COTEAU -LIBERATIO", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "7238", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "ST JUST EN CHEVALET", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5700", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "ST JUST LA PENDUE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "4988", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CHAMALIERES -ROYAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5578", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -BLATN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "5315", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "JOBERT EMMANUEL", "STORE": "CLERMONT FD -DELILLE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "A5GP", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "ALLAN -MALATAVERNE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 1, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "1061", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "CHATILLON EN DIOIS", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6307", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "MOURS-SAINT-EUSEBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "4686", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "MAGNY CHRISTOPHE", "STORE": "VALENCE -LIBERATION", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "CHRISTOPHE" },
+            { "ANABEL": "6586", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "BARRIOL AMELIE", "STORE": "BRON -BROSSOLETTE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "1790", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "BARRIOL AMELIE", "STORE": "VILLEURBANNE -GENAS", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "1396", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "DIEMOZ -GR. NEUVE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "7258", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "LES GETS -TANINGES", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5627", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "ST-MARTIN-BELLEVUE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "6057", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "BRICOUT NICOLAS", "STORE": "TALLOIRES", "ENSEIGNE": "8 A HUIT", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "A4XL", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "ANNEMASSE -GARE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "1081", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "HAUTELUCE L. SAISIES", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "7259", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES HOUCHES", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "8887", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES MENUIRES -CROISE", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "6277", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "LES MENUIRES -PREYER", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "7260", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "MEGEVE -RTE NATIONAL", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5591", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "VAL THORENS -ARCELLE", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "6184", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GALLIOT SANDRINE", "STORE": "VAL THORENS -PORTILL", "ENSEIGNE": "CARREFOUR MONTAGNE", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "8942", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GONCALVES ISABELLE", "STORE": "GRENOBLE -FUSILLES", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "4644", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "GONCALVES ISABELLE", "STORE": "MONTBONNOT ST MARTIN", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "4922", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -CREQUI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "5568", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -CROIX ROUSSE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "EMMANUEL" },
+            { "ANABEL": "5321", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -DUQUESNE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "EMMANUEL" },
+            { "ANABEL": "1649", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -JANIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "A4O2", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON -VITTON 6", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "A5Z5", "region": "SUD-EST", "DT": "CURT FLORIAN", "CDF": "RENAUD STEPHANE", "STORE": "LYON-FELIX FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "EMMANUEL" },
+            { "ANABEL": "5326", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "CHAMBERY -MONTMELIAN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" },
+            { "ANABEL": "1943", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "FONTAINE -CURIE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "9566", "region": "SUD-EST", "DT": "PELLON RENAUD", "CDF": "ROBINET MANUEL", "STORE": "ST CHEF EN DAUP", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "EMMANUEL" },
+            { "ANABEL": "8636", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "VASSON KEVIN", "STORE": "AVIGNON -REPUBLIQUE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" }
+        ];
 
         let allRecords = [];
 
-        async function fetchRecords() {
-            try {
-                const response = await fetch(API_URL, { 
-                    method: 'GET',
-                    headers: HEADERS,
-                    mode: 'cors'
-                });
-                if (!response.ok) throw new Error("Erreur de connexion Airtable (Vérifie ton Token ou l'ID de la table)");
-                const data = await response.json();
-                allRecords = data.records;
-                
-                populateFilters(allRecords);
-                renderTable(allRecords);
-                updateStats(allRecords);
-            } catch (error) {
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="15" style="color:red; text-align:center;">Erreur : ${error.message}</td></tr>`;
+        function initApp() {
+            const formattedDefault = rawStoresData.map((item, index) => ({
+                id: String(index + 1),
+                fields: {
+                    STATUT: "À FAIRE",
+                    ANABEL: item.ANABEL,
+                    REGION: item.region,
+                    DT: item.DT,
+                    CDF: item.CDF,
+                    STORE: item.STORE,
+                    ENSEIGNE: item.ENSEIGNE,
+                    PRIO: item.PRIO,
+                    CSI: item.CSI,
+                    APPEL: "",
+                    MAIL: "",
+                    RELANCE: "",
+                    VISITE: "",
+                    NOTE: "",
+                    COMMENTAIRE: ""
+                }
+            }));
+
+            const savedData = localStorage.getItem('csi_audit_records_v4');
+            if (savedData) {
+                try {
+                    allRecords = JSON.parse(savedData);
+                } catch(e) {
+                    allRecords = formattedDefault;
+                }
+            } else {
+                allRecords = formattedDefault;
             }
+
+            populateFilters(allRecords);
+            renderTable(allRecords);
+            updateStats(allRecords);
         }
 
         function populateFilters(records) {
@@ -355,12 +405,15 @@
                     
                     td.addEventListener('blur', function() {
                         const newValue = this.innerText.trim();
-                        const oldValue = fields[col] || '';
-                        
-                        if (newValue !== oldValue) {
-                            updateRecord(record.id, col, newValue);
+                        if (newValue !== (fields[col] || '')) {
                             fields[col] = newValue;
+                            if (col === 'NOTE' && newValue !== '') {
+                                fields['STATUT'] = 'FAIT';
+                            }
+                            localStorage.setItem('csi_audit_records_v4', JSON.stringify(allRecords));
+                            showToast();
                             updateStats(allRecords);
+                            populateFilters(allRecords);
                         }
                     });
                     
@@ -375,6 +428,7 @@
             const total = records.length;
             const audites = records.filter(r => r.fields['NOTE'] || (r.fields['STATUT'] && r.fields['STATUT'] !== 'À FAIRE')).length;
             document.getElementById('stat-couverture').textContent = `${audites} / ${total}`;
+            document.getElementById('stat-audites').textContent = audites;
 
             let sum = 0, count = 0;
             records.forEach(r => {
@@ -391,36 +445,20 @@
             }
         }
 
-        async function updateRecord(recordId, fieldName, newValue) {
-            const updateData = {
-                "records": [{ "id": recordId, "fields": { [fieldName]: newValue } }]
-            };
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'PATCH',
-                    headers: HEADERS,
-                    body: JSON.stringify(updateData)
-                });
-
-                if (response.ok) {
-                    showToast();
-                } else {
-                    console.error("Erreur lors de la sauvegarde :", await response.text());
-                    alert("Erreur lors de la sauvegarde sur Airtable.");
-                }
-            } catch (error) {
-                console.error("Erreur réseau :", error);
-            }
-        }
-
         function showToast() {
             const toast = document.getElementById("toast");
             toast.className = "show";
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
-        window.onload = fetchRecords;
+        function resetData() {
+            if(confirm("Voulez-vous réinitialiser toutes les données saisies ?")) {
+                localStorage.removeItem('csi_audit_records_v4');
+                initApp();
+            }
+        }
+
+        window.onload = initApp;
     </script>
 </body>
 </html>
