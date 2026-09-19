@@ -533,14 +533,14 @@
             renderHistory();
             updateKPIs();
             document.getElementById('auditDate').valueAsDate = new Date();
-        });
-
-        function switchTab(tabId, btn) {
+        });        function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if (btn) btn.classList.add('active');
         }
+
+
 
         function initStoreSelect() {
             const select = document.getElementById('storeSelect');
