@@ -583,7 +583,7 @@
         // ==========================================
         // 4. SAUVEGARDE & ARCHIVAGE
         // ==========================================
-        function archiverAudit() {
+        async function archiverAudit() {
             const anabel = document.getElementById('dispAnabel').textContent;
             if (anabel === "-") return alert("Veuillez sélectionner un magasin.");
             const note = document.getElementById('auditNote').value;
