@@ -3,879 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Audit Magasins — Carrefour Proximité</title>
+    <title>Portail Audit Magasins CSI</title>
     <style>
         :root {
-            --primary: #00A651; --primary-dark: #00823F;
-            --secondary: #F37021; --secondary-dark: #D55C19;
-            --blue-carrefour: #00387B; --danger-red: #dc2626;
-            --warning-orange: #f59e0b; --success-green: #10b981;
-            --bg-light: #eef4f8; --card-bg: #ffffff;
-            --text-dark: #1e293b; --border: #cbd5e1;
+            --carrefour-blue: #00387b;
+            --carrefour-green: #00b050;
+            --bg-gray: #f4f6f9;
+            --border-color: #dee2e6;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text-dark); padding-bottom: 50px; }
-
-        header { 
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-            color: white; padding: 20px 40px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 4px solid var(--secondary); overflow: hidden; position: relative;
-            min-height: 90px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--bg-gray);
+            font-size: 13px;
         }
-
-        .runner-scene-left {
-            position: absolute; bottom: 8px; display: flex; align-items: flex-end; gap: 2px;
-            animation: runFromLeft 12s linear infinite; z-index: 1;
+        header {
+            background-color: var(--carrefour-green);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        .runner-scene-right {
-            position: absolute; bottom: 8px; display: flex; align-items: flex-end; gap: 2px;
-            transform: scaleX(-1);
-            animation: runFromRight 12s linear infinite; z-index: 1;
-        }
+        .header-title { font-size: 1.2rem; font-weight: bold; }
+        .nav-bar { background-color: var(--carrefour-blue); color: white; padding: 10px 20px; }
+        .container { padding: 20px; }
         
-        .stickman { position: relative; width: 35px; height: 50px; transform: rotate(12deg); margin-right: -4px; }
-        .runner-scene-right .stickman { transform: rotate(-12deg); }
+        /* Bouton Imprimer */
+        .btn-print {
+            background-color: white;
+            color: #333;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-print:hover { background-color: #f1f1f1; }
 
-        .head { 
-            width: 15px; height: 15px; border-radius: 50%; background: #ffccb3; 
-            position: absolute; left: 14px; top: -2px; animation: bob 0.3s infinite alternate ease-in-out; z-index: 3;
+        /* Statistiques et KPIs */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
-        
-        .head::before {
-            content: ''; position: absolute; top: -3px; left: -2px; width: 19px; height: 8px;
-            background: var(--secondary); border-radius: 10px 10px 2px 2px;
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--carrefour-blue);
         }
-        .head::after {
-            content: ''; position: absolute; top: 3px; right: -5px; width: 8px; height: 3px;
-            background: var(--secondary); border-radius: 2px; transform: rotate(15deg);
-        }
-        
-        .torso { 
-            width: 13px; height: 22px; background: var(--blue-carrefour); 
-            position: absolute; left: 10px; top: 13px; border-radius: 6px; z-index: 2;
-        }
-        
-        .arm { 
-            width: 16px; height: 4.5px; background: #ffccb3; position: absolute; 
-            border-radius: 3px; transform-origin: left center; z-index: 1;
-        }
-        .arm.left { left: 15px; top: 17px; transform: rotate(-15deg); background: #eba988; }
-        .arm.right { left: 17px; top: 15px; transform: rotate(-30deg); z-index: 3; }
+        .stat-card h4 { margin: 0 0 10px 0; font-size: 11px; color: #6c757d; text-transform: uppercase; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #333; }
 
-        .leg { 
-            width: 5.5px; height: 20px; background: #334155; position: absolute; top: 31px; 
-            border-radius: 3px; transform-origin: top center; z-index: 1;
+        /* Barre de filtres */
+        .filters-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
-        .leg.left { left: 11px; animation: runLegLeft 0.3s infinite alternate linear; background: #1e293b; }
-        .leg.right { left: 13px; animation: runLegRight 0.3s infinite alternate linear; z-index: 3; }
-
-        .cart-emoji { font-size: 2.3rem; display: inline-block; animation: cartShake 0.2s infinite alternate; z-index: 4; }
-
-        @keyframes runLegLeft { 0% { transform: rotate(-50deg); } 100% { transform: rotate(40deg); } }
-        @keyframes runLegRight { 0% { transform: rotate(40deg); } 100% { transform: rotate(-50deg); } }
-        @keyframes bob { 0% { transform: translateY(0px); } 100% { transform: translateY(2.5px); } }
-        @keyframes cartShake { 
-            0% { transform: scaleX(-1) translateY(4px) translateX(0px); } 
-            100% { transform: scaleX(-1) translateY(5px) translateX(-2px); } 
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
         }
-
-        @keyframes runFromLeft {
-            0% { left: -120px; }
-            40% { left: calc(50% - 70px); }
-            65% { left: calc(50% - 70px); }
-            100% { left: 110%; }
-        }
-
-        @keyframes runFromRight {
-            0% { right: -120px; }
-            40% { right: calc(50% - 70px); }
-            65% { right: calc(50% - 70px); }
-            100% { right: 110%; }
+        .filter-group label { display: block; font-size: 11px; color: #6c757d; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: #fff;
         }
 
-        .header-title h1 { font-size: 1.6rem; z-index: 2; position: relative; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .header-title p { font-size: 0.9rem; margin-top: 4px; z-index: 2; position: relative; }
-        
-        .btn { padding: 9px 18px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; z-index: 2; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-primary { background-color: var(--secondary); color: white; }
-        .btn-primary:hover { background-color: var(--secondary-dark); }
-        .btn-secondary { background-color: white; color: var(--primary-dark); }
-        .btn-danger { background-color: var(--danger-red); color: white; }
-
-        nav { background-color: var(--blue-carrefour); padding: 0 40px; display: flex; gap: 20px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2); }
-        .tab-btn { padding: 15px 16px; color: rgba(255,255,255,0.7); background: none; border: none; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
-        .tab-btn:hover { color: white; }
-        .tab-btn.active { color: white; border-bottom-color: var(--secondary); }
-
-        .container { max-width: 100%; margin: 25px auto; padding: 0 25px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .card { 
-            background: var(--card-bg); padding: 30px; border-radius: 12px; 
-            border: 1px solid var(--border); margin-bottom: 25px; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05); 
+        /* Tableau */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
         }
-        .search-container { display: flex; gap: 15px; align-items: flex-end; background: #e8f5e9; padding: 20px; border-radius: 10px; border: 1px solid #bbf7d0; margin-bottom: 20px; flex-wrap: wrap; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
-        .filter-container { background: #f1f5f9; border-color: #cbd5e1; }
-        
-        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .kpi-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); position: relative; overflow: hidden; transition: transform 0.2s; }
-        .kpi-card:hover { transform: translateY(-2px); }
-        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
-        .kpi-card.blue::before { background: var(--blue-carrefour); }
-        .kpi-card.green::before { background: var(--primary); }
-        .kpi-card.orange::before { background: var(--secondary); }
-        .kpi-card.purple::before { background: #8b5cf6; }
-        
-        .kpi-card h3 { font-size: 0.8rem; color: #64748b; margin-bottom: 8px; text-transform: uppercase; font-weight: 700;}
-        .kpi-card .value { font-size: 1.8rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px; }
-        
-        .progress-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 12px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--primary); transition: width 0.5s; border-radius: 4px; }
-        
-        .stats-mini { display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.75rem; font-weight: bold; }
-        .badge-stat { padding: 4px 8px; border-radius: 6px; color: white; font-weight: 600; }
-        .badge-stat.badge-exc { background: var(--success-green); }
-        .badge-stat.badge-cor { background: var(--warning-orange); }
-        .badge-stat.badge-cri { background: var(--danger-red); }
-
-        .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
-        .input-group label { font-size: 0.85rem; font-weight: 600; color: var(--blue-carrefour); }
-        .input-group input, .input-group select { padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background-color: #fafafa; transition: 0.2s; }
-        .input-group input:focus, .input-group select:focus { background-color: #fff; border-color: var(--blue-carrefour); outline: none; box-shadow: 0 0 0 3px rgba(0,56,123,0.1); }
-
-        .store-info-badge { background: linear-gradient(135deg, var(--blue-carrefour), #00224d); color: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 6px solid var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .store-info-badge .nom { font-size: 1.4rem; font-weight: bold; margin: 8px 0; }
-
-        .table-container { 
-            background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); 
-            overflow-x: auto; width: 100%; max-height: 70vh; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03), inset 0 1px 3px rgba(0,0,0,0.02); 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
         }
-        
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-        
-        th { 
-            background: linear-gradient(180deg, #f8fafc, #edf2f7); 
-            padding: 14px 16px; position: sticky; top: 0; z-index: 10; 
-            border-bottom: 2px solid var(--border); color: var(--blue-carrefour); 
-            font-weight: 700; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.5px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
         }
-        
-        td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; color: #334155; }
-        
-        tbody tr:nth-child(even) { background-color: #fcfdfe; }
-        tr:hover td { background-color: #f1f5f9; color: #0f172a; }
+        th {
+            background-color: #e9ecef;
+            color: var(--carrefour-blue);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .editable {
+            background-color: #fffbdd;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .editable:hover { background-color: #fff3cd; }
+        .editable:focus {
+            background-color: #fff;
+            outline: 2px solid var(--carrefour-blue);
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #ffeeba;
+            color: #856404;
+            font-weight: bold;
+            font-size: 11px;
+        }
 
-        table.excel-table { width: max-content; min-width: 100%; font-size: 12px; }
-        table.excel-table th, table.excel-table td { border: 1px solid #cbd5e1; padding: 6px 8px; }
-        table.excel-table th { background: linear-gradient(180deg, #f1f5f9, #e2e8f0); color: var(--blue-carrefour); text-align: center; }
-        table.excel-table input, table.excel-table select { width: 100%; border: 1px solid transparent; background: transparent; font-size: 12px; padding: 4px; border-radius: 4px; transition: 0.2s; }
-        table.excel-table input:focus, table.excel-table select:focus { border-color: var(--blue-carrefour); background-color: #fff; outline:none; box-shadow: 0 0 0 2px rgba(0,56,123,0.1); }
+        /* Notification Toast */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #28a745;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 12px;
+            position: fixed;
+            z-index: 1000;
+            right: 20px;
+            bottom: 20px;
+            font-size: 14px;
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
-        .cat-header { background-color: #e2e8f0; font-weight: bold; color: var(--blue-carrefour); text-transform: uppercase; font-size: 0.8rem; }
-
-        .badge-status-audited { background-color: #dcfce7; color: #166534; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #bbf7d0; }
-        .badge-status-pending { background-color: #fef3c7; color: #92400e; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: 1px solid #fde68a; }
-
-        #toast { position: fixed; bottom: 25px; right: 25px; background: var(--primary-dark); color: white; padding: 14px 28px; border-radius: 8px; font-weight: bold; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        
         @media print {
-            body, html { background: white !important; height: auto !important; overflow: visible !important; }
-            header, nav, .no-print { display: none !important; }
-            .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            .tab-content { display: none !important; }
-            .tab-content.active { display: block !important; }
-            .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 0 !important; }
-            .table-container { max-height: none !important; overflow: visible !important; border: none !important; box-shadow: none !important; }
-            table { width: 100% !important; table-layout: auto !important; }
-            table.excel-table { width: 100% !important; font-size: 10px !important; }
-            th, td { border: 1px solid #94a3b8 !important; padding: 4px !important; }
-            input, select { border: none !important; background: transparent !important; }
+            .filters-bar, header, .nav-bar, .btn-print, th:nth-last-child(-n+6) { display: none; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="runner-scene-left" id="sceneLeft">
-            <div class="stickman">
-                <div class="head"></div>
-                <div class="arm left"></div>
-                <div class="torso"></div>
-                <div class="arm right"></div>
-                <div class="leg left"></div>
-                <div class="leg right"></div>
-            </div>
-            <div class="cart-emoji">🛒</div>
-        </div>
-
-        <div class="runner-scene-right" id="sceneRight">
-            <div class="stickman">
-                <div class="head"></div>
-                <div class="arm left"></div>
-                <div class="torso"></div>
-                <div class="arm right"></div>
-                <div class="leg left"></div>
-                <div class="leg right"></div>
-            </div>
-            <div class="cart-emoji">🛒</div>
-        </div>
-        
-        <div class="header-title">
-            <h1>🛒 Portail Audit Magasins CSI</h1>
-            <p>Suivi des équipements & conformité — Carrefour Proximité 
-                <span id="db-status" style="color:#a7f3d0; margin-left: 10px;">(Base Airtable 🟢)</span>
-            </p>
-        </div>
-        <button class="btn btn-secondary no-print" onclick="window.print()">📊 Imprimer</button>
+        <div class="header-title">💻 Portail Audit Magasins CSI</div>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
     </header>
-
-    <nav class="no-print">
-        <button class="tab-btn" onclick="switchTab('tab-audit', this)">📝 Saisie de l'Audit (Détaillé)</button>
-        <button class="tab-btn active" onclick="switchTab('tab-grille', this)">📊 Grille & Statistiques</button>
-        <button class="tab-btn" onclick="switchTab('tab-archives', this)">📁 Historique Global</button>
-    </nav>
+    <div class="nav-bar">
+        Saisie de l'Audit (Détaillé) | <strong>Grille & Statistiques</strong>
+    </div>
 
     <div class="container">
-        
-        <!-- ONGLET 1 : SAISIE -->
-        <div id="tab-audit" class="tab-content">
-            <div class="card">
-                <div class="search-container no-print">
-                    <div class="input-group">
-                        <label>Code ANABEL ou Ville</label>
-                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, LYON..." onkeyup="if(event.key==='Enter') chercherMagasin()">
-                    </div>
-                    <div class="input-group">
-                        <label>Ou choisir dans la liste complète</label>
-                        <select id="storeSelect" onchange="activerMagasin(this.value)">
-                            <option value="">-- Chargement des magasins --</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary" onclick="chercherMagasin()">🔍 Démarrer l'audit</button>
-                </div>
-
-                <div id="activeStoreInfo" style="display: none;">
-                    <div class="store-info-badge">
-                        <span id="dispEnseigne">-</span>
-                        <div class="nom"><span id="dispAnabel">-</span> - <span id="dispStore">-</span></div>
-                        <div>Directeur Territorial : <span id="dispDT">-</span> | Chef de Secteur : <span id="dispCDF">-</span></div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:20px;">
-                        <div class="input-group"><label>Auditeur CSI</label>
-                            <select id="auditCSI">
-                                <option value="AMANDA">AMANDA</option>
-                                <option value="CHRISTOPHE">CHRISTOPHE</option>
-                                <option value="EMMANUEL">EMMANUEL</option>
-                            </select>
-                        </div>
-                        <div class="input-group"><label>Date de visite</label><input type="date" id="auditDate"></div>
-                        <div class="input-group"><label>Note Globale /20</label><input type="number" id="auditNote" max="20" min="0" placeholder="Ex: 16"></div>
-                        <div class="input-group" style="flex:2;"><label>Conclusion / Commentaire Général</label><input type="text" id="auditCommentaire" placeholder="Bilan global de la visite..."></div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 45%;">Équipement / Point de contrôle</th>
-                                    <th style="width: 30%;">Quantité / Modèle / Valeur</th>
-                                    <th style="width: 25%;">État / Conformité</th>
-                                </tr>
-                            </thead>
-                            <tbody id="auditGridBody"></tbody>
-                        </table>
-                    </div>
-                    
-                    <div style="margin-top: 20px;" class="no-print">
-                        <button class="btn btn-danger" style="font-size: 1.1rem; padding: 12px 25px;" onclick="archiverAudit()">💾 Valider et Enregistrer l'Audit</button>
-                    </div>
-                </div>
+        <!-- BLOCS DE STATISTIQUES -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Couverture du Parc</h4>
+                <div class="stat-value" id="stat-couverture">0 / 0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Note Moyenne Globale</h4>
+                <div class="stat-value" id="stat-moyenne">- / 20</div>
+            </div>
+            <div class="stat-card">
+                <h4>Meilleur Contributeur</h4>
+                <div class="stat-value" id="stat-contributeur" style="font-size: 1.1rem; padding-top: 5px;">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Activité Récente</h4>
+                <div class="stat-value" id="stat-activite" style="font-size: 1rem; color: #6c757d; padding-top: 5px;">Aucun audit récent</div>
             </div>
         </div>
 
-        <!-- ONGLET 2 : GRILLE ET DASHBOARD STATISTIQUES -->
-        <div id="tab-grille" class="tab-content active">
-            
-            <div class="kpi-container no-print">
-                <div class="kpi-card blue">
-                    <h3>Couverture du Parc</h3>
-                    <div class="value"><span id="kpi-audits">0</span> / <span id="kpi-total" style="font-size:1.2rem; color:#94a3b8;">72</span></div>
-                    <div class="progress-bg"><div class="progress-bar" id="kpi-progress" style="width: 0%;"></div></div>
-                    <div style="display:flex; justify-content:space-between; font-size: 0.8rem; margin-top:6px; font-weight:bold;">
-                        <span style="color:#64748b;">Reste à auditer: <b id="kpi-reste">72</b></span>
-                        <span style="color:var(--primary);" id="kpi-percent">0%</span>
-                    </div>
-                </div>
-                
-                <div class="kpi-card green">
-                    <h3>Note Moyenne Globale</h3>
-                    <div class="value" id="kpi-moyenne">- <span style="font-size:1rem; color:#94a3b8;">/ 20</span></div>
-                    <div class="stats-mini">
-                        <span class="badge-stat badge-exc" title=">= 15/20"><span id="kpi-exc">0</span> Excellent</span>
-                        <span class="badge-stat badge-cor" title="10 à 14/20"><span id="kpi-cor">0</span> Correct</span>
-                        <span class="badge-stat badge-cri" title="< 10/20"><span id="kpi-cri">0</span> Critique</span>
-                    </div>
-                </div>
-
-                <div class="kpi-card orange">
-                    <h3>Meilleur Contributeur</h3>
-                    <div class="value">🏆 <span id="kpi-top-auditor">-</span></div>
-                    <div class="stats-mini" id="kpi-csi-details" style="display:flex; flex-direction:column; gap:4px; margin-top:8px;"></div>
-                </div>
-                
-                <div class="kpi-card purple">
-                    <h3>Activité Récente</h3>
-                    <div class="value" style="font-size: 1.2rem; margin-top: 10px;" id="kpi-last-date">-</div>
-                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 8px;" id="kpi-last-store">Aucun audit récent</div>
-                </div>
+        <!-- BARRE DE FILTRES -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label>Filtrer par Statut</label>
+                <select id="filter-statut" onchange="filterTable()">
+                    <option value="">Tous les statuts</option>
+                </select>
             </div>
-
-            <div class="card">
-                <div class="search-container filter-container no-print" style="padding:15px;">
-                    <div class="input-group"><label>Filtrer par Statut Audit</label>
-                        <select id="g-filter-status" onchange="filtrerGrille()">
-                            <option value="ALL">Tous les magasins</option>
-                            <option value="AUDITED">Magasins Audités</option>
-                            <option value="NOT_AUDITED">Magasins Non Audités</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>Filtrer par DT</label><select id="g-filter-dt" onchange="filtrerGrille()"><option value="ALL">Tous les DT</option></select></div>
-                    <div class="input-group"><label>Filtrer par Chef de Secteur</label><select id="g-filter-cdf" onchange="filtrerGrille()"><option value="ALL">Tous les CDF</option></select></div>
-                    <div class="input-group"><label>Filtrer par CSI Assigné</label><select id="g-filter-csi" onchange="filtrerGrille()"><option value="ALL">Tous les CSI</option></select></div>
-                    <div class="input-group"><label>Filtrer par Priorité (PRIO)</label><select id="g-filter-prio" onchange="filtrerGrille()"><option value="ALL">Tous</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
-                </div>
-
-                <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; font-size: 0.8rem; font-weight: bold; align-items: center;" class="no-print">
-                    <span style="color: var(--blue-carrefour);">Légende DT :</span>
-                    <span style="background:#fef08a; padding: 4px 8px; border-radius: 4px; border: 1px solid #fde047; color: #854d0e;">WELTER RONAN</span>
-                    <span style="background:#fbcfe8; padding: 4px 8px; border-radius: 4px; border: 1px solid #f472b6; color: #9d174d;">LEROUX ARNOLD</span>
-                    <span style="background:#bfdbfe; padding: 4px 8px; border-radius: 4px; border: 1px solid #60a5fa; color: #1e40af;">CURT FLORIAN</span>
-                    <span style="background:#bbf7d0; padding: 4px 8px; border-radius: 4px; border: 1px solid #4ade80; color: #166534;">PELLON RENAUD</span>
-                </div>
-
-                <div class="table-container">
-                    <table class="excel-table">
-                        <thead>
-                            <tr>
-                                <th>Statut</th><th>ANABEL</th><th>Région</th><th>DT</th><th>CDF</th><th>STORE</th><th>ENSEIGNE</th>
-                                <th>PRIO</th><th>CSI</th><th>Appel ✏️</th><th>Mail ✏️</th>
-                                <th>Relance ✏️</th><th>Visite ✏️</th><th>Note ✏️</th><th>Commentaire ✏️</th>
-                            </tr>
-                        </thead>
-                        <tbody id="grilleTableBody"></tbody>
-                    </table>
-                </div>
+            <div class="filter-group">
+                <label>Filtrer par DT</label>
+                <select id="filter-dt" onchange="filterTable()">
+                    <option value="">Tous les DT</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filtrer par Chef de Secteur</label>
+                <select id="filter-cdf" onchange="filterTable()">
+                    <option value="">Tous les CDF</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filtrer par CSI Assigné</label>
+                <select id="filter-csi" onchange="filterTable()">
+                    <option value="">Tous les CSI</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filtrer par Priorité (Prio)</label>
+                <select id="filter-prio" onchange="filterTable()">
+                    <option value="">Toutes</option>
+                </select>
             </div>
         </div>
 
-        <!-- ONGLET 3 : ARCHIVES -->
-        <div id="tab-archives" class="tab-content">
-            <div class="card">
-                <h2 style="color: var(--blue-carrefour); margin-bottom: 5px;">📁 Historique Global des Audits</h2>
-                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Retrouvez l'ensemble des visites de parcs informatiques déjà enregistrées et validées.</p>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date Visite</th>
-                                <th>ANABEL</th>
-                                <th>Magasin</th>
-                                <th>Auditeur CSI</th>
-                                <th>Note /20</th>
-                                <th>Commentaire Global</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- TABLEAU DES DONNÉES -->
+        <div class="table-container">
+            <table id="auditTable">
+                <thead>
+                    <tr>
+                        <th>Statut</th>
+                        <th>Anabel</th>
+                        <th>Région</th>
+                        <th>DT</th>
+                        <th>CDF</th>
+                        <th>Store</th>
+                        <th>Enseigne</th>
+                        <th>Prio</th>
+                        <th>CSI</th>
+                        <th>Appel ✏️</th>
+                        <th>Mail ✏️</th>
+                        <th>Relance ✏️</th>
+                        <th>Visite ✏️</th>
+                        <th>Note ✏️</th>
+                        <th>Commentaire ✏️</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="15" style="text-align:center;">Chargement des données Airtable...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
-    
-    <div id="toast">✅ Enregistré avec succès</div>
+
+    <div id="toast">Enregistré dans Airtable ! ✅</div>
 
     <script>
-        // --- CONFIGURATION API AIRTABLE ---
         const AIRTABLE_PAT = "patIzjfTlwG25KRPn.0afbc4ad5fcb497a11612a20b9537e02f2b413540d1ffac83ac0338005c9a5ee";
-        const AIRTABLE_BASE_ID = "appgnEwxlkcToFDhV";
-        const AIRTABLE_TABLE_NAME = "Table1";
-        // ----------------------------------
-
-        const dtColors = {
-            "WELTER RONAN": { bg: "#fef08a", text: "#854d0e" },
-            "LEROUX ARNOLD": { bg: "#fbcfe8", text: "#9d174d" },
-            "CURT FLORIAN": { bg: "#bfdbfe", text: "#1e40af" },
-            "PELLON RENAUD": { bg: "#bbf7d0", text: "#166534" }
+        const BASE_ID = "appgnEwxlkcToFDhV";
+        const TABLE_ID = "tblliNWMvRXdSlNZg";
+        
+        const API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
+        const HEADERS = {
+            "Authorization": `Bearer ${AIRTABLE_PAT}`,
+            "Content-Type": "application/json"
         };
 
-        const defaultAuditItems = [
-            { cat: "CONFORMITÉ GLOBALE", name: "Base magasin conforme aux équipements ?", qty: "OUI", state: "BON" },
-            { cat: "LIGNE DE CAISSE", name: "Nombre de caisses", qty: "2", state: "BON" },
-            { cat: "LIGNE DE CAISSE", name: "Type de caisses", qty: "TPV Standard", state: "BON" },
-            { cat: "LIGNE DE CAISSE", name: "Écrans Caisse", qty: "2", state: "BON" },
-            { cat: "LIGNE DE CAISSE", name: "Scanners", qty: "2", state: "BON" },
-            { cat: "LIGNE DE CAISSE", name: "Douchettes", qty: "2", state: "BON" },
-            { cat: "LIGNE DE CAISSE", name: "Meti en caisse", qty: "Oui", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Switch", qty: "1", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Baie de brassage & État", qty: "1", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne ADSL", qty: "Oui", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Ligne FIBRE", qty: "Oui", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Opérateur Réseau", qty: "Orange", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Routeur de secours", qty: "4G", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Onduleur", qty: "1", state: "BON" },
-            { cat: "RÉSEAU & INFRASTRUCTURE", name: "Imprimante (Marque/État)", qty: "HP Laser", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Terminaux Zebra / DT50", qty: "2", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Batterie de secours DT50", qty: "2", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "PC BOI & Écran", qty: "1 PC / 1 Écran", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "PC MUSE & Écran", qty: "1 PC / 1 Écran", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Autre PC", qty: "0", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Imprimante Deava", qty: "1", state: "BON" },
-            { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Terminaux MC 3100 / 3200", qty: "0", state: "BON" },
-            { cat: "PROCESS & DIVERS", name: "Utilisation de la PCA", qty: "Oui", state: "BON" },
-            { cat: "PROCESS & DIVERS", name: "Documentation de formation", qty: "Présente", state: "BON" }
-        ];
+        let allRecords = [];
 
-        let storesData = [
-            { "ANABEL": "6345", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "ARAMON -DE GAULLE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "6266", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -LODI", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "5569", "region": "SUD-EST", "DT": "WELTER RONAN", "CDF": "BOURDOT DAVID", "STORE": "MARSEILLE -TURCAT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 1, "CSI": "AMANDA" },
-            { "ANABEL": "2752", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "HYERES -TOULON", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "5280", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "GENSOLLEN MAELLE", "STORE": "JUAN LES PIN -WILSON", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "2896", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -BORRIGLIONE 73", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "A46S", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -LAMARTINE", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "A46E", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -MEDECIN", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "8956", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "NICE -VILLERMONT", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 2, "CSI": "AMANDA" },
-            { "ANABEL": "6617", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "LOZA NATHALIE", "STORE": "SAINT-LAURENT-DU-VAR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "8926", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "AJACCIO -DEL PELLEGR", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "5281", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "BEAUSOLEIL -MARCHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "7207", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "MENTON -FAURE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "A5GU", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -DEROULEDE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "5982", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MALAUSSENA", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "5727", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE -MEYERBEER", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "A5GW", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "NICE-CORNICHE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "294", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "OTA- HAMEAU DE PORTO", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 2, "CSI": "AMANDA" },
-            { "ANABEL": "6744", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "ROQUEBRUNE-CAP-MARTI", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "A4R6", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "SARROLA-CARCOPINO -B", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "1786", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "MALOT STEPHANE", "STORE": "VENCE -RHIN DANUBE", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "6027", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "AIX EN P -CORDEL 63", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 4, "CSI": "AMANDA" },
-            { "ANABEL": "1076", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "FORCALQUIER", "ENSEIGNE": "CARREFOUR EXPRESS", "PRIO": 3, "CSI": "AMANDA" },
-            { "ANABEL": "2911", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "NEGREL NICOLAS", "STORE": "ROUSSET", "ENSEIGNE": "CARREFOUR CONTACT", "PRIO": 3, "CSI": "AMANDA" }
-        ];
-
-        let airtableRecordsCache = [];
-
-        // ==========================================
-        // 1. GESTION DES ONGLETS
-        // ==========================================
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            if (btnElement) btnElement.classList.add('active');
-        }
-
-        // ==========================================
-        // 2. INITIALISATION AU CHARGEMENT
-        // ==========================================
-        window.onload = async function() {
-            chargerListeMagasins();
-            chargerFiltres();
-            await synchroniserEtChargerDonneesAirtable(); // Attend le chargement complet des données avant d'afficher
-        };
-
-        function chargerListeMagasins() {
-            const select = document.getElementById('storeSelect');
-            select.innerHTML = '<option value="">-- Choisir un magasin --</option>';
-            const sortedStores = [...storesData].sort((a, b) => a.ANABEL.localeCompare(b.ANABEL));
-            sortedStores.forEach(store => {
-                let option = document.createElement('option');
-                option.value = store.ANABEL;
-                option.textContent = `${store.ANABEL} - ${store.STORE} (${store.ENSEIGNE})`;
-                select.appendChild(option);
-            });
-        }
-
-        function chargerFiltres() {
-            const dts = [...new Set(storesData.map(s => s.DT))].filter(Boolean);
-            const cdfs = [...new Set(storesData.map(s => s.CDF))].filter(Boolean);
-            const csis = [...new Set(storesData.map(s => s.CSI))].filter(Boolean);
-            const peuplerSelect = (id, tableau) => {
-                const select = document.getElementById(id);
-                tableau.forEach(val => { select.innerHTML += `<option value="${val}">${val}</option>`; });
-            };
-            peuplerSelect('g-filter-dt', dts);
-            peuplerSelect('g-filter-cdf', cdfs);
-            peuplerSelect('g-filter-csi', csis);
-        }
-
-        // ==========================================
-        // 3. RECHERCHE ET SÉLECTION (Onglet Saisie)
-        // ==========================================
-        function chercherMagasin() {
-            const searchValue = document.getElementById('anabelSearch').value.toUpperCase().trim();
-            if (!searchValue) return;
-            const store = storesData.find(s => s.ANABEL === searchValue || s.STORE.toUpperCase().includes(searchValue));
-            if (store) {
-                document.getElementById('storeSelect').value = store.ANABEL;
-                activerMagasin(store.ANABEL);
-            } else {
-                alert("Magasin introuvable. Vérifiez le code ANABEL ou la ville.");
-            }
-        }
-
-        function activerMagasin(anabel) {
-            if (!anabel) { document.getElementById('activeStoreInfo').style.display = 'none'; return; }
-            const store = storesData.find(s => s.ANABEL === anabel);
-            if (!store) return;
-            document.getElementById('dispEnseigne').textContent = store.ENSEIGNE;
-            document.getElementById('dispAnabel').textContent = store.ANABEL;
-            document.getElementById('dispStore').textContent = store.STORE;
-            document.getElementById('dispDT').textContent = store.DT;
-            document.getElementById('dispCDF').textContent = store.CDF;
-            if (store.CSI) document.getElementById('auditCSI').value = store.CSI;
-            document.getElementById('auditDate').valueAsDate = new Date();
-            document.getElementById('auditNote').value = "";
-            document.getElementById('auditCommentaire').value = "";
-            genererGrilleAudit();
-            document.getElementById('activeStoreInfo').style.display = 'block';
-        }
-
-        function genererGrilleAudit() {
-            const tbody = document.getElementById('auditGridBody');
-            tbody.innerHTML = "";
-            let currentCat = "";
-            defaultAuditItems.forEach((item, index) => {
-                if (item.cat !== currentCat) {
-                    currentCat = item.cat;
-                    let trCat = document.createElement('tr');
-                    trCat.innerHTML = `<td colspan="3" class="cat-header">${currentCat}</td>`;
-                    tbody.appendChild(trCat);
-                }
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${item.name}</strong></td>
-                    <td><input type="text" id="qty_${index}" value="${item.qty}" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:4px;"></td>
-                    <td>
-                        <select id="state_${index}" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:4px;">
-                            <option value="BON" ${item.state === 'BON' ? 'selected' : ''}>Bon / Conforme</option>
-                            <option value="MOYEN" ${item.state === 'MOYEN' ? 'selected' : ''}>Moyen / À surveiller</option>
-                            <option value="MAUVAIS" ${item.state === 'MAUVAIS' ? 'selected' : ''}>Mauvais / Non conforme</option>
-                            <option value="ABSENT" ${item.state === 'ABSENT' ? 'selected' : ''}>Absent / Manquant</option>
-                        </select>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ==========================================
-        // 4. SAUVEGARDE & ARCHIVAGE (AIRTABLE)
-        // ==========================================
-        async function archiverAudit() {
-            const anabel = document.getElementById('dispAnabel').textContent;
-            if (anabel === "-") return alert("Veuillez sélectionner un magasin.");
-            
-            const note = document.getElementById('auditNote').value;
-            if (!note) return alert("Veuillez saisir une note globale sur 20.");
-
-            const auditeur = document.getElementById('auditCSI').value;
-            const dateAudit = document.getElementById('auditDate').value;
-            const commentaire = document.getElementById('auditCommentaire').value;
-            const storeName = document.getElementById('dispStore').textContent;
-
-            let detailsAudit = [];
-            defaultAuditItems.forEach((item, index) => {
-                let qty = document.getElementById(`qty_${index}`).value;
-                let state = document.getElementById(`state_${index}`).value;
-                detailsAudit.push({ point: item.name, quantite: qty, etat: state });
-            });
-
-            const dataAirtable = {
-                fields: {
-                    "ANABEL": anabel,
-                    "Magasin": storeName,
-                    "Auditeur CSI": auditeur,
-                    "Date Visite": dateAudit,
-                    "Note": parseFloat(note),
-                    "Commentaire Global": commentaire,
-                    "Détails Audit": JSON.stringify(detailsAudit)
-                }
-            };
-
-            const btnValider = document.querySelector('.btn-danger');
-            const originalText = btnValider.innerHTML;
-            btnValider.innerHTML = "⏳ Enregistrement...";
-            btnValider.disabled = true;
-
+        async function fetchRecords() {
             try {
-                const existingRecord = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(anabel).trim().toUpperCase());
-                let response;
-
-                if (existingRecord) {
-                    response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}/${existingRecord.id}`, {
-                        method: "PATCH",
-                        headers: { "Authorization": `Bearer ${AIRTABLE_PAT}`, "Content-Type": "application/json" },
-                        body: JSON.stringify(dataAirtable)
-                    });
-                } else {
-                    response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`, {
-                        method: "POST",
-                        headers: { "Authorization": `Bearer ${AIRTABLE_PAT}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ records: [dataAirtable] })
-                    });
-                }
-
-                if (!response.ok) {
-                    const errRes = await response.json();
-                    throw new Error(JSON.stringify(errRes));
-                }
-
-                afficherToast("✅ Audit enregistré et synchronisé !");
-                await synchroniserEtChargerDonneesAirtable();
-                switchTab('tab-archives', document.querySelectorAll('.tab-btn')[2]);
-
+                const response = await fetch(API_URL, { headers: HEADERS });
+                if (!response.ok) throw new Error("Erreur de connexion Airtable (Vérifie ton Token)");
+                const data = await response.json();
+                allRecords = data.records;
+                
+                populateFilters(allRecords);
+                renderTable(allRecords);
+                updateStats(allRecords);
             } catch (error) {
-                console.error("Erreur de synchronisation:", error);
-                alert("Erreur Airtable: " + error.message);
-            } finally {
-                btnValider.innerHTML = originalText;
-                btnValider.disabled = false;
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="15" style="color:red; text-align:center;">Erreur : ${error.message}</td></tr>`;
             }
         }
 
-        // ==========================================
-        // 5. SAUVEGARDE AUTOMATIQUE DES CHAMPS DE LA GRILLE (Appel, Mail, Relance, Visite, Note, Commentaire)
-        // ==========================================
-        async function sauvegarderChampGrille(anabel, champNom, valeur) {
-            try {
-                let existingRecord = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(anabel).trim().toUpperCase());
-                let payloadFields = {};
-                payloadFields[champNom] = valeur;
-                payloadFields["ANABEL"] = anabel;
-
-                const storeInfo = storesData.find(s => s.ANABEL === anabel);
-                if (storeInfo && !payloadFields["Magasin"]) {
-                    payloadFields["Magasin"] = storeInfo.STORE;
-                }
-
-                let response;
-                if (existingRecord) {
-                    response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}/${existingRecord.id}`, {
-                        method: "PATCH",
-                        headers: { "Authorization": `Bearer ${AIRTABLE_PAT}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ fields: payloadFields })
-                    });
-                } else {
-                    response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`, {
-                        method: "POST",
-                        headers: { "Authorization": `Bearer ${AIRTABLE_PAT}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ records: [{ fields: payloadFields }] })
-                    });
-                }
-
-                if (!response.ok) {
-                    const errRes = await response.json();
-                    throw new Error(JSON.stringify(errRes));
-                }
-
-                afficherToast("⚡ Donnée synchronisée");
-                await synchroniserEtChargerDonneesAirtable(); // Recharge proprement le cache et les KPI
-            } catch (err) {
-                console.error("Erreur mise à jour automatique:", err);
-                alert("Erreur d'enregistrement Airtable (vérifiez que la colonne '" + champNom + "' existe bien dans Airtable) : " + err.message);
-            }
-        }
-
-        // ==========================================
-        // 6. GESTION DE LA GRILLE ET DES STATISTIQUES
-        // ==========================================
-        async function synchroniserEtChargerDonneesAirtable() {
-            try {
-                const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`, {
-                    method: "GET",
-                    headers: { "Authorization": `Bearer ${AIRTABLE_PAT}` }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    airtableRecordsCache = data.records || [];
-                }
-            } catch (e) {
-                console.warn("Erreur de chargement Airtable:", e);
-            }
-            afficherGrille(storesData);
-            majKPI();
-            chargerHistorique();
-        }
-
-        function afficherGrille(data) {
-            const tbody = document.getElementById('grilleTableBody');
-            tbody.innerHTML = "";
+        function populateFilters(records) {
+            const statuts = new Set(), dts = new Set(), cdfs = new Set(), csis = new Set(), prios = new Set();
             
-            data.forEach(store => {
-                let dtStyle = dtColors[store.DT] ? `background-color: ${dtColors[store.DT].bg}; color: ${dtColors[store.DT].text}; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;` : "";
-                
-                let record = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(store.ANABEL).trim().toUpperCase());
-                let fields = record ? record.fields : {};
-                
-                let isAudited = fields["Note"] !== undefined || fields["Date Visite"] !== undefined;
-                let statusBadge = isAudited ? '<span class="badge-status-audited">AUDITÉ</span>' : '<span class="badge-status-pending">À FAIRE</span>';
+            records.forEach(r => {
+                const f = r.fields;
+                if(f['STATUT']) statuts.add(f['STATUT']);
+                if(f['DT']) dts.add(f['DT']);
+                if(f['CDF']) cdfs.add(f['CDF']);
+                if(f['CSI']) csis.add(f['CSI']);
+                if(f['PRIO'] !== undefined) prios.add(f['PRIO']);
+            });
 
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align:center;">${statusBadge}</td>
-                    <td><strong>${store.ANABEL}</strong></td>
-                    <td>${store.region || 'SUD-EST'}</td>
-                    <td><span style="${dtStyle}">${store.DT || ''}</span></td>
-                    <td>${store.CDF || ''}</td>
-                    <td>${store.STORE}</td>
-                    <td>${store.ENSEIGNE}</td>
-                    <td style="text-align:center;"><strong>${store.PRIO || '-'}</strong></td>
-                    <td>${store.CSI || '-'}</td>
-                    <td><input type="text" value="${fields["Appel"] || ''}" placeholder="..." onchange="sauvegarderChampGrille('${store.ANABEL}', 'Appel', this.value)"></td>
-                    <td><input type="text" value="${fields["Mail"] || ''}" placeholder="..." onchange="sauvegarderChampGrille('${store.ANABEL}', 'Mail', this.value)"></td>
-                    <td><input type="text" value="${fields["Relance"] || ''}" placeholder="..." onchange="sauvegarderChampGrille('${store.ANABEL}', 'Relance', this.value)"></td>
-                    <td><input type="text" value="${fields["Visite"] || ''}" placeholder="..." onchange="sauvegarderChampGrille('${store.ANABEL}', 'Visite', this.value)"></td>
-                    <td><input type="number" min="0" max="20" value="${fields["Note"] !== undefined ? fields["Note"] : ''}" placeholder="..." onchange="sauvegarderChampGrille('${store.ANABEL}', 'Note', parseFloat(this.value))"></td>
-                    <td><input type="text" value="${fields["Commentaire Global"] || ''}" placeholder="..." onchange="sauvegarderChampGrille('${store.ANABEL}', 'Commentaire Global', this.value)"></td>
-                `;
-                tbody.appendChild(tr);
+            fillSelect('filter-statut', statuts);
+            fillSelect('filter-dt', dts);
+            fillSelect('filter-cdf', cdfs);
+            fillSelect('filter-csi', csis);
+            fillSelect('filter-prio', prios);
+        }
+
+        function fillSelect(elementId, setValues) {
+            const select = document.getElementById(elementId);
+            const defaultOption = select.options[0];
+            select.innerHTML = '';
+            select.appendChild(defaultOption);
+            
+            Array.from(setValues).sort().forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = val;
+                select.appendChild(opt);
             });
         }
 
-        function filtrerGrille() {
-            const fStatus = document.getElementById('g-filter-status').value;
-            const fDt = document.getElementById('g-filter-dt').value;
-            const fCdf = document.getElementById('g-filter-cdf').value;
-            const fCsi = document.getElementById('g-filter-csi').value;
-            const fPrio = document.getElementById('g-filter-prio').value;
+        function filterTable() {
+            const fStatut = document.getElementById('filter-statut').value;
+            const fDt = document.getElementById('filter-dt').value;
+            const fCdf = document.getElementById('filter-cdf').value;
+            const fCsi = document.getElementById('filter-csi').value;
+            const fPrio = document.getElementById('filter-prio').value;
 
-            let filtered = storesData.filter(s => {
-                let record = airtableRecordsCache.find(r => String(r.fields.ANABEL).trim().toUpperCase() === String(s.ANABEL).trim().toUpperCase());
-                let isAudited = record && (record.fields["Note"] !== undefined || record.fields["Date Visite"]);
-
-                if (fStatus === "AUDITED" && !isAudited) return false;
-                if (fStatus === "NOT_AUDITED" && isAudited) return false;
-
-                return (fDt === "ALL" || s.DT === fDt) && 
-                       (fCdf === "ALL" || s.CDF === fCdf) && 
-                       (fCsi === "ALL" || s.CSI === fCsi) && 
-                       (fPrio === "ALL" || String(s.PRIO) === fPrio);
-            });
-            afficherGrille(filtered);
-        }
-
-        // ==========================================
-        // 7. CALCUL DES KPIs (Dashboard)
-        // ==========================================
-        function majKPI() {
-            const totalStores = storesData.length;
-            document.getElementById('kpi-total').textContent = totalStores;
-
-            let auditsFaitsList = airtableRecordsCache.filter(r => r.fields["Note"] !== undefined || r.fields["Date Visite"]);
-            let auditsFaits = auditsFaitsList.length;
-
-            document.getElementById('kpi-audits').textContent = auditsFaits;
-            document.getElementById('kpi-reste').textContent = Math.max(0, totalStores - auditsFaits);
-            
-            let percent = totalStores > 0 ? Math.round((auditsFaits / totalStores) * 100) : 0;
-            document.getElementById('kpi-percent').textContent = percent + "%";
-            document.getElementById('kpi-progress').style.width = percent + "%";
-
-            let notes = auditsFaitsList.map(r => parseFloat(r.fields["Note"])).filter(n => !isNaN(n));
-            let sommeNotes = notes.reduce((acc, curr) => acc + curr, 0);
-            let moyenne = notes.length > 0 ? (sommeNotes / notes.length).toFixed(1) : "-";
-            
-            document.getElementById('kpi-moyenne').innerHTML = `${moyenne} <span style="font-size:1rem; color:#94a3b8;">/ 20</span>`;
-
-            let exc = notes.filter(n => n >= 15).length;
-            let cor = notes.filter(n => n >= 10 && n < 15).length;
-            let cri = notes.filter(n => n < 10).length;
-
-            document.getElementById('kpi-exc').textContent = exc;
-            document.getElementById('kpi-cor').textContent = cor;
-            document.getElementById('kpi-cri').textContent = cri;
-
-            let auditeursCount = {};
-            airtableRecordsCache.forEach(r => {
-                let aud = r.fields["Auditeur CSI"];
-                if (aud) {
-                    auditeursCount[aud] = (auditeursCount[aud] || 0) + 1;
-                }
+            const filtered = allRecords.filter(r => {
+                const f = r.fields;
+                if (fStatut && f['STATUT'] !== fStatut) return false;
+                if (fDt && f['DT'] !== fDt) return false;
+                if (fCdf && f['CDF'] !== fCdf) return false;
+                if (fCsi && f['CSI'] !== fCsi) return false;
+                if (fPrio && String(f['PRIO']) !== fPrio) return false;
+                return true;
             });
 
-            let topAuditeur = "-";
-            let maxAudits = 0;
-            for (let [aud, count] of Object.entries(auditeursCount)) {
-                if (count > maxAudits) {
-                    maxAudits = count;
-                    topAuditeur = `${aud} (${count})`;
-                }
-            }
-            document.getElementById('kpi-top-auditor').textContent = topAuditeur;
-
-            let auditsAvecDate = airtableRecordsCache
-                .filter(r => r.fields["Date Visite"])
-                .sort((a, b) => new Date(b.fields["Date Visite"]) - new Date(a.fields["Date Visite"]));
-
-            if (auditsAvecDate.length > 0) {
-                let dernier = auditsAvecDate[0].fields;
-                document.getElementById('kpi-last-date').textContent = dernier["Date Visite"];
-                document.getElementById('kpi-last-store').textContent = `${dernier["ANABEL"]} - ${dernier["Magasin"] || 'Magasin'}`;
-            } else {
-                document.getElementById('kpi-last-date').textContent = "-";
-                document.getElementById('kpi-last-store').textContent = "Aucun audit récent";
-            }
+            renderTable(filtered);
         }
 
-        // ==========================================
-        // 8. HISTORIQUE GLOBAL
-        // ==========================================
-        function chargerHistorique() {
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = "";
+        function renderTable(records) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
 
-            let validRecords = airtableRecordsCache
-                .filter(r => r.fields["Date Visite"] || r.fields["Note"] !== undefined)
-                .sort((a, b) => new Date(b.fields["Date Visite"] || 0) - new Date(a.fields["Date Visite"] || 0));
-
-            if (validRecords.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Aucun audit enregistré pour le moment.</td></tr>';
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="15" style="text-align:center; color:#6c757d;">Aucun magasin trouvé avec ces filtres.</td></tr>`;
                 return;
             }
 
-            validRecords.forEach(record => {
-                const f = record.fields;
-                let tr = document.createElement('tr');
+            records.forEach(record => {
+                const fields = record.fields;
+                const tr = document.createElement('tr');
+                
                 tr.innerHTML = `
-                    <td>${f["Date Visite"] || '-'}</td>
-                    <td><strong>${f["ANABEL"] || '-'}</strong></td>
-                    <td>${f["Magasin"] || '-'}</td>
-                    <td>${f["Auditeur CSI"] || '-'}</td>
-                    <td><strong>${f["Note"] !== undefined ? f["Note"] : '-'}</strong> / 20</td>
-                    <td>${f["Commentaire Global"] || '-'}</td>
+                    <td><span class="status-badge">${fields['STATUT'] || 'À FAIRE'}</span></td>
+                    <td>${fields['ANABEL'] || ''}</td>
+                    <td>${fields['REGION'] || ''}</td>
+                    <td>${fields['DT'] || ''}</td>
+                    <td>${fields['CDF'] || ''}</td>
+                    <td>${fields['STORE'] || ''}</td>
+                    <td>${fields['ENSEIGNE'] || ''}</td>
+                    <td>${fields['PRIO'] || ''}</td>
+                    <td>${fields['CSI'] || ''}</td>
                 `;
+
+                const editableColumns = ['APPEL', 'MAIL', 'RELANCE', 'VISITE', 'NOTE', 'COMMENTAIRE'];
+                
+                editableColumns.forEach(col => {
+                    const td = document.createElement('td');
+                    td.className = 'editable';
+                    td.contentEditable = "true";
+                    td.innerText = fields[col] || '';
+                    
+                    td.addEventListener('blur', function() {
+                        const newValue = this.innerText.trim();
+                        const oldValue = fields[col] || '';
+                        
+                        if (newValue !== oldValue) {
+                            updateRecord(record.id, col, newValue);
+                            fields[col] = newValue;
+                            updateStats(allRecords);
+                        }
+                    });
+                    
+                    tr.appendChild(td);
+                });
+
                 tbody.appendChild(tr);
             });
         }
 
-        function afficherToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateY(-20px)';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(0)';
-            }, 2500);
+        function updateStats(records) {
+            const total = records.length;
+            const audites = records.filter(r => r.fields['NOTE'] || (r.fields['STATUT'] && r.fields['STATUT'] !== 'À FAIRE')).length;
+            document.getElementById('stat-couverture').textContent = `${audites} / ${total}`;
+
+            let sum = 0, count = 0;
+            records.forEach(r => {
+                const noteVal = parseFloat(r.fields['NOTE']);
+                if (!isNaN(noteVal)) {
+                    sum += noteVal;
+                    count++;
+                }
+            });
+            if (count > 0) {
+                document.getElementById('stat-moyenne').textContent = (sum / count).toFixed(1) + " / 20";
+            } else {
+                document.getElementById('stat-moyenne').textContent = "- / 20";
+            }
         }
+
+        async function updateRecord(recordId, fieldName, newValue) {
+            const updateData = {
+                "records": [{ "id": recordId, "fields": { [fieldName]: newValue } }]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'PATCH',
+                    headers: HEADERS,
+                    body: JSON.stringify(updateData)
+                });
+
+                if (response.ok) {
+                    showToast();
+                } else {
+                    console.error("Erreur lors de la sauvegarde :", await response.text());
+                    alert("Erreur lors de la sauvegarde sur Airtable.");
+                }
+            } catch (error) {
+                console.error("Erreur réseau :", error);
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        window.onload = fetchRecords;
     </script>
 </body>
 </html>
