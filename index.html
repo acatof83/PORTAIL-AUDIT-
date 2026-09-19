@@ -29,7 +29,6 @@
         .nav-bar { background-color: var(--carrefour-blue); color: white; padding: 10px 20px; }
         .container { padding: 20px; }
         
-        /* Bouton Imprimer */
         .btn-print {
             background-color: white;
             color: #333;
@@ -41,7 +40,6 @@
         }
         .btn-print:hover { background-color: #f1f1f1; }
 
-        /* Statistiques et KPIs */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -58,7 +56,6 @@
         .stat-card h4 { margin: 0 0 10px 0; font-size: 11px; color: #6c757d; text-transform: uppercase; }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #333; }
 
-        /* Barre de filtres */
         .filters-bar {
             background: white;
             padding: 15px;
@@ -82,7 +79,6 @@
             background-color: #fff;
         }
 
-        /* Tableau */
         .table-container {
             background: white;
             border-radius: 8px;
@@ -125,7 +121,6 @@
             font-size: 11px;
         }
 
-        /* Notification Toast */
         #toast {
             visibility: hidden;
             min-width: 250px;
@@ -158,7 +153,6 @@
     </div>
 
     <div class="container">
-        <!-- BLOCS DE STATISTIQUES -->
         <div class="stats-grid">
             <div class="stat-card">
                 <h4>Couverture du Parc</h4>
@@ -178,7 +172,6 @@
             </div>
         </div>
 
-        <!-- BARRE DE FILTRES -->
         <div class="filters-bar">
             <div class="filter-group">
                 <label>Filtrer par Statut</label>
@@ -212,7 +205,6 @@
             </div>
         </div>
 
-        <!-- TABLEAU DES DONNÉES -->
         <div class="table-container">
             <table id="auditTable">
                 <thead>
@@ -248,10 +240,7 @@
         const BASE_ID = "appgnEwxlkcToFDhV";
         const TABLE_ID = "tblliNWMvRXdSlNZg";
         
-        // Utilisation d'un proxy CORS public pour autoriser l'accès à tous tes collègues depuis le web
-        const API_URL = `https://corsproxy.io/?` + encodeURIComponent(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`);
-        const PATCH_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
-
+        const API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
         const HEADERS = {
             "Authorization": `Bearer ${AIRTABLE_PAT}`,
             "Content-Type": "application/json"
@@ -261,8 +250,12 @@
 
         async function fetchRecords() {
             try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error("Erreur de connexion Airtable");
+                const response = await fetch(API_URL, { 
+                    method: 'GET',
+                    headers: HEADERS,
+                    mode: 'cors'
+                });
+                if (!response.ok) throw new Error("Erreur de connexion Airtable (Vérifie ton Token ou l'ID de la table)");
                 const data = await response.json();
                 allRecords = data.records;
                 
@@ -332,7 +325,7 @@
             tbody.innerHTML = '';
 
             if (records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="15" style="text-align:center; color:#6c757d;">Aucun magasin trouvé avec ces filtres.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="15" style="text-align:center; color:#6c757d;">Aucun magasin trouvé.</td></tr>`;
                 return;
             }
 
@@ -404,8 +397,7 @@
             };
 
             try {
-                // Pour l'écriture des données, on tape directement sur Airtable avec le jeton sécurisé
-                const response = await fetch(PATCH_URL, {
+                const response = await fetch(API_URL, {
                     method: 'PATCH',
                     headers: HEADERS,
                     body: JSON.stringify(updateData)
