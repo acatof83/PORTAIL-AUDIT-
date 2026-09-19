@@ -248,7 +248,10 @@
         const BASE_ID = "appgnEwxlkcToFDhV";
         const TABLE_ID = "tblliNWMvRXdSlNZg";
         
-        const API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
+        // Utilisation d'un proxy CORS public pour autoriser l'accès à tous tes collègues depuis le web
+        const API_URL = `https://api.allorigins.win/raw?url=` + encodeURIComponent(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`);
+        const PATCH_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
+
         const HEADERS = {
             "Authorization": `Bearer ${AIRTABLE_PAT}`,
             "Content-Type": "application/json"
@@ -258,8 +261,8 @@
 
         async function fetchRecords() {
             try {
-                const response = await fetch(API_URL, { headers: HEADERS });
-                if (!response.ok) throw new Error("Erreur de connexion Airtable (Vérifie ton Token)");
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("Erreur de connexion Airtable");
                 const data = await response.json();
                 allRecords = data.records;
                 
@@ -401,7 +404,8 @@
             };
 
             try {
-                const response = await fetch(API_URL, {
+                // Pour l'écriture des données, on tape directement sur Airtable avec le jeton sécurisé
+                const response = await fetch(PATCH_URL, {
                     method: 'PATCH',
                     headers: HEADERS,
                     body: JSON.stringify(updateData)
