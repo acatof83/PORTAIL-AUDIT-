@@ -85,7 +85,9 @@
             letter-spacing: 0.12em;
             line-height: 1;
             margin: 0;
-            color: #ffffff;
+            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             transition: opacity 0.3s ease;
         }
 
@@ -93,7 +95,7 @@
             font-size: clamp(0.5rem, 0.8vw, 0.68rem);
             font-weight: 600;
             letter-spacing: 0.22em;
-            color: #e2e8f0;
+            color: var(--subtitle-color);
             margin-top: 4px;
             white-space: nowrap;
         }
@@ -339,9 +341,10 @@
         </div>
 
         <!-- NOUVEAU LOGO BOHÊME DYNAMIQUE -->
-        <div class="header-logo-container" id="logoContainer">
-            <div class="logo-container">
+        <div class="header-logo-container">
+            <div class="logo-container" id="logoContainer">
                 <img src="image_b75a41.png" alt="Emblème Chat Circuit" class="logo-icon">
+                
                 <div class="logo-text">
                     <h1 class="brand-title">BOHÊME</h1>
                     <p class="brand-subtitle">CODE &bull; DESIGN &bull; RETAIL</p>
@@ -1121,41 +1124,17 @@
                     topCsi = csiName;
                 }
             }
-            document.getElementById('kpi-top-auditor').textContent = topCsi !== '-' ? `${topCsi} (${maxCount})` : '-';
-            document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml || '<span style="color:#94a3b8;">Aucun audit validé</span>';
+            document.getElementById('kpi-top-auditor').textContent = topCsi !== '-' ? topCsi : '-';
+            document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml;
 
-            const dtStats = {};
-            storesData.forEach(s => {
-                if (!dtStats[s.DT]) dtStats[s.DT] = { total: 0, done: 0 };
-                dtStats[s.DT].total++;
-                const a = auditsHistory[s.ANABEL];
-                if (a && (a.date || (a.note !== null && a.note !== undefined))) {
-                    dtStats[s.DT].done++;
-                }
-            });
+            const lastAudit = Object.values(auditsHistory)
+                .filter(a => a.updatedAt)
+                .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
 
-            const dtDetailsContainer = document.getElementById('kpi-dt-details');
-            dtDetailsContainer.innerHTML = '';
-            for (const [dtName, stat] of Object.entries(dtStats)) {
-                const dtPct = Math.round((stat.done / stat.total) * 100);
-                const displayName = dtName.length > 16 ? dtName.substring(0, 14) + '..' : dtName;
-                dtDetailsContainer.innerHTML += `
-                    <div style="font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:600; color:#334155;" title="${dtName}">${displayName}</span>
-                        <span><b>${stat.done}/${stat.total}</b> (${dtPct}%)</span>
-                    </div>
-                `;
-            }
-
-            const validAudits = Object.values(auditsHistory).filter(a => a.date);
-            if (validAudits.length > 0) {
-                validAudits.sort((a,b) => new Date(b.date) - new Date(a.date));
-                const last = validAudits[0];
-                document.getElementById('kpi-last-date').textContent = formatDateFR(last.date);
-                document.getElementById('kpi-last-store').textContent = `${last.anabel} - ${last.store}`;
-            } else {
-                document.getElementById('kpi-last-date').textContent = '-';
-                document.getElementById('kpi-last-store').textContent = 'Aucun audit récent';
+            if (lastAudit) {
+                document.getElementById('kpi-last-date').textContent = formatDateFR(lastAudit.date || new Date(lastAudit.updatedAt));
+                const sRef = storesData.find(s => String(s.ANABEL) === String(lastAudit.anabel));
+                document.getElementById('kpi-last-store').textContent = `${lastAudit.anabel} - ${sRef ? sRef.STORE : lastAudit.store} (${lastAudit.csi})`;
             }
         }
 
@@ -1163,69 +1142,12 @@
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.style.opacity = '1';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 3000);
+            setTimeout(() => { toast.style.opacity = '0'; }, 3000);
         }
 
-        /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
-        function initLogoVibrationDetector() {
-            const logo = document.getElementById('logoContainer');
-            const runnerLeft = document.getElementById('runnerLeft');
-            const runnerRight = document.getElementById('runnerRight');
-
-            if (!logo || !runnerLeft || !runnerRight) return;
-
-            let leftTriggered = false;
-            let rightTriggered = false;
-
-            function checkOverlap() {
-                const logoRect = logo.getBoundingClientRect();
-                const leftRect = runnerLeft.getBoundingClientRect();
-                const rightRect = runnerRight.getBoundingClientRect();
-
-                if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
-                    if (!leftTriggered) {
-                        triggerLogoVibration();
-                        leftTriggered = true;
-                    }
-                } else {
-                    leftTriggered = false;
-                }
-
-                if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
-                    if (!rightTriggered) {
-                        triggerLogoVibration();
-                        rightTriggered = true;
-                    }
-                } else {
-                    rightTriggered = false;
-                }
-
-                requestAnimationFrame(checkOverlap);
-            }
-
-            function triggerLogoVibration() {
-                logo.classList.remove('vibrate-logo');
-                void logo.offsetWidth;
-                logo.classList.add('vibrate-logo');
-                setTimeout(() => {
-                    logo.classList.remove('vibrate-logo');
-                }, 1000);
-            }
-
-            requestAnimationFrame(checkOverlap);
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener('DOMContentLoaded', () => {
             initStoreSelect();
             initFilterSelects();
-            renderGrille();
-            renderHistory();
-            updateKPIs();
-            document.getElementById('auditDate').value = formatDateISO(new Date());
-            
-            initLogoVibrationDetector();
             ecouterChangementsFirebase();
         });
     </script>
