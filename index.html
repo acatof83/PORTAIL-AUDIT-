@@ -662,7 +662,7 @@
             updateKPIs();
             document.getElementById('auditDate').value = formatDateISO(new Date());
             
-            // Charger automatiquement les données depuis Google Sheets au démarrage
+            // Chargement automatique des données depuis Google Sheets au démarrage
             await chargerAuditsDepuisGoogle();
             
             initLogoVibrationDetector();
@@ -823,7 +823,7 @@
         async function archiverAudit() {
             if (!currentActiveStore) return alert("Veuillez sélectionner un magasin d'abord.");
             const noteVal = document.getElementById('auditNote').value;
-            if (!noteVal) return alert("Veuillez saisir la note globale.");
+            if (noteVal === '') return alert("Veuillez saisir la note globale.");
 
             const btnSave = document.getElementById('btnSaveAudit');
             btnSave.disabled = true;
@@ -871,17 +871,14 @@
                         date: date,
                         csi: csi,
                         note: parseFloat(noteVal),
-                        comment: comment,
-                        callDate: auditsHistory[currentActiveStore.ANABEL].callDate || '',
-                        mailDate: auditsHistory[currentActiveStore.ANABEL].mailDate || '',
-                        relanceDate: auditsHistory[currentActiveStore.ANABEL].relanceDate || ''
+                        comment: comment
                     })
                 });
             } catch(e) {
                 console.log("Transmission Sheet directe passée", e);
             }
 
-            showToast("💾 Audit enregistré et synchronisé pour tous !");
+            showToast("💾 Audit enregistré et synchronisé !");
             renderGrille();
             renderHistory();
             updateKPIs();
@@ -902,7 +899,7 @@
 
             storesData.forEach(store => {
                 const audit = auditsHistory[store.ANABEL];
-                const isAudited = !!(audit && (audit.date || audit.note !== null));
+                const isAudited = !!(audit && (audit.date || (audit.note !== null && audit.note !== undefined)));
 
                 if (statusFilter === 'AUDITED' && !isAudited) return;
                 if (statusFilter === 'NOT_AUDITED' && isAudited) return;
@@ -939,7 +936,7 @@
             });
         }
 
-        async function updateGridField(anabel, field, value) {
+        function updateGridField(anabel, field, value) {
             if (!auditsHistory[anabel]) {
                 const store = storesData.find(s => String(s.ANABEL) === String(anabel));
                 auditsHistory[anabel] = {
@@ -965,29 +962,7 @@
             localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
             renderHistory();
             updateKPIs();
-            showToast("💾 Mis à jour et synchronisé");
-
-            // SYNCHRONISATION SERVEUR GOOGLE SHEETS (Pour que les autres voient les modifs de la grille)
-            try {
-                const auditData = auditsHistory[anabel];
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        anabel: auditData.anabel,
-                        date: auditData.date || '',
-                        csi: auditData.csi || '',
-                        note: auditData.note !== null && auditData.note !== undefined ? auditData.note : '',
-                        comment: auditData.comment || '',
-                        callDate: auditData.callDate || '',
-                        mailDate: auditData.mailDate || '',
-                        relanceDate: auditData.relanceDate || ''
-                    })
-                });
-            } catch(e) {
-                console.log("Erreur de synchro réseau", e);
-            }
+            showToast("💾 Champ mis à jour");
         }
 
         function filtrerGrille() {
@@ -998,7 +973,7 @@
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
 
-            const auditedList = Object.values(auditsHistory).filter(a => a.date || a.note !== null || a.comment);
+            const auditedList = Object.values(auditsHistory).filter(a => a.date || (a.note !== null && a.note !== undefined) || a.comment);
 
             if (auditedList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:30px;">Aucun audit enregistré pour le moment.</td></tr>`;
@@ -1017,7 +992,7 @@
                 if (audit.note < 15 && audit.note >= 10) noteClass = 'note-cor';
                 if (audit.note < 10) noteClass = 'note-cri';
 
-                const noteDisplay = (audit.note !== null && audit.note !== undefined) 
+                const noteDisplay = (audit.note !== null && audit.note !== undefined && !isNaN(audit.note)) 
                     ? `<span class="badge-note ${noteClass}">${audit.note} / 20</span>` 
                     : '-';
 
@@ -1091,7 +1066,7 @@
             const totalStores = storesData.length;
             const auditedStores = storesData.filter(s => {
                 const a = auditsHistory[s.ANABEL];
-                return a && (a.date || a.note !== null);
+                return a && (a.date || (a.note !== null && a.note !== undefined));
             }).length;
 
             const percent = totalStores > 0 ? Math.round((auditedStores / totalStores) * 100) : 0;
@@ -1124,7 +1099,7 @@
 
             const csiCounts = {};
             Object.values(auditsHistory).forEach(a => {
-                if (a.csi && (a.date || a.note !== null)) {
+                if (a.csi && (a.date || (a.note !== null && a.note !== undefined))) {
                     csiCounts[a.csi] = (csiCounts[a.csi] || 0) + 1;
                 }
             });
@@ -1147,7 +1122,7 @@
                 if (!dtStats[s.DT]) dtStats[s.DT] = { total: 0, done: 0 };
                 dtStats[s.DT].total++;
                 const a = auditsHistory[s.ANABEL];
-                if (a && (a.date || a.note !== null)) {
+                if (a && (a.date || (a.note !== null && a.note !== undefined))) {
                     dtStats[s.DT].done++;
                 }
             });
@@ -1192,7 +1167,7 @@
                 const data = await res.json();
                 if (data && Array.isArray(data)) {
                     data.forEach(row => {
-                        if (row.anabel && (row.date || row.note !== null)) {
+                        if (row.anabel && (row.date || (row.note !== null && row.note !== undefined))) {
                             if (!auditsHistory[row.anabel]) {
                                 const storeRef = storesData.find(s => String(s.ANABEL) === String(row.anabel)) || {};
                                 auditsHistory[row.anabel] = {
@@ -1209,9 +1184,6 @@
                                 if (row.date) auditsHistory[row.anabel].date = row.date;
                                 if (row.note !== null && row.note !== undefined) auditsHistory[row.anabel].note = row.note;
                                 if (row.comment) auditsHistory[row.anabel].comment = row.comment;
-                                if (row.callDate) auditsHistory[row.anabel].callDate = row.callDate;
-                                if (row.mailDate) auditsHistory[row.anabel].mailDate = row.mailDate;
-                                if (row.relanceDate) auditsHistory[row.anabel].relanceDate = row.relanceDate;
                             }
                         }
                     });
