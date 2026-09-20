@@ -37,7 +37,7 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* LOGO SVG INTEGRATION & VIBRATION */
+        /* LOGO SVG INTEGRATION & VIBRATION (DYNAMIQUE) */
         .header-logo-container {
             z-index: 2;
             position: relative;
@@ -45,18 +45,19 @@
             align-items: center;
             justify-content: center;
             height: 141px;
-            flex: 0 1 auto;
+            flex: 1 1 auto; /* Permet au conteneur de s'adapter */
+            max-width: 50%; /* Evite qu'il ne prenne toute la place sur petit écran */
         }
         .header-logo-container svg {
-            height: 100%;
-            width: auto;
+            height: auto; /* Dynamique */
+            width: 100%; /* Dynamique */
             max-height: 141px;
             max-width: 650px;
             display: block;
             transition: transform 0.1s ease-in-out;
         }
         .vibrate-logo {
-            animation: vibrate 1s linear forwards;
+            animation: vibrate 0.2s linear infinite; /* Vibration en boucle tant que le perso est devant */
         }
 
         @keyframes vibrate {
@@ -975,6 +976,7 @@
             });
         }
 
+        /* --- CODE COMPLETÉ ICI (suite de l'endroit où la fonction coupait) --- */
         window.ouvrirModalImpression = function(anabel) {
             const audit = auditsHistory[anabel];
             if (!audit) return;
@@ -985,39 +987,27 @@
             document.getElementById('modalStoreName').textContent = storeRef.STORE || audit.store || 'Magasin';
             document.getElementById('modalCSI').textContent = audit.csi || '-';
             document.getElementById('modalDate').textContent = formatDateFR(audit.date);
-            document.getElementById('modalNote').textContent = audit.note !== undefined && audit.note !== null ? `${audit.note} / 20` : '-';
-            document.getElementById('modalComment').textContent = audit.comment || 'Aucun commentaire particulier.';
+            document.getElementById('modalNote').textContent = (audit.note !== null && audit.note !== undefined) ? audit.note + ' / 20' : '-';
+            document.getElementById('modalComment').textContent = audit.comment || '-';
 
             const grid = document.getElementById('modalItemsGrid');
             grid.innerHTML = '';
+            (audit.items || defaultAuditItems).forEach(item => {
+                let stateColor = '#10b981';
+                if (item.state === 'MOYEN') stateColor = '#f59e0b';
+                if (item.state === 'CRITIQUE') stateColor = '#dc2626';
 
-            const itemsToDisplay = audit.items || defaultAuditItems;
-            let currentCatModal = '';
-
-            itemsToDisplay.forEach(item => {
-                if (item.cat !== currentCatModal) {
-                    currentCatModal = item.cat;
-                    const catTitle = document.createElement('div');
-                    catTitle.style.cssText = "font-weight:700; color:var(--carrefour-blue); background:#e2e8f0; padding:6px 10px; border-radius:4px; margin-top:8px; font-size:0.8rem; text-transform:uppercase;";
-                    catTitle.textContent = currentCatModal;
-                    grid.appendChild(catTitle);
-                }
-
-                let badgeStateStyle = "background:#dcfce7; color:#166534;";
-                if (item.state === 'MOYEN') badgeStateStyle = "background:#fef3c7; color:#92400e;";
-                if (item.state === 'CRITIQUE' || item.state === 'MAUVAIS') badgeStateStyle = "background:#fee2e2; color:#b91c1c;";
-                if (item.state === 'ABSENT') badgeStateStyle = "background:#f1f5f9; color:#64748b;";
-
-                const row = document.createElement('div');
-                row.style.cssText = "display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; align-items:center; padding:6px 10px; border-bottom:1px solid #e2e8f0; font-size:0.85rem;";
-                row.innerHTML = `
-                    <div>${item.name}</div>
-                    <div style="font-weight:600; color:#475569;">${item.qty || '-'}</div>
-                    <div><span style="padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.75rem; ${badgeStateStyle}">${item.state || 'BON'}</span></div>
+                grid.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem;">
+                        <span style="color:#334155;">${item.name}</span>
+                        <div style="display:flex; gap: 15px; font-weight: bold;">
+                            <span style="color:#64748b;">${item.qty}</span>
+                            <span style="color:${stateColor}; width: 70px; text-align: right;">${item.state}</span>
+                        </div>
+                    </div>
                 `;
-                grid.appendChild(row);
             });
-
+            
             document.getElementById('printModal').style.display = 'flex';
         };
 
@@ -1025,164 +1015,85 @@
             document.getElementById('printModal').style.display = 'none';
         };
 
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.opacity = 1;
+            toast.style.pointerEvents = 'auto';
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                toast.style.pointerEvents = 'none';
+            }, 3000);
+        };
+
         function updateKPIs() {
-            const totalStores = storesData.length;
-            const auditedStores = storesData.filter(s => {
-                const a = auditsHistory[s.ANABEL];
-                return a && (a.date || (a.note !== null && a.note !== undefined));
-            }).length;
-
-            const percent = totalStores > 0 ? Math.round((auditedStores / totalStores) * 100) : 0;
-
-            document.getElementById('kpi-audits').textContent = auditedStores;
-            document.getElementById('kpi-total').textContent = totalStores;
-            document.getElementById('kpi-reste').textContent = totalStores - auditedStores;
-            document.getElementById('kpi-percent').textContent = percent + '%';
+            const audited = Object.values(auditsHistory).filter(a => a.date || (a.note !== null && a.note !== undefined));
+            const total = storesData.length;
+            
+            document.getElementById('kpi-audits').textContent = audited.length;
+            document.getElementById('kpi-total').textContent = total;
+            document.getElementById('kpi-reste').textContent = total - audited.length;
+            
+            const percent = total > 0 ? Math.round((audited.length / total) * 100) : 0;
             document.getElementById('kpi-progress').style.width = percent + '%';
+            document.getElementById('kpi-percent').textContent = percent + '%';
 
-            let notesSum = 0;
-            let notesCount = 0;
+            let sumNotes = 0, countNotes = 0;
             let exc = 0, cor = 0, cri = 0;
-
-            Object.values(auditsHistory).forEach(a => {
+            audited.forEach(a => {
                 if (a.note !== null && a.note !== undefined && !isNaN(a.note)) {
-                    notesSum += a.note;
-                    notesCount++;
+                    sumNotes += a.note;
+                    countNotes++;
                     if (a.note >= 15) exc++;
                     else if (a.note >= 10) cor++;
                     else cri++;
                 }
             });
-
-            const avg = notesCount > 0 ? (notesSum / notesCount).toFixed(1) : '-';
-            document.getElementById('kpi-moyenne').innerHTML = `${avg} <span style="font-size:0.95rem; color:#94a3b8;">/ 20</span>`;
+            
+            document.getElementById('kpi-moyenne').innerHTML = countNotes > 0 ? (sumNotes/countNotes).toFixed(1) + ' <span style="font-size: 0.95rem; color: #94a3b8;">/ 20</span>' : '-';
             document.getElementById('kpi-exc').textContent = exc;
             document.getElementById('kpi-cor').textContent = cor;
             document.getElementById('kpi-cri').textContent = cri;
-
-            const csiCounts = {};
-            Object.values(auditsHistory).forEach(a => {
-                if (a.csi && (a.date || (a.note !== null && a.note !== undefined))) {
-                    csiCounts[a.csi] = (csiCounts[a.csi] || 0) + 1;
-                }
-            });
-
-            let topCsi = '-';
-            let maxCount = -1;
-            let csiDetailsHtml = '';
-            for (const [csiName, count] of Object.entries(csiCounts)) {
-                csiDetailsHtml += `<div><b>${csiName}</b> : ${count} audits</div>`;
-                if (count > maxCount) {
-                    maxCount = count;
-                    topCsi = csiName;
-                }
-            }
-            document.getElementById('kpi-top-auditor').textContent = topCsi !== '-' ? `${topCsi} (${maxCount})` : '-';
-            document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml || '<span style="color:#94a3b8;">Aucun audit validé</span>';
-
-            const dtStats = {};
-            storesData.forEach(s => {
-                if (!dtStats[s.DT]) dtStats[s.DT] = { total: 0, done: 0 };
-                dtStats[s.DT].total++;
-                const a = auditsHistory[s.ANABEL];
-                if (a && (a.date || (a.note !== null && a.note !== undefined))) {
-                    dtStats[s.DT].done++;
-                }
-            });
-
-            const dtDetailsContainer = document.getElementById('kpi-dt-details');
-            dtDetailsContainer.innerHTML = '';
-            for (const [dtName, stat] of Object.entries(dtStats)) {
-                const dtPct = Math.round((stat.done / stat.total) * 100);
-                const displayName = dtName.length > 16 ? dtName.substring(0, 14) + '..' : dtName;
-                dtDetailsContainer.innerHTML += `
-                    <div style="font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:600; color:#334155;" title="${dtName}">${displayName}</span>
-                        <span><b>${stat.done}/${stat.total}</b> (${dtPct}%)</span>
-                    </div>
-                `;
-            }
-
-            const validAudits = Object.values(auditsHistory).filter(a => a.date);
-            if (validAudits.length > 0) {
-                validAudits.sort((a,b) => new Date(b.date) - new Date(a.date));
-                const last = validAudits[0];
-                document.getElementById('kpi-last-date').textContent = formatDateFR(last.date);
-                document.getElementById('kpi-last-store').textContent = `${last.anabel} - ${last.store}`;
-            } else {
-                document.getElementById('kpi-last-date').textContent = '-';
-                document.getElementById('kpi-last-store').textContent = 'Aucun audit récent';
-            }
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.style.opacity = '1';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 3000);
-        }
+        // INIT
+        initStoreSelect();
+        initFilterSelects();
+        ecouterChangementsFirebase();
+    </script>
 
-        /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
-        function initLogoVibrationDetector() {
-            const logo = document.getElementById('logoContainer');
+    <!-- SCRIPT DE GESTION DE LA COLLISION & VIBRATION (NOUVEAU SCRIPT) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logo = document.querySelector('#logoContainer svg');
             const runnerLeft = document.getElementById('runnerLeft');
             const runnerRight = document.getElementById('runnerRight');
 
-            if (!logo || !runnerLeft || !runnerRight) return;
+            function checkCollision() {
+                if (!logo || !runnerLeft || !runnerRight) return;
 
-            let leftTriggered = false;
-            let rightTriggered = false;
-
-            function checkOverlap() {
                 const logoRect = logo.getBoundingClientRect();
                 const leftRect = runnerLeft.getBoundingClientRect();
                 const rightRect = runnerRight.getBoundingClientRect();
 
-                if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
-                    if (!leftTriggered) {
-                        triggerLogoVibration();
-                        leftTriggered = true;
+                // On vérifie le chevauchement avec une petite tolérance pour plus de fluidité
+                const isLeftColliding = (leftRect.right > logoRect.left + 20 && leftRect.left < logoRect.right - 20);
+                const isRightColliding = (rightRect.right > logoRect.left + 20 && rightRect.left < logoRect.right - 20);
+
+                if (isLeftColliding || isRightColliding) {
+                    if (!logo.classList.contains('vibrate-logo')) {
+                        logo.classList.add('vibrate-logo');
                     }
                 } else {
-                    leftTriggered = false;
-                }
-
-                if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
-                    if (!rightTriggered) {
-                        triggerLogoVibration();
-                        rightTriggered = true;
-                    }
-                } else {
-                    rightTriggered = false;
-                }
-
-                requestAnimationFrame(checkOverlap);
-            }
-
-            function triggerLogoVibration() {
-                logo.classList.remove('vibrate-logo');
-                void logo.offsetWidth;
-                logo.classList.add('vibrate-logo');
-                setTimeout(() => {
                     logo.classList.remove('vibrate-logo');
-                }, 1000);
+                }
+
+                // Appeler de manière continue pour surveiller la position
+                requestAnimationFrame(checkCollision);
             }
-
-            requestAnimationFrame(checkOverlap);
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initStoreSelect();
-            initFilterSelects();
-            renderGrille();
-            renderHistory();
-            updateKPIs();
-            document.getElementById('auditDate').value = formatDateISO(new Date());
             
-            initLogoVibrationDetector();
-            ecouterChangementsFirebase();
+            // Lancer la boucle d'analyse
+            requestAnimationFrame(checkCollision);
         });
     </script>
 </body>
