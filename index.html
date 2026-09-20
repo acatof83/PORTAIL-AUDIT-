@@ -662,7 +662,7 @@
             updateKPIs();
             document.getElementById('auditDate').value = formatDateISO(new Date());
             
-            // CORRECTION CLE : Charger automatiquement les données depuis Google Sheets au démarrage pour tous les utilisateurs
+            // Charger automatiquement les données depuis Google Sheets au démarrage
             await chargerAuditsDepuisGoogle();
             
             initLogoVibrationDetector();
@@ -871,14 +871,17 @@
                         date: date,
                         csi: csi,
                         note: parseFloat(noteVal),
-                        comment: comment
+                        comment: comment,
+                        callDate: auditsHistory[currentActiveStore.ANABEL].callDate || '',
+                        mailDate: auditsHistory[currentActiveStore.ANABEL].mailDate || '',
+                        relanceDate: auditsHistory[currentActiveStore.ANABEL].relanceDate || ''
                     })
                 });
             } catch(e) {
                 console.log("Transmission Sheet directe passée", e);
             }
 
-            showToast("💾 Audit enregistré et synchronisé !");
+            showToast("💾 Audit enregistré et synchronisé pour tous !");
             renderGrille();
             renderHistory();
             updateKPIs();
@@ -936,7 +939,7 @@
             });
         }
 
-        function updateGridField(anabel, field, value) {
+        async function updateGridField(anabel, field, value) {
             if (!auditsHistory[anabel]) {
                 const store = storesData.find(s => String(s.ANABEL) === String(anabel));
                 auditsHistory[anabel] = {
@@ -962,7 +965,29 @@
             localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
             renderHistory();
             updateKPIs();
-            showToast("💾 Champ mis à jour");
+            showToast("💾 Mis à jour et synchronisé");
+
+            // SYNCHRONISATION SERVEUR GOOGLE SHEETS (Pour que les autres voient les modifs de la grille)
+            try {
+                const auditData = auditsHistory[anabel];
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        anabel: auditData.anabel,
+                        date: auditData.date || '',
+                        csi: auditData.csi || '',
+                        note: auditData.note !== null && auditData.note !== undefined ? auditData.note : '',
+                        comment: auditData.comment || '',
+                        callDate: auditData.callDate || '',
+                        mailDate: auditData.mailDate || '',
+                        relanceDate: auditData.relanceDate || ''
+                    })
+                });
+            } catch(e) {
+                console.log("Erreur de synchro réseau", e);
+            }
         }
 
         function filtrerGrille() {
@@ -1184,6 +1209,9 @@
                                 if (row.date) auditsHistory[row.anabel].date = row.date;
                                 if (row.note !== null && row.note !== undefined) auditsHistory[row.anabel].note = row.note;
                                 if (row.comment) auditsHistory[row.anabel].comment = row.comment;
+                                if (row.callDate) auditsHistory[row.anabel].callDate = row.callDate;
+                                if (row.mailDate) auditsHistory[row.anabel].mailDate = row.mailDate;
+                                if (row.relanceDate) auditsHistory[row.anabel].relanceDate = row.relanceDate;
                             }
                         }
                     });
