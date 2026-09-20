@@ -96,7 +96,7 @@
             100% { background: #fde047; }
         }
 
-        /* ANIMATION DE SOULÈVEMENT DU LOGO À CHAQUE PASSAGE */
+        /* ANIMATION DE SOULÈVEMENT DU LOGO SYNCHRONISÉE AVEC LES PERSONNAGES */
         .boheme-logo-wrapper {
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: liftLogo 14s ease-in-out infinite;
@@ -104,11 +104,11 @@
         }
 
         @keyframes liftLogo {
-            0%, 15% { transform: translateY(0); }
-            20%, 28% { transform: translateY(-22px); }
-            33%, 65% { transform: translateY(0); }
-            70%, 78% { transform: translateY(-22px); }
-            83%, 100% { transform: translateY(0); }
+            0%, 35% { transform: translateY(0); }
+            38%, 48% { transform: translateY(-22px); } /* Passage du stickman venant de gauche */
+            52%, 85% { transform: translateY(0); }
+            88%, 98% { transform: translateY(-22px); } /* Passage du stickman venant de droite */
+            100% { transform: translateY(0); }
         }
 
         /* NAVIGATION BLEU MARINE */
@@ -282,7 +282,7 @@
         </div>
 
         <div class="header-right-container">
-            <!-- LOGO BOHÊME AGRANDI DE 10% + NOUVEAU SOUS-TITRE + ANIMATION CORRIGÉE -->
+            <!-- LOGO BOHÊME AGRANDI DE 10% + SOUS-TITRE (TAILLE TAILLE 13.2px) + ANIMATION CORRIGÉE -->
             <div class="boheme-logo-wrapper">
                 <svg width="297" height="77" viewBox="0 0 450 115" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));">
                     <defs>
@@ -334,8 +334,8 @@
                     <!-- Texte principal BOHÊME -->
                     <text x="200" y="66" font-family="'Cinzel', 'Georgia', 'Times New Roman', serif" font-size="52" font-weight="bold" fill="url(#goldTextGrad)" letter-spacing="4">BOHÊME</text>
                     
-                    <!-- Sous-titre MODIFIÉ : CODE DESIGN RETAIL -->
-                    <text x="205" y="93" font-family="'Montserrat', 'Helvetica', 'Arial', sans-serif" font-size="12" font-weight="600" fill="url(#bronzeGrad)" letter-spacing="3.2">CODE DESIGN RETAIL</text>
+                    <!-- Sous-titre MODIFIÉ (+10% -> 13.2px) : CODE DESIGN RETAIL -->
+                    <text x="205" y="93" font-family="'Montserrat', 'Helvetica', 'Arial', sans-serif" font-size="13.2" font-weight="600" fill="url(#bronzeGrad)" letter-spacing="3.2">CODE DESIGN RETAIL</text>
                 </svg>
             </div>
 
