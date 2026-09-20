@@ -37,20 +37,20 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* LOGO SVG INTEGRATION & VIBRATION (GROSSISSEMENT +30% -> 128px) */
+        /* LOGO SVG INTEGRATION & VIBRATION (+10% -> 141px) */
         .header-logo-container {
             z-index: 2;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 128px;
+            height: 141px;
             flex: 0 1 auto;
         }
         .header-logo-container svg {
             height: 100%;
             width: auto;
-            max-height: 128px;
+            max-height: 141px;
             max-width: 650px;
             display: block;
             transition: transform 0.1s ease-in-out;
@@ -287,7 +287,7 @@
             <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
 
-        <!-- LOGO BOHÊME INCRUSTÉ (+30% PLUS GRAND) -->
+        <!-- LOGO BOHÊME INCRUSTÉ (+10% PLUS GRAND -> 141px) -->
         <div class="header-logo-container" id="logoContainer">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250">
               <defs>
@@ -1128,9 +1128,10 @@
             dtDetailsContainer.innerHTML = '';
             for (const [dtName, stat] of Object.entries(dtStats)) {
                 const dtPct = Math.round((stat.done / stat.total) * 100);
+                const displayName = dtName.length > 16 ? dtName.substring(0, 14) + '..' : dtName;
                 dtDetailsContainer.innerHTML += `
                     <div style="font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:600; color:#334155;" title="${dtName}">${dtName.substring(0, 14)}..</span>
+                        <span style="font-weight:600; color:#334155;" title="${dtName}">${displayName}</span>
                         <span><b>${stat.done}/${stat.total}</b> (${dtPct}%)</span>
                     </div>
                 `;
