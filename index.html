@@ -654,14 +654,17 @@
             return '';
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             initStoreSelect();
             initFilterSelects();
             renderGrille();
             renderHistory();
             updateKPIs();
             document.getElementById('auditDate').value = formatDateISO(new Date());
-            chargerAuditsDepuisGoogle();
+            
+            // CORRECTION CLE : Charger automatiquement les données depuis Google Sheets au démarrage pour tous les utilisateurs
+            await chargerAuditsDepuisGoogle();
+            
             initLogoVibrationDetector();
         });
 
