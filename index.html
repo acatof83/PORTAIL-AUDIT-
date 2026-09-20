@@ -32,7 +32,23 @@
             min-height: 85px;
         }
 
-        .header-title { z-index: 2; position: relative; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .header-logo {
+            height: 45px;
+            width: auto;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
@@ -50,8 +66,8 @@
         .head::before { content: ''; position: absolute; top: -3px; left: -2px; width: 17px; height: 7px; background: var(--carrefour-orange); border-radius: 8px 8px 2px 2px; }
         
         .torso { width: 11px; height: 19px; position: absolute; left: 9px; top: 11px; border-radius: 5px; }
-        .torso-left { background: #f472b6; animation: colorCycleLeft 28s infinite; } /* Rose puis Bleu */
-        .torso-right { background: #fde047; animation: colorCycleRight 28s infinite 7s; } /* Jaune puis Vert */
+        .torso-left { background: #f472b6; animation: colorCycleLeft 28s infinite; }
+        .torso-right { background: #fde047; animation: colorCycleRight 28s infinite 7s; }
 
         .arm { width: 14px; height: 4px; background: #ffccb3; position: absolute; border-radius: 3px; transform-origin: left center; }
         .arm.left { left: 13px; top: 14px; transform: rotate(-15deg); background: #eba988; }
@@ -69,15 +85,14 @@
         @keyframes runFromLeft { 0% { left: -150px; } 100% { left: 110%; } }
         @keyframes runFromRight { 0% { right: -150px; } 100% { right: 110%; } }
 
-        /* ANIMATIONS CHANGEMENT COULEUR DES VETEMENTS */
         @keyframes colorCycleLeft {
-            0%, 49.99% { background: #f472b6; } /* Rose */
-            50%, 99.99% { background: #60a5fa; } /* Bleu */
+            0%, 49.99% { background: #f472b6; }
+            50%, 99.99% { background: #60a5fa; }
             100% { background: #f472b6; }
         }
         @keyframes colorCycleRight {
-            0%, 49.99% { background: #fde047; } /* Jaune */
-            50%, 99.99% { background: #4ade80; } /* Vert */
+            0%, 49.99% { background: #fde047; }
+            50%, 99.99% { background: #4ade80; }
             100% { background: #fde047; }
         }
 
@@ -246,9 +261,12 @@
             <div class="cart-emoji">🛒</div>
         </div>
 
-        <div class="header-title">
-            <h1>🛒 Portail Audit Magasins CSI</h1>
-            <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/3b/Logo_Carrefour_%282009%29.svg/1200px-Logo_Carrefour_%282009%29.svg.png" alt="Logo Carrefour" class="header-logo">
+            <div class="header-title">
+                <h1>Portail Audit Magasins CSI</h1>
+                <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
+            </div>
         </div>
         <button class="btn btn-secondary no-print" onclick="window.print()">🖨️ Imprimer la vue</button>
     </header>
