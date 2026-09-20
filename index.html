@@ -33,7 +33,7 @@
         }
 
         .header-title { z-index: 2; position: relative; }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-bottom: 3px; }
+        .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
         /* ANIMATION RUNNER & CADDIE */
@@ -246,15 +246,11 @@
             <div class="cart-emoji">🛒</div>
         </div>
 
-        <div class="header-title" style="display: flex; align-items: center; gap: 15px;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Carrefour_logo.svg" alt="Logo Carrefour" style="height: 48px; background: white; padding: 6px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-            <div>
-                <h1>🛒 Portail Audit Magasins CSI</h1>
-                <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
-            </div>
+        <div class="header-title">
+            <h1>🛒 Portail Audit Magasins CSI</h1>
+            <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
-        
-        <button class="btn btn-secondary no-print" onclick="window.print()" style="z-index: 2; position: relative;">🖨️ Imprimer la vue</button>
+        <button class="btn btn-secondary no-print" onclick="window.print()">🖨️ Imprimer la vue</button>
     </header>
 
     <nav class="no-print">
@@ -270,8 +266,8 @@
             <div class="card">
                 <div class="search-container no-print">
                     <div class="input-group">
-                        <label>Code ANABEL</label>
-                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, A46S..." onkeyup="if(event.key==='Enter') chercherMagasin()">
+                        <label>Code ANABEL ou Ville</label>
+                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, LYON..." onkeyup="if(event.key==='Enter') chercherMagasin()">
                     </div>
                     <div class="input-group" style="flex: 2;">
                         <label>Ou choisir dans la liste complète</label>
