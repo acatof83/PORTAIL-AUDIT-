@@ -845,6 +845,8 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
+                // Forcer une lecture immédiate après l'envoi
+                setTimeout(chargerAuditsDepuisGoogle, 800);
             } catch(e) {
                 console.error("Erreur de synchronisation backend", e);
             }
@@ -1197,14 +1199,13 @@
                 const data = await res.json();
                 
                 if (data && Array.isArray(data)) {
-                    let hasNewData = false;
+                    const newHistory = {};
 
                     data.forEach(row => {
-                        if (!row.anabel) return;
+                        const key = row.anabel ? String(row.anabel).trim() : '';
+                        if (!key) return;
                         
-                        const anabelKey = String(row.anabel);
-                        const storeRef = storesData.find(s => String(s.ANABEL) === anabelKey) || {};
-                        const existing = auditsHistory[anabelKey];
+                        const storeRef = storesData.find(s => String(s.ANABEL) === key) || {};
 
                         let parsedItems = defaultAuditItems;
                         if (row.items) {
@@ -1215,34 +1216,27 @@
                             }
                         }
 
-                        const remoteUpdatedAt = row.updatedAt ? new Date(row.updatedAt).getTime() : 0;
-                        const localUpdatedAt = existing?.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
-
-                        if (!existing || remoteUpdatedAt >= localUpdatedAt || !existing.updatedAt) {
-                            auditsHistory[anabelKey] = {
-                                anabel: anabelKey,
-                                store: row.store || storeRef.STORE || '',
-                                enseigne: row.enseigne || storeRef.ENSEIGNE || '',
-                                csi: row.csi || storeRef.CSI || '',
-                                date: row.date ? formatDateISO(row.date) : (existing?.date || ''),
-                                note: (row.note !== null && row.note !== undefined && row.note !== '') ? parseFloat(row.note) : (existing?.note ?? null),
-                                comment: row.comment !== undefined ? row.comment : (existing?.comment || ''),
-                                callDate: row.callDate ? formatDateISO(row.callDate) : (existing?.callDate || ''),
-                                mailDate: row.mailDate ? formatDateISO(row.mailDate) : (existing?.mailDate || ''),
-                                relanceDate: row.relanceDate ? formatDateISO(row.relanceDate) : (existing?.relanceDate || ''),
-                                items: (parsedItems && parsedItems.length) ? parsedItems : (existing?.items || defaultAuditItems),
-                                updatedAt: row.updatedAt || existing?.updatedAt || new Date().toISOString()
-                            };
-                            hasNewData = true;
-                        }
+                        newHistory[key] = {
+                            anabel: key,
+                            store: row.store || storeRef.STORE || '',
+                            enseigne: row.enseigne || storeRef.ENSEIGNE || '',
+                            csi: row.csi || storeRef.CSI || '',
+                            date: row.date ? formatDateISO(row.date) : '',
+                            note: (row.note !== null && row.note !== undefined && row.note !== '') ? parseFloat(row.note) : null,
+                            comment: row.comment || '',
+                            callDate: row.callDate ? formatDateISO(row.callDate) : '',
+                            mailDate: row.mailDate ? formatDateISO(row.mailDate) : '',
+                            relanceDate: row.relanceDate ? formatDateISO(row.relanceDate) : '',
+                            items: (parsedItems && parsedItems.length) ? parsedItems : defaultAuditItems,
+                            updatedAt: row.updatedAt || new Date().toISOString()
+                        };
                     });
 
-                    if (hasNewData) {
-                        localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
-                        renderGrille();
-                        renderHistory();
-                        updateKPIs();
-                    }
+                    auditsHistory = newHistory;
+                    localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+                    renderGrille();
+                    renderHistory();
+                    updateKPIs();
                 }
             } catch(e) {
                 console.log("Mode hors-ligne ou synchro indisponible", e);
