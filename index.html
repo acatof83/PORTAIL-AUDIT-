@@ -19,56 +19,32 @@
             --warning-orange: #f59e0b;
             --success-green: #10b981;
             --subtitle-color: #9ca3af;
-            --accent-glow: rgba(255, 255, 255, 0.3);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
         body { background-color: var(--bg-light); color: var(--text-dark); padding-bottom: 50px; }
 
-        /* HEADER VERT CARREFOUR */
+        /* HEADER VERT CARREFOUR & BRANDING BOHÊME */
         header { 
             background: linear-gradient(135deg, var(--carrefour-green), var(--carrefour-green-dark)); 
             color: white; padding: 18px 30px; 
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 4px solid var(--carrefour-orange); overflow: hidden; position: relative;
             min-height: 140px;
-            gap: 15px;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .header-title { z-index: 2; position: relative; flex: 1 1 auto; }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
-
-        /* LOGO DYNAMIQUE BOHÊME */
-        .header-logo-container {
-            z-index: 2;
-            position: relative;
+        .header-brand {
             display: flex;
             align-items: center;
-            animation: logoLiftCycle 14s infinite;
-            transform-origin: bottom center;
+            gap: 20px;
+            z-index: 2;
+            position: relative;
         }
 
-        .header-logo {
-            height: 52px;
-            width: auto;
-            border-radius: 8px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.35);
-            border: 2px solid rgba(255,255,255,0.5);
-            background: #fff;
-            object-fit: cover;
-        }
-
-        @keyframes logoLiftCycle {
-            0%, 40% { transform: translateY(0) rotate(0deg); }
-            43% { transform: translateY(-28px) rotate(-6deg); }
-            48% { transform: translateY(-28px) rotate(6deg); }
-            52% { transform: translateY(0) rotate(0deg); }
-            90% { transform: translateY(0) rotate(0deg); }
-            93% { transform: translateY(-28px) rotate(6deg); }
-            98% { transform: translateY(-28px) rotate(-6deg); }
-            100% { transform: translateY(0) rotate(0deg); }
-        }
+        .header-title h1 { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .header-title p { font-size: 0.85rem; margin-top: 3px; opacity: 0.95; }
 
         /* ANIMATION RUNNER & CADDIE */
         .runner-scene-left {
@@ -99,10 +75,8 @@
         @keyframes runLegRight { 0% { transform: rotate(35deg); } 100% { transform: rotate(-45deg); } }
         @keyframes bob { 0% { transform: translateY(0px); } 100% { transform: translateY(2px); } }
         @keyframes cartShake { 0% { transform: scaleX(-1) translateY(3px); } 100% { transform: scaleX(-1) translateY(4px) translateX(-2px); } }
-        
         @keyframes runFromLeft { 0% { left: -150px; } 100% { left: 110%; } }
         @keyframes runFromRight { 0% { right: -150px; } 100% { right: 110%; } }
-
         @keyframes colorCycleLeft {
             0%, 49.99% { background: #f472b6; }
             50%, 99.99% { background: #60a5fa; }
@@ -277,14 +251,43 @@
             <div class="cart-emoji">🛒</div>
         </div>
 
-        <div class="header-title">
-            <h1>🛒 Portail Audit Magasins CSI</h1>
-            <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
-        </div>
+        <div class="header-brand">
+            <!-- LOGO BOHÊME INTÉGRÉ EN CODE SVG NATIF (NON PRÉSENT COMME FICHIER IMAGE) -->
+            <svg width="190" height="52" viewBox="0 0 350 90" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                <defs>
+                    <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#f5d7b2"/>
+                        <stop offset="50%" stop-color="#c58d59"/>
+                        <stop offset="100%" stop-color="#8a5328"/>
+                    </linearGradient>
+                    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="50%" stop-color="#fde047"/>
+                        <stop offset="100%" stop-color="#f5d7b2"/>
+                    </linearGradient>
+                </defs>
+                <!-- Circuit lines on the left -->
+                <g stroke="url(#copperGrad)" stroke-width="3" fill="none" stroke-linecap="round">
+                    <path d="M 45 30 L 25 30 L 15 20" />
+                    <circle cx="15" cy="20" r="3" fill="url(#copperGrad)" />
+                    <path d="M 40 50 L 20 50" />
+                    <circle cx="20" cy="50" r="3" fill="url(#copperGrad)" />
+                    <path d="M 45 70 L 25 70 L 15 80" />
+                    <circle cx="15" cy="80" r="3" fill="url(#copperGrad)" />
+                </g>
+                <!-- Stylized Letter C -->
+                <path d="M 75 22 C 50 22 35 40 35 55 C 35 70 50 88 75 88 C 95 88 110 78 118 65 L 98 55 C 94 62 86 68 76 68 C 64 68 56 58 56 55 C 56 52 64 42 76 42 C 86 42 94 48 98 55 L 118 45 C 110 32 95 22 75 22 Z" fill="url(#copperGrad)" />
+                <!-- Cat silhouette inside C -->
+                <path d="M 75 58 C 73 58 71 60 71 62 L 71 72 C 71 74 73 76 75 76 C 77 76 79 74 79 72 L 79 62 C 79 60 77 58 75 58 Z M 71 52 L 69 46 L 73 49 Z M 79 52 L 81 46 L 77 49 Z" fill="#1b1008" />
+                <!-- Text BOHÊME -->
+                <text x="135" y="55" font-family="Georgia, serif" font-size="30" font-weight="bold" fill="url(#textGrad)" letter-spacing="2">BOHÊME</text>
+                <text x="137" y="74" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#e2e8f0" letter-spacing="2.5">CODE • DESIGN • RETAIL</text>
+            </svg>
 
-        <!-- LOGO BOHÊME INTÉGRÉ ICI (À GAUCHE DU BOUTON IMPRIMER) -->
-        <div class="header-logo-container no-print">
-            <img src="logo 3 .jfif" alt="Logo Bohême" class="header-logo">
+            <div class="header-title">
+                <h1>Portail Audit Magasins CSI</h1>
+                <p>Suivi équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 6px;">(72 Magasins Intégrés 🟢)</span></p>
+            </div>
         </div>
 
         <button class="btn btn-secondary no-print" onclick="window.print()" style="z-index: 2; position: relative;">🖨️ Imprimer la vue</button>
@@ -1012,13 +1015,11 @@
             let auditedStores = 0;
             let dtStats = {};
 
-            // 1. Initialiser le total des magasins par DT
             storesData.forEach(s => {
                 if (!dtStats[s.DT]) dtStats[s.DT] = { total: 0, audited: 0 };
                 dtStats[s.DT].total++;
             });
 
-            // 2. Parcourir les magasins pour identifier ceux qui sont audités
             storesData.forEach(store => {
                 const audit = auditsHistory[store.ANABEL];
                 const isAudited = !!(audit && (audit.date || (audit.note !== null && audit.note !== undefined)));
@@ -1029,10 +1030,9 @@
                 }
             });
 
-            // 3. Injecter le nom et la jauge de progression dans l'affichage HTML
             const dtContainer = document.getElementById('kpi-dt-details');
             if (dtContainer) {
-                dtContainer.innerHTML = ''; // Nettoyage de la zone
+                dtContainer.innerHTML = '';
                 for (let dt in dtStats) {
                     const stats = dtStats[dt];
                     const percent = Math.round((stats.audited / stats.total) * 100) || 0;
@@ -1049,7 +1049,6 @@
                 }
             }
             
-            // Couverture globale du parc
             const percentGlobal = totalStores > 0 ? Math.round((auditedStores / totalStores) * 100) : 0;
             if (document.getElementById('kpi-audits')) {
                 document.getElementById('kpi-audits').textContent = auditedStores;
@@ -1059,7 +1058,6 @@
                 document.getElementById('kpi-percent').textContent = percentGlobal + '%';
             }
 
-            // Note Moyenne Globale
             let notesSum = 0;
             let notesCount = 0;
             let exc = 0, cor = 0, cri = 0;
@@ -1082,7 +1080,6 @@
                 document.getElementById('kpi-cri').textContent = cri;
             }
 
-            // Meilleur Contributeur
             const csiCounts = {};
             Object.values(auditsHistory).forEach(a => {
                 if (a.csi && (a.date || (a.note !== null && a.note !== undefined))) {
@@ -1105,7 +1102,6 @@
                 document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml;
             }
 
-            // Activité Récente
             const lastAudit = Object.values(auditsHistory)
                 .filter(a => a.updatedAt)
                 .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
