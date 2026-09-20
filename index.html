@@ -451,7 +451,6 @@
                         <h2 style="color: var(--carrefour-blue); font-size: 1.3rem;"><i class="fas fa-folder-open"></i> Historique Global des Audits</h2>
                         <p style="color: #64748b; font-size: 0.88rem; margin-top: 2px;">Retrouvez les visites enregistrées et réimprimez les comptes-rendus d'audit.</p>
                     </div>
-                    <button class="btn btn-primary no-print" onclick="chargerAuditsDepuisGoogle()"><i class="fas fa-sync"></i> Rafraîchir</button>
                 </div>
 
                 <div class="table-container">
@@ -503,8 +502,24 @@
     
     <div id="toast">✅ Enregistré avec succès</div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb7yT6nntE7PE_3NlAbg6RbKYChcbEdnMm4K2oHxCU7d6wrzJkMzRqC5qV-NRQl4bT/exec";
+    <!-- SCRIPT FIREBASE SYNCHRONISATION EN TEMPS RÉEL -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // CONFIGURATION FIREBASE - REMPLACEZ CES VALEURS PAR VOTRE CONSOLE FIREBASE
+        const firebaseConfig = {
+  apiKey: "AIzaSyB9AD-LH3bOILvx7bgShujS2B3rsE-OWQE",
+  authDomain: "audit-csi.firebaseapp.com",
+  projectId: "audit-csi",
+  storageBucket: "audit-csi.firebasestorage.app",
+  messagingSenderId: "1094554772120",
+  appId: "1:1094554772120:web:5b02353eba000e22e2e6ed",
+  measurementId: "G-6WZBQPHC8V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         const dtColors = {
             "JEROME CHAPELLE": { bg: "#fef08a", text: "#854d0e" },
@@ -615,9 +630,8 @@
             { "ANABEL": "8636", "region": "SUD-EST", "DT": "LEROUX ARNOLD", "CDF": "VASSON KEVIN", "STORE": "AVIGNON -REPUBLIQUE", "ENSEIGNE": "CARREFOUR CITY", "PRIO": 4, "CSI": "EMMANUEL" }
         ];
 
-        let auditsHistory = JSON.parse(localStorage.getItem('auditsHistory_csi_v5')) || {};
+        let auditsHistory = {};
         let currentActiveStore = null;
-        let isFetching = false;
 
         function formatDateFR(dateStr) {
             if (!dateStr) return '-';
@@ -652,7 +666,21 @@
             return '';
         }
 
-        document.addEventListener("DOMContentLoaded", async () => {
+        // ECOUTE EN TEMPS REEL DE LA COLLECTION FIREBASE "audits"
+        function ecouterChangementsFirebase() {
+            onSnapshot(doc(db, "audits", "parc_complet"), (snapshot) => {
+                if (snapshot.exists()) {
+                    auditsHistory = snapshot.data();
+                    renderGrille();
+                    renderHistory();
+                    updateKPIs();
+                }
+            }, (error) => {
+                console.error("Erreur d'écoute Firebase Firestore :", error);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
             initStoreSelect();
             initFilterSelects();
             renderGrille();
@@ -660,11 +688,8 @@
             updateKPIs();
             document.getElementById('auditDate').value = formatDateISO(new Date());
             
-            await chargerAuditsDepuisGoogle();
             initLogoVibrationDetector();
-
-            // Synchronisation automatique en arrière-plan toutes les 4 secondes
-            setInterval(chargerAuditsDepuisGoogle, 4000);
+            ecouterChangementsFirebase();
         });
 
         /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
@@ -716,12 +741,12 @@
             requestAnimationFrame(checkOverlap);
         }
 
-        function switchTab(tabId, btn) {
+        window.switchTab = function(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if (btn) btn.classList.add('active');
-        }
+        };
 
         function initStoreSelect() {
             const select = document.getElementById('storeSelect');
@@ -748,7 +773,7 @@
             csis.forEach(csi => csiSel.innerHTML += `<option value="${csi}">${csi}</option>`);
         }
 
-        function chercherMagasin() {
+        window.chercherMagasin = function() {
             const query = document.getElementById('anabelSearch').value.trim().toLowerCase();
             if (!query) return;
             const found = storesData.find(s => String(s.ANABEL).toLowerCase() === query || s.STORE.toLowerCase().includes(query));
@@ -758,9 +783,9 @@
             } else {
                 alert("Aucun magasin trouvé pour cette recherche.");
             }
-        }
+        };
 
-        function activerMagasin(anabel) {
+        window.activerMagasin = function(anabel) {
             if (!anabel) return;
             currentActiveStore = storesData.find(s => String(s.ANABEL) === String(anabel));
             if (!currentActiveStore) return;
@@ -786,7 +811,7 @@
                 document.getElementById('auditCommentaire').value = '';
                 renderAuditGridBody(defaultAuditItems);
             }
-        }
+        };
 
         function renderAuditGridBody(items) {
             const container = document.getElementById('auditGridBody');
@@ -819,40 +844,15 @@
             });
         }
 
-        async function synchroniserAvecGoogle(anabel) {
-            const audit = auditsHistory[anabel];
-            if (!audit) return;
-
-            const payload = {
-                anabel: audit.anabel,
-                store: audit.store || '',
-                enseigne: audit.enseigne || '',
-                csi: audit.csi || '',
-                date: audit.date || '',
-                note: audit.note !== undefined && audit.note !== null ? audit.note : '',
-                comment: audit.comment || '',
-                callDate: audit.callDate || '',
-                mailDate: audit.mailDate || '',
-                relanceDate: audit.relanceDate || '',
-                items: audit.items ? JSON.stringify(audit.items) : '',
-                updatedAt: audit.updatedAt || new Date().toISOString()
-            };
-
+        async function enregistrerDirectementFirebase() {
             try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                // Forcer une lecture immédiate après l'envoi
-                setTimeout(chargerAuditsDepuisGoogle, 800);
-            } catch(e) {
-                console.error("Erreur de synchronisation backend", e);
+                await setDoc(doc(db, "audits", "parc_complet"), auditsHistory);
+            } catch (e) {
+                console.error("Erreur d'enregistrement Firebase :", e);
             }
         }
 
-        async function archiverAudit() {
+        window.archiverAudit = async function() {
             if (!currentActiveStore) return alert("Veuillez sélectionner un magasin d'abord.");
             const noteVal = document.getElementById('auditNote').value;
             if (noteVal === '') return alert("Veuillez saisir la note globale.");
@@ -894,21 +894,18 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+            await enregistrerDirectementFirebase();
 
-            await synchroniserAvecGoogle(currentActiveStore.ANABEL);
-
-            showToast("💾 Audit enregistré et synchronisé !");
+            showToast("💾 Audit enregistré et synchronisé en direct !");
             renderGrille();
             renderHistory();
             updateKPIs();
 
             btnSave.disabled = false;
             btnSave.innerHTML = `💾 Valider et Enregistrer l'Audit`;
-        }
+        };
 
         function renderGrille() {
-            // Protection : si un utilisateur tape dans un champ de la grille, ne pas détruire le DOM pendant la frappe
             if (document.activeElement && document.activeElement.closest('#grilleTableBody')) {
                 return;
             }
@@ -950,18 +947,18 @@
                     <td>${store.ENSEIGNE}</td>
                     <td style="text-align:center;"><b>P${store.PRIO}</b></td>
                     <td>${store.CSI}</td>
-                    <td><input type="date" value="${formatDateISO(audit?.callDate)}" onchange="updateGridField('${store.ANABEL}', 'callDate', this.value)"></td>
-                    <td><input type="date" value="${formatDateISO(audit?.mailDate)}" onchange="updateGridField('${store.ANABEL}', 'mailDate', this.value)"></td>
-                    <td><input type="date" value="${formatDateISO(audit?.relanceDate)}" onchange="updateGridField('${store.ANABEL}', 'relanceDate', this.value)"></td>
-                    <td><input type="date" value="${formatDateISO(audit?.date)}" onchange="updateGridField('${store.ANABEL}', 'date', this.value)"></td>
-                    <td><input type="number" min="0" max="20" style="width:55px; font-weight:bold;" value="${audit?.note !== undefined && audit?.note !== null ? audit.note : ''}" onchange="updateGridField('${store.ANABEL}', 'note', this.value)"></td>
-                    <td><input type="text" style="width:100%; min-width:140px;" value="${audit?.comment || ''}" onchange="updateGridField('${store.ANABEL}', 'comment', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.callDate)}" onchange="window.updateGridField('${store.ANABEL}', 'callDate', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.mailDate)}" onchange="window.updateGridField('${store.ANABEL}', 'mailDate', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.relanceDate)}" onchange="window.updateGridField('${store.ANABEL}', 'relanceDate', this.value)"></td>
+                    <td><input type="date" value="${formatDateISO(audit?.date)}" onchange="window.updateGridField('${store.ANABEL}', 'date', this.value)"></td>
+                    <td><input type="number" min="0" max="20" style="width:55px; font-weight:bold;" value="${audit?.note !== undefined && audit?.note !== null ? audit.note : ''}" onchange="window.updateGridField('${store.ANABEL}', 'note', this.value)"></td>
+                    <td><input type="text" style="width:100%; min-width:140px;" value="${audit?.comment || ''}" onchange="window.updateGridField('${store.ANABEL}', 'comment', this.value)"></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        async function updateGridField(anabel, field, value) {
+        window.updateGridField = async function(anabel, field, value) {
             if (!auditsHistory[anabel]) {
                 const store = storesData.find(s => String(s.ANABEL) === String(anabel));
                 auditsHistory[anabel] = {
@@ -986,17 +983,16 @@
 
             auditsHistory[anabel].updatedAt = new Date().toISOString();
 
-            localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+            await enregistrerDirectementFirebase();
+
             renderHistory();
             updateKPIs();
             showToast("💾 Champ mis à jour et synchronisé");
+        };
 
-            await synchroniserAvecGoogle(anabel);
-        }
-
-        function filtrerGrille() {
+        window.filtrerGrille = function() {
             renderGrille();
-        }
+        };
 
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
@@ -1034,14 +1030,14 @@
                     <td>${noteDisplay}</td>
                     <td><span style="color:#334155; font-style:italic;">${audit.comment || '-'}</span></td>
                     <td style="text-align:center;" class="no-print">
-                        <button class="btn btn-secondary btn-sm" onclick="ouvrirModalImpression('${audit.anabel}')"><i class="fas fa-print"></i> Rapport</button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.ouvrirModalImpression('${audit.anabel}')"><i class="fas fa-print"></i> Rapport</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function ouvrirModalImpression(anabel) {
+        window.ouvrirModalImpression = function(anabel) {
             const audit = auditsHistory[anabel];
             if (!audit) return;
 
@@ -1085,11 +1081,11 @@
             });
 
             document.getElementById('printModal').style.display = 'flex';
-        }
+        };
 
-        function fermerModalImpression() {
+        window.fermerModalImpression = function() {
             document.getElementById('printModal').style.display = 'none';
-        }
+        };
 
         function updateKPIs() {
             const totalStores = storesData.length;
@@ -1189,61 +1185,8 @@
                 toast.style.opacity = '0';
             }, 3000);
         }
-
-        async function chargerAuditsDepuisGoogle() {
-            if (isFetching) return;
-            isFetching = true;
-
-            try {
-                const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
-                const data = await res.json();
-                
-                if (data && Array.isArray(data)) {
-                    const newHistory = {};
-
-                    data.forEach(row => {
-                        const key = row.anabel ? String(row.anabel).trim() : '';
-                        if (!key) return;
-                        
-                        const storeRef = storesData.find(s => String(s.ANABEL) === key) || {};
-
-                        let parsedItems = defaultAuditItems;
-                        if (row.items) {
-                            try {
-                                parsedItems = typeof row.items === 'string' ? JSON.parse(row.items) : row.items;
-                            } catch(e) {
-                                parsedItems = defaultAuditItems;
-                            }
-                        }
-
-                        newHistory[key] = {
-                            anabel: key,
-                            store: row.store || storeRef.STORE || '',
-                            enseigne: row.enseigne || storeRef.ENSEIGNE || '',
-                            csi: row.csi || storeRef.CSI || '',
-                            date: row.date ? formatDateISO(row.date) : '',
-                            note: (row.note !== null && row.note !== undefined && row.note !== '') ? parseFloat(row.note) : null,
-                            comment: row.comment || '',
-                            callDate: row.callDate ? formatDateISO(row.callDate) : '',
-                            mailDate: row.mailDate ? formatDateISO(row.mailDate) : '',
-                            relanceDate: row.relanceDate ? formatDateISO(row.relanceDate) : '',
-                            items: (parsedItems && parsedItems.length) ? parsedItems : defaultAuditItems,
-                            updatedAt: row.updatedAt || new Date().toISOString()
-                        };
-                    });
-
-                    auditsHistory = newHistory;
-                    localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
-                    renderGrille();
-                    renderHistory();
-                    updateKPIs();
-                }
-            } catch(e) {
-                console.log("Mode hors-ligne ou synchro indisponible", e);
-            } finally {
-                isFetching = false;
-            }
-        }
-    </script>
+   const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+ </script>
 </body>
 </html>
