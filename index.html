@@ -39,89 +39,6 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* NOUVEAU LOGO DYNAMIQUE & INTEGRATION VIBRATION */
-        .header-logo-container {
-            z-index: 2;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 1 auto;
-            transition: transform 0.1s ease-in-out;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: clamp(10px, 1.5vw, 18px);
-            text-decoration: none;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .logo-icon {
-            width: clamp(38px, 4.5vw, 54px);
-            height: clamp(38px, 4.5vw, 54px);
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px var(--accent-glow));
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
-            flex-shrink: 0;
-        }
-
-        .logo-container:hover .logo-icon {
-            transform: scale(1.08) rotate(4deg);
-            filter: drop-shadow(0 6px 14px var(--accent-glow));
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .brand-title {
-            font-size: clamp(1.2rem, 2.2vw, 1.75rem);
-            font-weight: 800;
-            letter-spacing: 0.12em;
-            line-height: 1;
-            margin: 0;
-            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: opacity 0.3s ease;
-        }
-
-        .brand-subtitle {
-            font-size: clamp(0.5rem, 0.8vw, 0.68rem);
-            font-weight: 600;
-            letter-spacing: 0.22em;
-            color: var(--subtitle-color);
-            margin-top: 4px;
-            white-space: nowrap;
-        }
-
-        .logo-container:hover .brand-title {
-            opacity: 0.9;
-        }
-
-        .vibrate-logo {
-            animation: vibrate 1s linear forwards;
-        }
-
-        @keyframes vibrate {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            10% { transform: translate(-2px, -2px) rotate(-1deg); }
-            20% { transform: translate(2px, 0px) rotate(1deg); }
-            30% { transform: translate(-2px, 2px) rotate(0deg); }
-            40% { transform: translate(2px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(2px, 1px) rotate(0deg); }
-            70% { transform: translate(-2px, 1px) rotate(-1deg); }
-            80% { transform: translate(2px, -2px) rotate(1deg); }
-            90% { transform: translate(-1px, -1px) rotate(0deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
         /* ANIMATION RUNNER & CADDIE */
         .runner-scene-left {
             position: absolute; bottom: 6px; left: -150px; display: flex; align-items: flex-end; gap: 2px;
@@ -305,12 +222,6 @@
 
         #toast { position: fixed; bottom: 20px; right: 20px; background: var(--carrefour-green-dark); color: white; padding: 12px 24px; border-radius: 6px; font-weight: bold; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
-        @media (max-width: 640px) {
-            .brand-subtitle {
-                letter-spacing: 0.14em;
-            }
-        }
-
         @media print {
             header, nav, .no-print, .search-container, .modal-overlay .no-print { display: none !important; }
             .container { padding: 0 !important; margin: 0 !important; }
@@ -338,42 +249,6 @@
         <div class="header-title">
             <h1>🛒 Portail Audit Magasins CSI</h1>
             <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
-        </div>
-
-        <!-- NOUVEAU LOGO BOHÊME DYNAMIQUE -->
-        <div class="header-logo-container">
-            <div class="logo-container" id="logoContainer" style="width: 260px;">
-                <!-- DEBUT DU CODE DU LOGO SVG -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250" style="width: 100%; height: auto; filter: drop-shadow(0 4px 8px rgba(255,255,255,0.3)); transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-                    <defs>
-                      <!-- Dégradé métallique cuivré -->
-                      <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#F7BA83" />
-                        <stop offset="50%" stop-color="#D37538" />
-                        <stop offset="100%" stop-color="#914015" />
-                      </linearGradient>
-                    </defs>
-
-                    <!-- Symbole 'C' principal -->
-                    <path d="M 230 40 A 85 85 0 1 0 230 210 L 230 185 A 60 60 0 1 1 230 65 Z" fill="url(#copperGrad)" />
-                    
-                    <!-- Lignes de circuit imprimé décoratives sur le bord gauche du C -->
-                    <path d="M 145 125 L 115 125 M 155 65 L 140 50 M 155 185 L 140 200" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
-                    <circle cx="110" cy="125" r="3" fill="url(#copperGrad)" />
-                    <circle cx="135" cy="45" r="3" fill="url(#copperGrad)" />
-                    <circle cx="135" cy="205" r="3" fill="url(#copperGrad)" />
-
-                    <!-- Silhouette du chat géométrique intégrée au centre du C -->
-                    <path d="M 160 190 Q 150 140 180 115 L 185 90 L 195 105 L 210 95 L 205 120 Q 220 140 205 180 L 205 210 L 195 210 L 195 180 L 175 180 L 175 210 L 165 210 Z" fill="url(#copperGrad)" />
-
-                    <!-- Texte Principal : BOHÊME -->
-                    <text x="270" y="145" font-family="'Times New Roman', Times, serif" font-size="80" font-weight="bold" fill="url(#copperGrad)" letter-spacing="6">BOHÊME</text>
-
-                    <!-- Texte Secondaire : Spécialités -->
-                    <text x="275" y="195" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="url(#copperGrad)" letter-spacing="8">CODE • DESIGN • RETAIL</text>
-                </svg>
-                <!-- FIN DU CODE DU LOGO SVG -->
-            </div>
         </div>
 
         <button class="btn btn-secondary no-print" onclick="window.print()" style="z-index: 2; position: relative;">🖨️ Imprimer la vue</button>
