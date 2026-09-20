@@ -388,7 +388,7 @@
                             <tr>
                                 <th style="width: 120px;">DATE VISITE</th>
                                 <th style="width: 90px;">ANABEL</th>
-                                <th>MAGASIN & ENSEIGNE</th>
+                                <th>MAGASIN</th>
                                 <th style="width: 150px;">AUDITEUR CSI</th>
                                 <th style="width: 110px;">NOTE /20</th>
                                 <th>COMMENTAIRE GLOBAL</th>
@@ -624,7 +624,7 @@
         function chercherMagasin() {
             const query = document.getElementById('anabelSearch').value.trim().toLowerCase();
             if (!query) return;
-            const found = storesData.find(s => s.ANABEL.toLowerCase() === query || s.STORE.toLowerCase().includes(query));
+            const found = storesData.find(s => String(s.ANABEL).toLowerCase() === query || s.STORE.toLowerCase().includes(query));
             if (found) {
                 document.getElementById('storeSelect').value = found.ANABEL;
                 activerMagasin(found.ANABEL);
@@ -635,7 +635,7 @@
 
         function activerMagasin(anabel) {
             if (!anabel) return;
-            currentActiveStore = storesData.find(s => s.ANABEL === anabel);
+            currentActiveStore = storesData.find(s => String(s.ANABEL) === String(anabel));
             if (!currentActiveStore) return;
 
             document.getElementById('dispEnseigne').textContent = currentActiveStore.ENSEIGNE;
@@ -810,7 +810,7 @@
 
         function updateGridField(anabel, field, value) {
             if (!auditsHistory[anabel]) {
-                const store = storesData.find(s => s.ANABEL === anabel);
+                const store = storesData.find(s => String(s.ANABEL) === String(anabel));
                 auditsHistory[anabel] = {
                     anabel: store.ANABEL,
                     store: store.STORE,
@@ -853,9 +853,8 @@
             }
 
             auditedList.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(audit => {
-                const storeRef = storesData.find(s => s.ANABEL === audit.anabel) || {};
+                const storeRef = storesData.find(s => String(s.ANABEL) === String(audit.anabel)) || {};
                 const storeName = audit.store || storeRef.STORE || 'Magasin Inconnu';
-                const enseigneName = audit.enseigne || storeRef.ENSEIGNE || '';
 
                 let csiClass = 'badge-csi-amanda';
                 if (audit.csi === 'CHRISTOPHE') csiClass = 'badge-csi-christophe';
@@ -873,7 +872,7 @@
                 tr.innerHTML = `
                     <td><b style="color:#1e293b;">${formatDateFR(audit.date)}</b></td>
                     <td><span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:bold;">${audit.anabel}</span></td>
-                    <td><b>${storeName}</b> ${enseigneName ? `<small style="color:#64748b; margin-left:4px;">(${enseigneName})</small>` : ''}</td>
+                    <td><b>${storeName}</b></td>
                     <td><span class="badge-csi ${csiClass}"><i class="fas fa-user-check"></i> ${audit.csi || '-'}</span></td>
                     <td>${noteDisplay}</td>
                     <td><span style="color:#334155; font-style:italic;">${audit.comment || '-'}</span></td>
@@ -889,7 +888,7 @@
             const audit = auditsHistory[anabel];
             if (!audit) return;
 
-            const storeRef = storesData.find(s => s.ANABEL === anabel) || {};
+            const storeRef = storesData.find(s => String(s.ANABEL) === String(anabel)) || {};
 
             document.getElementById('modalAnabel').textContent = audit.anabel;
             document.getElementById('modalStoreName').textContent = storeRef.STORE || audit.store || 'Magasin';
@@ -1041,7 +1040,7 @@
                     data.forEach(row => {
                         if (row.anabel && (row.date || row.note !== null)) {
                             if (!auditsHistory[row.anabel]) {
-                                const storeRef = storesData.find(s => s.ANABEL === row.anabel) || {};
+                                const storeRef = storesData.find(s => String(s.ANABEL) === String(row.anabel)) || {};
                                 auditsHistory[row.anabel] = {
                                     anabel: row.anabel,
                                     store: storeRef.STORE || '',
