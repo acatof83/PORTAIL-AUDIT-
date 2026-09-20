@@ -30,11 +30,48 @@
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 4px solid var(--carrefour-orange); overflow: hidden; position: relative;
             min-height: 85px;
+            gap: 15px;
         }
 
-        .header-title { z-index: 2; position: relative; }
+        .header-title { z-index: 2; position: relative; flex: 1 1 auto; }
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
+
+        /* LOGO SVG INTEGRATION & VIBRATION */
+        .header-logo-container {
+            z-index: 2;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 55px;
+            flex: 0 1 auto;
+        }
+        .header-logo-container svg {
+            height: 100%;
+            width: auto;
+            max-height: 55px;
+            max-width: 280px;
+            display: block;
+            transition: transform 0.1s ease-in-out;
+        }
+        .vibrate-logo {
+            animation: vibrate 1s linear forwards;
+        }
+
+        @keyframes vibrate {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-2px, -2px) rotate(-1deg); }
+            20% { transform: translate(2px, 0px) rotate(1deg); }
+            30% { transform: translate(-2px, 2px) rotate(0deg); }
+            40% { transform: translate(2px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(2px, 1px) rotate(0deg); }
+            70% { transform: translate(-2px, 1px) rotate(-1deg); }
+            80% { transform: translate(2px, -2px) rotate(1deg); }
+            90% { transform: translate(-1px, -1px) rotate(0deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
 
         /* ANIMATION RUNNER & CADDIE */
         .runner-scene-left {
@@ -237,11 +274,11 @@
 <body>
 
     <header>
-        <div class="runner-scene-left">
+        <div class="runner-scene-left" id="runnerLeft">
             <div class="stickman"><div class="head"></div><div class="arm left"></div><div class="torso torso-left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
             <div class="cart-emoji">🛒</div>
         </div>
-        <div class="runner-scene-right">
+        <div class="runner-scene-right" id="runnerRight">
             <div class="stickman"><div class="head"></div><div class="arm left"></div><div class="torso torso-right"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
             <div class="cart-emoji">🛒</div>
         </div>
@@ -250,7 +287,29 @@
             <h1>🛒 Portail Audit Magasins CSI</h1>
             <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
-        <button class="btn btn-secondary no-print" onclick="window.print()">🖨️ Imprimer la vue</button>
+
+        <!-- LOGO BOHÊME INCRUSTÉ -->
+        <div class="header-logo-container" id="logoContainer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250">
+              <defs>
+                <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F7BA83" />
+                  <stop offset="50%" stop-color="#D37538" />
+                  <stop offset="100%" stop-color="#914015" />
+                </linearGradient>
+              </defs>
+              <path d="M 230 40 A 85 85 0 1 0 230 210 L 230 185 A 60 60 0 1 1 230 65 Z" fill="url(#copperGrad)" />
+              <path d="M 145 125 L 115 125 M 155 65 L 140 50 M 155 185 L 140 200" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+              <circle cx="110" cy="125" r="3" fill="url(#copperGrad)" />
+              <circle cx="135" cy="45" r="3" fill="url(#copperGrad)" />
+              <circle cx="135" cy="205" r="3" fill="url(#copperGrad)" />
+              <path d="M 160 190 Q 150 140 180 115 L 185 90 L 195 105 L 210 95 L 205 120 Q 220 140 205 180 L 205 210 L 195 210 L 195 180 L 175 180 L 175 210 L 165 210 Z" fill="url(#copperGrad)" />
+              <text x="270" y="145" font-family="'Times New Roman', Times, serif" font-size="80" font-weight="bold" fill="url(#copperGrad)" letter-spacing="6">BOHÊME</text>
+              <text x="275" y="195" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="url(#copperGrad)" letter-spacing="8">CODE • DESIGN • RETAIL</text>
+            </svg>
+        </div>
+
+        <button class="btn btn-secondary no-print" onclick="window.print()" style="z-index: 2; position: relative;">🖨️ Imprimer la vue</button>
     </header>
 
     <nav class="no-print">
@@ -604,7 +663,59 @@
             updateKPIs();
             document.getElementById('auditDate').value = formatDateISO(new Date());
             chargerAuditsDepuisGoogle();
+            initLogoVibrationDetector();
         });
+
+        /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
+        function initLogoVibrationDetector() {
+            const logo = document.getElementById('logoContainer');
+            const runnerLeft = document.getElementById('runnerLeft');
+            const runnerRight = document.getElementById('runnerRight');
+
+            if (!logo || !runnerLeft || !runnerRight) return;
+
+            let leftTriggered = false;
+            let rightTriggered = false;
+
+            function checkOverlap() {
+                const logoRect = logo.getBoundingClientRect();
+                const leftRect = runnerLeft.getBoundingClientRect();
+                const rightRect = runnerRight.getBoundingClientRect();
+
+                // Verification passage bonhomme gauche
+                if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
+                    if (!leftTriggered) {
+                        triggerLogoVibration();
+                        leftTriggered = true;
+                    }
+                } else {
+                    leftTriggered = false;
+                }
+
+                // Verification passage bonhomme droite
+                if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
+                    if (!rightTriggered) {
+                        triggerLogoVibration();
+                        rightTriggered = true;
+                    }
+                } else {
+                    rightTriggered = false;
+                }
+
+                requestAnimationFrame(checkOverlap);
+            }
+
+            function triggerLogoVibration() {
+                logo.classList.remove('vibrate-logo');
+                void logo.offsetWidth; // Force re-flow
+                logo.classList.add('vibrate-logo');
+                setTimeout(() => {
+                    logo.classList.remove('vibrate-logo');
+                }, 1000);
+            }
+
+            requestAnimationFrame(checkOverlap);
+        }
 
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
