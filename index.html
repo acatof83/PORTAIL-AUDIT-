@@ -29,7 +29,7 @@
             color: white; padding: 18px 30px; 
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 4px solid var(--carrefour-orange); overflow: hidden; position: relative;
-            min-height: 85px;
+            min-height: 120px;
             gap: 15px;
         }
 
@@ -37,21 +37,21 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* LOGO SVG INTEGRATION & VIBRATION */
+        /* LOGO SVG INTEGRATION & VIBRATION (GROSSISSEMENT +80%) */
         .header-logo-container {
             z-index: 2;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 55px;
+            height: 99px;
             flex: 0 1 auto;
         }
         .header-logo-container svg {
             height: 100%;
             width: auto;
-            max-height: 55px;
-            max-width: 280px;
+            max-height: 99px;
+            max-width: 500px;
             display: block;
             transition: transform 0.1s ease-in-out;
         }
@@ -87,8 +87,8 @@
         .head::before { content: ''; position: absolute; top: -3px; left: -2px; width: 17px; height: 7px; background: var(--carrefour-orange); border-radius: 8px 8px 2px 2px; }
         
         .torso { width: 11px; height: 19px; position: absolute; left: 9px; top: 11px; border-radius: 5px; }
-        .torso-left { background: #f472b6; animation: colorCycleLeft 28s infinite; } /* Rose puis Bleu */
-        .torso-right { background: #fde047; animation: colorCycleRight 28s infinite 7s; } /* Jaune puis Vert */
+        .torso-left { background: #f472b6; animation: colorCycleLeft 28s infinite; }
+        .torso-right { background: #fde047; animation: colorCycleRight 28s infinite 7s; }
 
         .arm { width: 14px; height: 4px; background: #ffccb3; position: absolute; border-radius: 3px; transform-origin: left center; }
         .arm.left { left: 13px; top: 14px; transform: rotate(-15deg); background: #eba988; }
@@ -106,15 +106,14 @@
         @keyframes runFromLeft { 0% { left: -150px; } 100% { left: 110%; } }
         @keyframes runFromRight { 0% { right: -150px; } 100% { right: 110%; } }
 
-        /* ANIMATIONS CHANGEMENT COULEUR DES VETEMENTS */
         @keyframes colorCycleLeft {
-            0%, 49.99% { background: #f472b6; } /* Rose */
-            50%, 99.99% { background: #60a5fa; } /* Bleu */
+            0%, 49.99% { background: #f472b6; }
+            50%, 99.99% { background: #60a5fa; }
             100% { background: #f472b6; }
         }
         @keyframes colorCycleRight {
-            0%, 49.99% { background: #fde047; } /* Jaune */
-            50%, 99.99% { background: #4ade80; } /* Vert */
+            0%, 49.99% { background: #fde047; }
+            50%, 99.99% { background: #4ade80; }
             100% { background: #fde047; }
         }
 
@@ -682,7 +681,6 @@
                 const leftRect = runnerLeft.getBoundingClientRect();
                 const rightRect = runnerRight.getBoundingClientRect();
 
-                // Verification passage bonhomme gauche
                 if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
                     if (!leftTriggered) {
                         triggerLogoVibration();
@@ -692,7 +690,6 @@
                     leftTriggered = false;
                 }
 
-                // Verification passage bonhomme droite
                 if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
                     if (!rightTriggered) {
                         triggerLogoVibration();
@@ -707,7 +704,7 @@
 
             function triggerLogoVibration() {
                 logo.classList.remove('vibrate-logo');
-                void logo.offsetWidth; // Force re-flow
+                void logo.offsetWidth;
                 logo.classList.add('vibrate-logo');
                 setTimeout(() => {
                     logo.classList.remove('vibrate-logo');
