@@ -37,7 +37,7 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* LOGO SVG INTEGRATION & VIBRATION (+10% -> 141px) */
+        /* LOGO SVG INTEGRATION & VIBRATION */
         .header-logo-container {
             z-index: 2;
             position: relative;
@@ -234,7 +234,7 @@
         table.excel-table input, table.excel-table select { width: 100%; border: 1px solid transparent; background: transparent; font-size: 12px; padding: 3px; border-radius: 4px; }
         table.excel-table input:focus, table.excel-table select:focus { border-color: var(--carrefour-blue); background-color: #fff; outline:none; }
 
-        /* STYLE DES BADGES HISTORIQUE */
+        /* BADGES */
         .badge-csi { padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.76rem; display: inline-block; }
         .badge-csi-amanda { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
         .badge-csi-christophe { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
@@ -245,14 +245,12 @@
         .note-cor { background: #fef3c7; color: #b45309; border: 1px solid #fde047; }
         .note-cri { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-        /* BADGES STATUT */
         .badge-status-audited { background-color: #dcfce7; color: #166534; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 0.74rem; border: 1px solid #bbf7d0; }
         .badge-status-pending { background-color: #fef3c7; color: #92400e; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 0.74rem; border: 1px solid #fde68a; }
 
-        /* LÉGENDE DT */
         .legend-dt-item { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.78rem; border: 1px solid transparent; }
 
-        /* MODALE IMPRESSION DÉTAILLÉE */
+        /* MODALE */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); display: flex; justify-content: center; align-items: center; z-index: 10000; padding: 20px; }
         .modal-card { background: white; border-radius: 12px; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; padding: 30px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; }
 
@@ -287,7 +285,6 @@
             <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
 
-        <!-- LOGO BOHÊME INCRUSTÉ (+10% PLUS GRAND -> 141px) -->
         <div class="header-logo-container" id="logoContainer">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250">
               <defs>
@@ -620,6 +617,7 @@
 
         let auditsHistory = JSON.parse(localStorage.getItem('auditsHistory_csi_v5')) || {};
         let currentActiveStore = null;
+        let isFetching = false;
 
         function formatDateFR(dateStr) {
             if (!dateStr) return '-';
@@ -662,10 +660,11 @@
             updateKPIs();
             document.getElementById('auditDate').value = formatDateISO(new Date());
             
-            // Chargement automatique des données depuis Google Sheets au démarrage
             await chargerAuditsDepuisGoogle();
-            
             initLogoVibrationDetector();
+
+            // Synchronisation automatique en arrière-plan toutes les 4 secondes
+            setInterval(chargerAuditsDepuisGoogle, 4000);
         });
 
         /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
@@ -820,6 +819,37 @@
             });
         }
 
+        async function synchroniserAvecGoogle(anabel) {
+            const audit = auditsHistory[anabel];
+            if (!audit) return;
+
+            const payload = {
+                anabel: audit.anabel,
+                store: audit.store || '',
+                enseigne: audit.enseigne || '',
+                csi: audit.csi || '',
+                date: audit.date || '',
+                note: audit.note !== undefined && audit.note !== null ? audit.note : '',
+                comment: audit.comment || '',
+                callDate: audit.callDate || '',
+                mailDate: audit.mailDate || '',
+                relanceDate: audit.relanceDate || '',
+                items: audit.items ? JSON.stringify(audit.items) : '',
+                updatedAt: audit.updatedAt || new Date().toISOString()
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+            } catch(e) {
+                console.error("Erreur de synchronisation backend", e);
+            }
+        }
+
         async function archiverAudit() {
             if (!currentActiveStore) return alert("Veuillez sélectionner un magasin d'abord.");
             const noteVal = document.getElementById('auditNote').value;
@@ -847,7 +877,10 @@
                 });
             });
 
+            const existing = auditsHistory[currentActiveStore.ANABEL] || {};
+
             auditsHistory[currentActiveStore.ANABEL] = {
+                ...existing,
                 anabel: currentActiveStore.ANABEL,
                 store: currentActiveStore.STORE,
                 enseigne: currentActiveStore.ENSEIGNE,
@@ -861,22 +894,7 @@
 
             localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
 
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        anabel: currentActiveStore.ANABEL,
-                        date: date,
-                        csi: csi,
-                        note: parseFloat(noteVal),
-                        comment: comment
-                    })
-                });
-            } catch(e) {
-                console.log("Transmission Sheet directe passée", e);
-            }
+            await synchroniserAvecGoogle(currentActiveStore.ANABEL);
 
             showToast("💾 Audit enregistré et synchronisé !");
             renderGrille();
@@ -888,6 +906,11 @@
         }
 
         function renderGrille() {
+            // Protection : si un utilisateur tape dans un champ de la grille, ne pas détruire le DOM pendant la frappe
+            if (document.activeElement && document.activeElement.closest('#grilleTableBody')) {
+                return;
+            }
+
             const tbody = document.getElementById('grilleTableBody');
             tbody.innerHTML = '';
 
@@ -936,7 +959,7 @@
             });
         }
 
-        function updateGridField(anabel, field, value) {
+        async function updateGridField(anabel, field, value) {
             if (!auditsHistory[anabel]) {
                 const store = storesData.find(s => String(s.ANABEL) === String(anabel));
                 auditsHistory[anabel] = {
@@ -959,10 +982,14 @@
                 auditsHistory[anabel][field] = value;
             }
 
+            auditsHistory[anabel].updatedAt = new Date().toISOString();
+
             localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
             renderHistory();
             updateKPIs();
-            showToast("💾 Champ mis à jour");
+            showToast("💾 Champ mis à jour et synchronisé");
+
+            await synchroniserAvecGoogle(anabel);
         }
 
         function filtrerGrille() {
@@ -1162,38 +1189,65 @@
         }
 
         async function chargerAuditsDepuisGoogle() {
+            if (isFetching) return;
+            isFetching = true;
+
             try {
-                const res = await fetch(SCRIPT_URL);
+                const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
                 const data = await res.json();
+                
                 if (data && Array.isArray(data)) {
+                    let hasNewData = false;
+
                     data.forEach(row => {
-                        if (row.anabel && (row.date || (row.note !== null && row.note !== undefined))) {
-                            if (!auditsHistory[row.anabel]) {
-                                const storeRef = storesData.find(s => String(s.ANABEL) === String(row.anabel)) || {};
-                                auditsHistory[row.anabel] = {
-                                    anabel: row.anabel,
-                                    store: storeRef.STORE || '',
-                                    enseigne: storeRef.ENSEIGNE || '',
-                                    csi: row.csi || storeRef.CSI || '',
-                                    date: row.date,
-                                    note: row.note,
-                                    comment: row.comment || '',
-                                    items: defaultAuditItems
-                                };
-                            } else {
-                                if (row.date) auditsHistory[row.anabel].date = row.date;
-                                if (row.note !== null && row.note !== undefined) auditsHistory[row.anabel].note = row.note;
-                                if (row.comment) auditsHistory[row.anabel].comment = row.comment;
+                        if (!row.anabel) return;
+                        
+                        const anabelKey = String(row.anabel);
+                        const storeRef = storesData.find(s => String(s.ANABEL) === anabelKey) || {};
+                        const existing = auditsHistory[anabelKey];
+
+                        let parsedItems = defaultAuditItems;
+                        if (row.items) {
+                            try {
+                                parsedItems = typeof row.items === 'string' ? JSON.parse(row.items) : row.items;
+                            } catch(e) {
+                                parsedItems = defaultAuditItems;
                             }
                         }
+
+                        const remoteUpdatedAt = row.updatedAt ? new Date(row.updatedAt).getTime() : 0;
+                        const localUpdatedAt = existing?.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+
+                        if (!existing || remoteUpdatedAt >= localUpdatedAt || !existing.updatedAt) {
+                            auditsHistory[anabelKey] = {
+                                anabel: anabelKey,
+                                store: row.store || storeRef.STORE || '',
+                                enseigne: row.enseigne || storeRef.ENSEIGNE || '',
+                                csi: row.csi || storeRef.CSI || '',
+                                date: row.date ? formatDateISO(row.date) : (existing?.date || ''),
+                                note: (row.note !== null && row.note !== undefined && row.note !== '') ? parseFloat(row.note) : (existing?.note ?? null),
+                                comment: row.comment !== undefined ? row.comment : (existing?.comment || ''),
+                                callDate: row.callDate ? formatDateISO(row.callDate) : (existing?.callDate || ''),
+                                mailDate: row.mailDate ? formatDateISO(row.mailDate) : (existing?.mailDate || ''),
+                                relanceDate: row.relanceDate ? formatDateISO(row.relanceDate) : (existing?.relanceDate || ''),
+                                items: (parsedItems && parsedItems.length) ? parsedItems : (existing?.items || defaultAuditItems),
+                                updatedAt: row.updatedAt || existing?.updatedAt || new Date().toISOString()
+                            };
+                            hasNewData = true;
+                        }
                     });
-                    localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
-                    renderGrille();
-                    renderHistory();
-                    updateKPIs();
+
+                    if (hasNewData) {
+                        localStorage.setItem('auditsHistory_csi_v5', JSON.stringify(auditsHistory));
+                        renderGrille();
+                        renderHistory();
+                        updateKPIs();
+                    }
                 }
             } catch(e) {
-                console.log("Mode hors-ligne ou synchro Google indisponible", e);
+                console.log("Mode hors-ligne ou synchro indisponible", e);
+            } finally {
+                isFetching = false;
             }
         }
     </script>
