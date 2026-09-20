@@ -342,13 +342,37 @@
 
         <!-- NOUVEAU LOGO BOHÊME DYNAMIQUE -->
         <div class="header-logo-container">
-            <div class="logo-container" id="logoContainer">
-                <img src="image_b75a41.png" alt="Emblème Chat Circuit" class="logo-icon">
-                
-                <div class="logo-text">
-                    <h1 class="brand-title">BOHÊME</h1>
-                    <p class="brand-subtitle">CODE &bull; DESIGN &bull; RETAIL</p>
-                </div>
+            <div class="logo-container" id="logoContainer" style="width: 260px;">
+                <!-- DEBUT DU CODE DU LOGO SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250" style="width: 100%; height: auto; filter: drop-shadow(0 4px 8px rgba(255,255,255,0.3)); transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    <defs>
+                      <!-- Dégradé métallique cuivré -->
+                      <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#F7BA83" />
+                        <stop offset="50%" stop-color="#D37538" />
+                        <stop offset="100%" stop-color="#914015" />
+                      </linearGradient>
+                    </defs>
+
+                    <!-- Symbole 'C' principal -->
+                    <path d="M 230 40 A 85 85 0 1 0 230 210 L 230 185 A 60 60 0 1 1 230 65 Z" fill="url(#copperGrad)" />
+                    
+                    <!-- Lignes de circuit imprimé décoratives sur le bord gauche du C -->
+                    <path d="M 145 125 L 115 125 M 155 65 L 140 50 M 155 185 L 140 200" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+                    <circle cx="110" cy="125" r="3" fill="url(#copperGrad)" />
+                    <circle cx="135" cy="45" r="3" fill="url(#copperGrad)" />
+                    <circle cx="135" cy="205" r="3" fill="url(#copperGrad)" />
+
+                    <!-- Silhouette du chat géométrique intégrée au centre du C -->
+                    <path d="M 160 190 Q 150 140 180 115 L 185 90 L 195 105 L 210 95 L 205 120 Q 220 140 205 180 L 205 210 L 195 210 L 195 180 L 175 180 L 175 210 L 165 210 Z" fill="url(#copperGrad)" />
+
+                    <!-- Texte Principal : BOHÊME -->
+                    <text x="270" y="145" font-family="'Times New Roman', Times, serif" font-size="80" font-weight="bold" fill="url(#copperGrad)" letter-spacing="6">BOHÊME</text>
+
+                    <!-- Texte Secondaire : Spécialités -->
+                    <text x="275" y="195" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="url(#copperGrad)" letter-spacing="8">CODE • DESIGN • RETAIL</text>
+                </svg>
+                <!-- FIN DU CODE DU LOGO SVG -->
             </div>
         </div>
 
@@ -1073,20 +1097,58 @@
         };
 
         function updateKPIs() {
-            const totalStores = storesData.length;
-            const auditedStores = storesData.filter(s => {
-                const a = auditsHistory[s.ANABEL];
-                return a && (a.date || (a.note !== null && a.note !== undefined));
-            }).length;
+            let totalStores = storesData.length;
+            let auditedStores = 0;
+            let dtStats = {};
 
-            const percent = totalStores > 0 ? Math.round((auditedStores / totalStores) * 100) : 0;
+            // 1. Initialiser le total des magasins par DT
+            storesData.forEach(s => {
+                if (!dtStats[s.DT]) dtStats[s.DT] = { total: 0, audited: 0 };
+                dtStats[s.DT].total++;
+            });
 
-            document.getElementById('kpi-audits').textContent = auditedStores;
-            document.getElementById('kpi-total').textContent = totalStores;
-            document.getElementById('kpi-reste').textContent = totalStores - auditedStores;
-            document.getElementById('kpi-percent').textContent = percent + '%';
-            document.getElementById('kpi-progress').style.width = percent + '%';
+            // 2. Parcourir les magasins pour identifier ceux qui sont audités
+            storesData.forEach(store => {
+                const audit = auditsHistory[store.ANABEL];
+                const isAudited = !!(audit && (audit.date || (audit.note !== null && audit.note !== undefined)));
+                
+                if (isAudited) {
+                    auditedStores++;
+                    dtStats[store.DT].audited++;
+                }
+            });
 
+            // 3. Injecter le nom et la jauge de progression dans l'affichage HTML
+            const dtContainer = document.getElementById('kpi-dt-details');
+            if (dtContainer) {
+                dtContainer.innerHTML = ''; // Nettoyage de la zone
+                for (let dt in dtStats) {
+                    const stats = dtStats[dt];
+                    const percent = Math.round((stats.audited / stats.total) * 100) || 0;
+                    
+                    dtContainer.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:bold;">
+                            <span style="color:#475569;">${dt}</span>
+                            <span style="color:var(--carrefour-blue);">${stats.audited}/${stats.total} (${percent}%)</span>
+                        </div>
+                        <div style="width:100%; height:5px; background:#e2e8f0; border-radius:3px; margin-bottom:5px; overflow:hidden;">
+                            <div style="width:${percent}%; height:100%; background:var(--carrefour-green); transition:width 0.5s; border-radius:3px;"></div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Couverture globale du parc
+            const percentGlobal = totalStores > 0 ? Math.round((auditedStores / totalStores) * 100) : 0;
+            if (document.getElementById('kpi-audits')) {
+                document.getElementById('kpi-audits').textContent = auditedStores;
+                document.getElementById('kpi-total').textContent = totalStores;
+                document.getElementById('kpi-reste').textContent = totalStores - auditedStores;
+                document.getElementById('kpi-progress').style.width = percentGlobal + '%';
+                document.getElementById('kpi-percent').textContent = percentGlobal + '%';
+            }
+
+            // Note Moyenne Globale
             let notesSum = 0;
             let notesCount = 0;
             let exc = 0, cor = 0, cri = 0;
@@ -1102,11 +1164,14 @@
             });
 
             const avg = notesCount > 0 ? (notesSum / notesCount).toFixed(1) : '-';
-            document.getElementById('kpi-moyenne').innerHTML = `${avg} <span style="font-size:0.95rem; color:#94a3b8;">/ 20</span>`;
-            document.getElementById('kpi-exc').textContent = exc;
-            document.getElementById('kpi-cor').textContent = cor;
-            document.getElementById('kpi-cri').textContent = cri;
+            if (document.getElementById('kpi-moyenne')) {
+                document.getElementById('kpi-moyenne').innerHTML = `${avg} <span style="font-size:0.95rem; color:#94a3b8;">/ 20</span>`;
+                document.getElementById('kpi-exc').textContent = exc;
+                document.getElementById('kpi-cor').textContent = cor;
+                document.getElementById('kpi-cri').textContent = cri;
+            }
 
+            // Meilleur Contributeur
             const csiCounts = {};
             Object.values(auditsHistory).forEach(a => {
                 if (a.csi && (a.date || (a.note !== null && a.note !== undefined))) {
@@ -1124,14 +1189,17 @@
                     topCsi = csiName;
                 }
             }
-            document.getElementById('kpi-top-auditor').textContent = topCsi !== '-' ? topCsi : '-';
-            document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml;
+            if (document.getElementById('kpi-top-auditor')) {
+                document.getElementById('kpi-top-auditor').textContent = topCsi !== '-' ? topCsi : '-';
+                document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml;
+            }
 
+            // Activité Récente
             const lastAudit = Object.values(auditsHistory)
                 .filter(a => a.updatedAt)
                 .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
 
-            if (lastAudit) {
+            if (lastAudit && document.getElementById('kpi-last-date')) {
                 document.getElementById('kpi-last-date').textContent = formatDateFR(lastAudit.date || new Date(lastAudit.updatedAt));
                 const sRef = storesData.find(s => String(s.ANABEL) === String(lastAudit.anabel));
                 document.getElementById('kpi-last-store').textContent = `${lastAudit.anabel} - ${sRef ? sRef.STORE : lastAudit.store} (${lastAudit.csi})`;
