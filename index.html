@@ -309,9 +309,9 @@
     </header>
 
     <nav class="no-print">
-        <button class="tab-btn" onclick="switchTab('tab-saisie', this)"><i class="fas fa-edit"></i> Saisie de l'Audit (Détaillé)</button>
-        <button class="tab-btn active" onclick="switchTab('tab-grille', this)"><i class="fas fa-chart-bar"></i> Grille & Statistiques</button>
-        <button class="tab-btn" onclick="switchTab('tab-archives', this)"><i class="fas fa-folder"></i> Historique Global</button>
+        <button class="tab-btn" onclick="window.switchTab('tab-saisie', this)"><i class="fas fa-edit"></i> Saisie de l'Audit (Détaillé)</button>
+        <button class="tab-btn active" onclick="window.switchTab('tab-grille', this)"><i class="fas fa-chart-bar"></i> Grille & Statistiques</button>
+        <button class="tab-btn" onclick="window.switchTab('tab-archives', this)"><i class="fas fa-folder"></i> Historique Global</button>
     </nav>
 
     <div class="container">
@@ -322,15 +322,15 @@
                 <div class="search-container no-print">
                     <div class="input-group">
                         <label>Code ANABEL ou Ville</label>
-                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, LYON..." onkeyup="if(event.key==='Enter') chercherMagasin()">
+                        <input type="text" id="anabelSearch" placeholder="Ex: 6345, LYON..." onkeyup="if(event.key==='Enter') window.chercherMagasin()">
                     </div>
                     <div class="input-group" style="flex: 2;">
                         <label>Ou choisir dans la liste complète</label>
-                        <select id="storeSelect" onchange="activerMagasin(this.value)">
+                        <select id="storeSelect" onchange="window.activerMagasin(this.value)">
                             <option value="">-- Chargement des 72 magasins --</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" onclick="chercherMagasin()">🔍 Démarrer l'audit</button>
+                    <button class="btn btn-primary" onclick="window.chercherMagasin()">🔍 Démarrer l'audit</button>
                 </div>
 
                 <div id="activeStoreInfo" style="display: none;">
@@ -357,7 +357,7 @@
                     <div class="audit-grid-layout" id="auditGridBody"></div>
                     
                     <div style="margin-top: 25px; text-align: right;" class="no-print">
-                        <button class="btn btn-danger" style="font-size: 1rem; padding: 10px 22px;" id="btnSaveAudit" onclick="archiverAudit()">💾 Valider et Enregistrer l'Audit</button>
+                        <button class="btn btn-danger" style="font-size: 1rem; padding: 10px 22px;" id="btnSaveAudit" onclick="window.archiverAudit()">💾 Valider et Enregistrer l'Audit</button>
                     </div>
                 </div>
             </div>
@@ -408,16 +408,16 @@
             <div class="card">
                 <div class="search-container filter-container no-print" style="padding: 12px 16px;">
                     <div class="input-group"><label>Filtrer par Statut Audit</label>
-                        <select id="g-filter-status" onchange="filtrerGrille()">
+                        <select id="g-filter-status" onchange="window.filtrerGrille()">
                             <option value="ALL">Tous les magasins</option>
                             <option value="AUDITED">Magasins Audités</option>
                             <option value="NOT_AUDITED">Magasins Non Audités</option>
                         </select>
                     </div>
-                    <div class="input-group"><label>Filtrer par DT</label><select id="g-filter-dt" onchange="filtrerGrille()"><option value="ALL">Tous les DT</option></select></div>
-                    <div class="input-group"><label>Filtrer par Chef de Secteur</label><select id="g-filter-cdf" onchange="filtrerGrille()"><option value="ALL">Tous les CDF</option></select></div>
-                    <div class="input-group"><label>Filtrer par CSI Assigné</label><select id="g-filter-csi" onchange="filtrerGrille()"><option value="ALL">Tous les CSI</option></select></div>
-                    <div class="input-group"><label>Filtrer par Priorité (PRIO)</label><select id="g-filter-prio" onchange="filtrerGrille()"><option value="ALL">Tous</option><option value="1">P1</option><option value="2">P2</option><option value="3">P3</option><option value="4">P4</option></select></div>
+                    <div class="input-group"><label>Filtrer par DT</label><select id="g-filter-dt" onchange="window.filtrerGrille()"><option value="ALL">Tous les DT</option></select></div>
+                    <div class="input-group"><label>Filtrer par Chef de Secteur</label><select id="g-filter-cdf" onchange="window.filtrerGrille()"><option value="ALL">Tous les CDF</option></select></div>
+                    <div class="input-group"><label>Filtrer par CSI Assigné</label><select id="g-filter-csi" onchange="window.filtrerGrille()"><option value="ALL">Tous les CSI</option></select></div>
+                    <div class="input-group"><label>Filtrer par Priorité (PRIO)</label><select id="g-filter-prio" onchange="window.filtrerGrille()"><option value="ALL">Tous</option><option value="1">P1</option><option value="2">P2</option><option value="3">P3</option><option value="4">P4</option></select></div>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; font-size: 0.78rem; font-weight: bold; align-items: center;" class="no-print">
@@ -483,7 +483,7 @@
                 </div>
                 <div class="no-print" style="display: flex; gap: 10px;">
                     <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Imprimer / PDF</button>
-                    <button class="btn btn-secondary" onclick="fermerModalImpression()"><i class="fas fa-times"></i> Fermer</button>
+                    <button class="btn btn-secondary" onclick="window.fermerModalImpression()"><i class="fas fa-times"></i> Fermer</button>
                 </div>
             </div>
 
@@ -507,15 +507,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURATION FIREBASE - REMPLACEZ CES VALEURS PAR VOTRE CONSOLE FIREBASE
         const firebaseConfig = {
-  apiKey: "AIzaSyB9AD-LH3bOILvx7bgShujS2B3rsE-OWQE",
-  authDomain: "audit-csi.firebaseapp.com",
-  projectId: "audit-csi",
-  storageBucket: "audit-csi.firebasestorage.app",
-  messagingSenderId: "1094554772120",
-  appId: "1:1094554772120:web:5b02353eba000e22e2e6ed",
-  measurementId: "G-6WZBQPHC8V"
+            apiKey: "AIzaSyB9AD-LH3bOILvx7bgShujS2B3rsE-OWQE",
+            authDomain: "audit-csi.firebaseapp.com",
+            projectId: "audit-csi",
+            storageBucket: "audit-csi.firebasestorage.app",
+            messagingSenderId: "1094554772120",
+            appId: "1:1094554772120:web:5b02353eba000e22e2e6ed",
+            measurementId: "G-6WZBQPHC8V"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -680,67 +679,6 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initStoreSelect();
-            initFilterSelects();
-            renderGrille();
-            renderHistory();
-            updateKPIs();
-            document.getElementById('auditDate').value = formatDateISO(new Date());
-            
-            initLogoVibrationDetector();
-            ecouterChangementsFirebase();
-        });
-
-        /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
-        function initLogoVibrationDetector() {
-            const logo = document.getElementById('logoContainer');
-            const runnerLeft = document.getElementById('runnerLeft');
-            const runnerRight = document.getElementById('runnerRight');
-
-            if (!logo || !runnerLeft || !runnerRight) return;
-
-            let leftTriggered = false;
-            let rightTriggered = false;
-
-            function checkOverlap() {
-                const logoRect = logo.getBoundingClientRect();
-                const leftRect = runnerLeft.getBoundingClientRect();
-                const rightRect = runnerRight.getBoundingClientRect();
-
-                if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
-                    if (!leftTriggered) {
-                        triggerLogoVibration();
-                        leftTriggered = true;
-                    }
-                } else {
-                    leftTriggered = false;
-                }
-
-                if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
-                    if (!rightTriggered) {
-                        triggerLogoVibration();
-                        rightTriggered = true;
-                    }
-                } else {
-                    rightTriggered = false;
-                }
-
-                requestAnimationFrame(checkOverlap);
-            }
-
-            function triggerLogoVibration() {
-                logo.classList.remove('vibrate-logo');
-                void logo.offsetWidth;
-                logo.classList.add('vibrate-logo');
-                setTimeout(() => {
-                    logo.classList.remove('vibrate-logo');
-                }, 1000);
-            }
-
-            requestAnimationFrame(checkOverlap);
-        }
-
         window.switchTab = function(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -779,7 +717,7 @@
             const found = storesData.find(s => String(s.ANABEL).toLowerCase() === query || s.STORE.toLowerCase().includes(query));
             if (found) {
                 document.getElementById('storeSelect').value = found.ANABEL;
-                activerMagasin(found.ANABEL);
+                window.activerMagasin(found.ANABEL);
             } else {
                 alert("Aucun magasin trouvé pour cette recherche.");
             }
@@ -1185,8 +1123,67 @@
                 toast.style.opacity = '0';
             }, 3000);
         }
-   const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
- </script>
+
+        /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
+        function initLogoVibrationDetector() {
+            const logo = document.getElementById('logoContainer');
+            const runnerLeft = document.getElementById('runnerLeft');
+            const runnerRight = document.getElementById('runnerRight');
+
+            if (!logo || !runnerLeft || !runnerRight) return;
+
+            let leftTriggered = false;
+            let rightTriggered = false;
+
+            function checkOverlap() {
+                const logoRect = logo.getBoundingClientRect();
+                const leftRect = runnerLeft.getBoundingClientRect();
+                const rightRect = runnerRight.getBoundingClientRect();
+
+                if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
+                    if (!leftTriggered) {
+                        triggerLogoVibration();
+                        leftTriggered = true;
+                    }
+                } else {
+                    leftTriggered = false;
+                }
+
+                if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
+                    if (!rightTriggered) {
+                        triggerLogoVibration();
+                        rightTriggered = true;
+                    }
+                } else {
+                    rightTriggered = false;
+                }
+
+                requestAnimationFrame(checkOverlap);
+            }
+
+            function triggerLogoVibration() {
+                logo.classList.remove('vibrate-logo');
+                void logo.offsetWidth;
+                logo.classList.add('vibrate-logo');
+                setTimeout(() => {
+                    logo.classList.remove('vibrate-logo');
+                }, 1000);
+            }
+
+            requestAnimationFrame(checkOverlap);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initStoreSelect();
+            initFilterSelects();
+            renderGrille();
+            renderHistory();
+            updateKPIs();
+            document.getElementById('auditDate').value = formatDateISO(new Date());
+            
+            initLogoVibrationDetector();
+            ecouterChangementsFirebase();
+        });
+    </script>
 </body>
 </html>
