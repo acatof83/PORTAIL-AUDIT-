@@ -29,7 +29,7 @@
             color: white; padding: 18px 30px; 
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 4px solid var(--carrefour-orange); overflow: hidden; position: relative;
-            min-height: 120px;
+            min-height: 140px;
             gap: 15px;
         }
 
@@ -37,21 +37,21 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* LOGO SVG INTEGRATION & VIBRATION (GROSSISSEMENT +80%) */
+        /* LOGO SVG INTEGRATION & VIBRATION (GROSSISSEMENT +30% -> 128px) */
         .header-logo-container {
             z-index: 2;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 99px;
+            height: 128px;
             flex: 0 1 auto;
         }
         .header-logo-container svg {
             height: 100%;
             width: auto;
-            max-height: 99px;
-            max-width: 500px;
+            max-height: 128px;
+            max-width: 650px;
             display: block;
             transition: transform 0.1s ease-in-out;
         }
@@ -287,7 +287,7 @@
             <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
 
-        <!-- LOGO BOHÊME INCRUSTÉ -->
+        <!-- LOGO BOHÊME INCRUSTÉ (+30% PLUS GRAND) -->
         <div class="header-logo-container" id="logoContainer">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250">
               <defs>
