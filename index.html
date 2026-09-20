@@ -18,6 +18,8 @@
             --danger-red: #dc2626;
             --warning-orange: #f59e0b;
             --success-green: #10b981;
+            --subtitle-color: #9ca3af;
+            --accent-glow: rgba(255, 255, 255, 0.3);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
@@ -37,27 +39,71 @@
         .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header-title p { font-size: 0.88rem; margin-top: 3px; opacity: 0.95; }
 
-        /* LOGO SVG INTEGRATION & VIBRATION (DYNAMIQUE) */
+        /* NOUVEAU LOGO DYNAMIQUE & INTEGRATION VIBRATION */
         .header-logo-container {
             z-index: 2;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 141px;
-            flex: 1 1 auto; /* Permet au conteneur de s'adapter */
-            max-width: 50%; /* Evite qu'il ne prenne toute la place sur petit écran */
-        }
-        .header-logo-container svg {
-            height: auto; /* Dynamique */
-            width: 100%; /* Dynamique */
-            max-height: 141px;
-            max-width: 650px;
-            display: block;
+            flex: 0 1 auto;
             transition: transform 0.1s ease-in-out;
         }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 1.5vw, 18px);
+            text-decoration: none;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .logo-icon {
+            width: clamp(38px, 4.5vw, 54px);
+            height: clamp(38px, 4.5vw, 54px);
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px var(--accent-glow));
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+            flex-shrink: 0;
+        }
+
+        .logo-container:hover .logo-icon {
+            transform: scale(1.08) rotate(4deg);
+            filter: drop-shadow(0 6px 14px var(--accent-glow));
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand-title {
+            font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            line-height: 1;
+            margin: 0;
+            color: #ffffff;
+            transition: opacity 0.3s ease;
+        }
+
+        .brand-subtitle {
+            font-size: clamp(0.5rem, 0.8vw, 0.68rem);
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            color: #e2e8f0;
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+
+        .logo-container:hover .brand-title {
+            opacity: 0.9;
+        }
+
         .vibrate-logo {
-            animation: vibrate 0.2s linear infinite; /* Vibration en boucle tant que le perso est devant */
+            animation: vibrate 1s linear forwards;
         }
 
         @keyframes vibrate {
@@ -257,6 +303,12 @@
 
         #toast { position: fixed; bottom: 20px; right: 20px; background: var(--carrefour-green-dark); color: white; padding: 12px 24px; border-radius: 6px; font-weight: bold; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
+        @media (max-width: 640px) {
+            .brand-subtitle {
+                letter-spacing: 0.14em;
+            }
+        }
+
         @media print {
             header, nav, .no-print, .search-container, .modal-overlay .no-print { display: none !important; }
             .container { padding: 0 !important; margin: 0 !important; }
@@ -286,24 +338,15 @@
             <p>Suivi des équipements & conformité — Carrefour Proximité <span style="color:#a7f3d0; font-weight: bold; margin-left: 8px;">(72 Magasins Intégrés 🟢)</span></p>
         </div>
 
+        <!-- NOUVEAU LOGO BOHÊME DYNAMIQUE -->
         <div class="header-logo-container" id="logoContainer">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 250">
-              <defs>
-                <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#F7BA83" />
-                  <stop offset="50%" stop-color="#D37538" />
-                  <stop offset="100%" stop-color="#914015" />
-                </linearGradient>
-              </defs>
-              <path d="M 230 40 A 85 85 0 1 0 230 210 L 230 185 A 60 60 0 1 1 230 65 Z" fill="url(#copperGrad)" />
-              <path d="M 145 125 L 115 125 M 155 65 L 140 50 M 155 185 L 140 200" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
-              <circle cx="110" cy="125" r="3" fill="url(#copperGrad)" />
-              <circle cx="135" cy="45" r="3" fill="url(#copperGrad)" />
-              <circle cx="135" cy="205" r="3" fill="url(#copperGrad)" />
-              <path d="M 160 190 Q 150 140 180 115 L 185 90 L 195 105 L 210 95 L 205 120 Q 220 140 205 180 L 205 210 L 195 210 L 195 180 L 175 180 L 175 210 L 165 210 Z" fill="url(#copperGrad)" />
-              <text x="270" y="145" font-family="'Times New Roman', Times, serif" font-size="80" font-weight="bold" fill="url(#copperGrad)" letter-spacing="6">BOHÊME</text>
-              <text x="275" y="195" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="url(#copperGrad)" letter-spacing="8">CODE • DESIGN • RETAIL</text>
-            </svg>
+            <div class="logo-container">
+                <img src="image_b75a41.png" alt="Emblème Chat Circuit" class="logo-icon">
+                <div class="logo-text">
+                    <h1 class="brand-title">BOHÊME</h1>
+                    <p class="brand-subtitle">CODE &bull; DESIGN &bull; RETAIL</p>
+                </div>
+            </div>
         </div>
 
         <button class="btn btn-secondary no-print" onclick="window.print()" style="z-index: 2; position: relative;">🖨️ Imprimer la vue</button>
@@ -976,7 +1019,6 @@
             });
         }
 
-        /* --- CODE COMPLETÉ ICI (suite de l'endroit où la fonction coupait) --- */
         window.ouvrirModalImpression = function(anabel) {
             const audit = auditsHistory[anabel];
             if (!audit) return;
@@ -987,27 +1029,39 @@
             document.getElementById('modalStoreName').textContent = storeRef.STORE || audit.store || 'Magasin';
             document.getElementById('modalCSI').textContent = audit.csi || '-';
             document.getElementById('modalDate').textContent = formatDateFR(audit.date);
-            document.getElementById('modalNote').textContent = (audit.note !== null && audit.note !== undefined) ? audit.note + ' / 20' : '-';
-            document.getElementById('modalComment').textContent = audit.comment || '-';
+            document.getElementById('modalNote').textContent = audit.note !== undefined && audit.note !== null ? `${audit.note} / 20` : '-';
+            document.getElementById('modalComment').textContent = audit.comment || 'Aucun commentaire particulier.';
 
             const grid = document.getElementById('modalItemsGrid');
             grid.innerHTML = '';
-            (audit.items || defaultAuditItems).forEach(item => {
-                let stateColor = '#10b981';
-                if (item.state === 'MOYEN') stateColor = '#f59e0b';
-                if (item.state === 'CRITIQUE') stateColor = '#dc2626';
 
-                grid.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem;">
-                        <span style="color:#334155;">${item.name}</span>
-                        <div style="display:flex; gap: 15px; font-weight: bold;">
-                            <span style="color:#64748b;">${item.qty}</span>
-                            <span style="color:${stateColor}; width: 70px; text-align: right;">${item.state}</span>
-                        </div>
-                    </div>
+            const itemsToDisplay = audit.items || defaultAuditItems;
+            let currentCatModal = '';
+
+            itemsToDisplay.forEach(item => {
+                if (item.cat !== currentCatModal) {
+                    currentCatModal = item.cat;
+                    const catTitle = document.createElement('div');
+                    catTitle.style.cssText = "font-weight:700; color:var(--carrefour-blue); background:#e2e8f0; padding:6px 10px; border-radius:4px; margin-top:8px; font-size:0.8rem; text-transform:uppercase;";
+                    catTitle.textContent = currentCatModal;
+                    grid.appendChild(catTitle);
+                }
+
+                let badgeStateStyle = "background:#dcfce7; color:#166534;";
+                if (item.state === 'MOYEN') badgeStateStyle = "background:#fef3c7; color:#92400e;";
+                if (item.state === 'CRITIQUE' || item.state === 'MAUVAIS') badgeStateStyle = "background:#fee2e2; color:#b91c1c;";
+                if (item.state === 'ABSENT') badgeStateStyle = "background:#f1f5f9; color:#64748b;";
+
+                const row = document.createElement('div');
+                row.style.cssText = "display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; align-items:center; padding:6px 10px; border-bottom:1px solid #e2e8f0; font-size:0.85rem;";
+                row.innerHTML = `
+                    <div>${item.name}</div>
+                    <div style="font-weight:600; color:#475569;">${item.qty || '-'}</div>
+                    <div><span style="padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.75rem; ${badgeStateStyle}">${item.state || 'BON'}</span></div>
                 `;
+                grid.appendChild(row);
             });
-            
+
             document.getElementById('printModal').style.display = 'flex';
         };
 
@@ -1015,85 +1069,164 @@
             document.getElementById('printModal').style.display = 'none';
         };
 
-        window.showToast = function(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.style.opacity = 1;
-            toast.style.pointerEvents = 'auto';
-            setTimeout(() => {
-                toast.style.opacity = 0;
-                toast.style.pointerEvents = 'none';
-            }, 3000);
-        };
-
         function updateKPIs() {
-            const audited = Object.values(auditsHistory).filter(a => a.date || (a.note !== null && a.note !== undefined));
-            const total = storesData.length;
-            
-            document.getElementById('kpi-audits').textContent = audited.length;
-            document.getElementById('kpi-total').textContent = total;
-            document.getElementById('kpi-reste').textContent = total - audited.length;
-            
-            const percent = total > 0 ? Math.round((audited.length / total) * 100) : 0;
-            document.getElementById('kpi-progress').style.width = percent + '%';
-            document.getElementById('kpi-percent').textContent = percent + '%';
+            const totalStores = storesData.length;
+            const auditedStores = storesData.filter(s => {
+                const a = auditsHistory[s.ANABEL];
+                return a && (a.date || (a.note !== null && a.note !== undefined));
+            }).length;
 
-            let sumNotes = 0, countNotes = 0;
+            const percent = totalStores > 0 ? Math.round((auditedStores / totalStores) * 100) : 0;
+
+            document.getElementById('kpi-audits').textContent = auditedStores;
+            document.getElementById('kpi-total').textContent = totalStores;
+            document.getElementById('kpi-reste').textContent = totalStores - auditedStores;
+            document.getElementById('kpi-percent').textContent = percent + '%';
+            document.getElementById('kpi-progress').style.width = percent + '%';
+
+            let notesSum = 0;
+            let notesCount = 0;
             let exc = 0, cor = 0, cri = 0;
-            audited.forEach(a => {
+
+            Object.values(auditsHistory).forEach(a => {
                 if (a.note !== null && a.note !== undefined && !isNaN(a.note)) {
-                    sumNotes += a.note;
-                    countNotes++;
+                    notesSum += a.note;
+                    notesCount++;
                     if (a.note >= 15) exc++;
                     else if (a.note >= 10) cor++;
                     else cri++;
                 }
             });
-            
-            document.getElementById('kpi-moyenne').innerHTML = countNotes > 0 ? (sumNotes/countNotes).toFixed(1) + ' <span style="font-size: 0.95rem; color: #94a3b8;">/ 20</span>' : '-';
+
+            const avg = notesCount > 0 ? (notesSum / notesCount).toFixed(1) : '-';
+            document.getElementById('kpi-moyenne').innerHTML = `${avg} <span style="font-size:0.95rem; color:#94a3b8;">/ 20</span>`;
             document.getElementById('kpi-exc').textContent = exc;
             document.getElementById('kpi-cor').textContent = cor;
             document.getElementById('kpi-cri').textContent = cri;
+
+            const csiCounts = {};
+            Object.values(auditsHistory).forEach(a => {
+                if (a.csi && (a.date || (a.note !== null && a.note !== undefined))) {
+                    csiCounts[a.csi] = (csiCounts[a.csi] || 0) + 1;
+                }
+            });
+
+            let topCsi = '-';
+            let maxCount = -1;
+            let csiDetailsHtml = '';
+            for (const [csiName, count] of Object.entries(csiCounts)) {
+                csiDetailsHtml += `<div><b>${csiName}</b> : ${count} audits</div>`;
+                if (count > maxCount) {
+                    maxCount = count;
+                    topCsi = csiName;
+                }
+            }
+            document.getElementById('kpi-top-auditor').textContent = topCsi !== '-' ? `${topCsi} (${maxCount})` : '-';
+            document.getElementById('kpi-csi-details').innerHTML = csiDetailsHtml || '<span style="color:#94a3b8;">Aucun audit validé</span>';
+
+            const dtStats = {};
+            storesData.forEach(s => {
+                if (!dtStats[s.DT]) dtStats[s.DT] = { total: 0, done: 0 };
+                dtStats[s.DT].total++;
+                const a = auditsHistory[s.ANABEL];
+                if (a && (a.date || (a.note !== null && a.note !== undefined))) {
+                    dtStats[s.DT].done++;
+                }
+            });
+
+            const dtDetailsContainer = document.getElementById('kpi-dt-details');
+            dtDetailsContainer.innerHTML = '';
+            for (const [dtName, stat] of Object.entries(dtStats)) {
+                const dtPct = Math.round((stat.done / stat.total) * 100);
+                const displayName = dtName.length > 16 ? dtName.substring(0, 14) + '..' : dtName;
+                dtDetailsContainer.innerHTML += `
+                    <div style="font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; color:#334155;" title="${dtName}">${displayName}</span>
+                        <span><b>${stat.done}/${stat.total}</b> (${dtPct}%)</span>
+                    </div>
+                `;
+            }
+
+            const validAudits = Object.values(auditsHistory).filter(a => a.date);
+            if (validAudits.length > 0) {
+                validAudits.sort((a,b) => new Date(b.date) - new Date(a.date));
+                const last = validAudits[0];
+                document.getElementById('kpi-last-date').textContent = formatDateFR(last.date);
+                document.getElementById('kpi-last-store').textContent = `${last.anabel} - ${last.store}`;
+            } else {
+                document.getElementById('kpi-last-date').textContent = '-';
+                document.getElementById('kpi-last-store').textContent = 'Aucun audit récent';
+            }
         }
 
-        // INIT
-        initStoreSelect();
-        initFilterSelects();
-        ecouterChangementsFirebase();
-    </script>
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 3000);
+        }
 
-    <!-- SCRIPT DE GESTION DE LA COLLISION & VIBRATION (NOUVEAU SCRIPT) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const logo = document.querySelector('#logoContainer svg');
+        /* DETECTION DU PASSAGE DES PERSONNAGES SOUS LE LOGO */
+        function initLogoVibrationDetector() {
+            const logo = document.getElementById('logoContainer');
             const runnerLeft = document.getElementById('runnerLeft');
             const runnerRight = document.getElementById('runnerRight');
 
-            function checkCollision() {
-                if (!logo || !runnerLeft || !runnerRight) return;
+            if (!logo || !runnerLeft || !runnerRight) return;
 
+            let leftTriggered = false;
+            let rightTriggered = false;
+
+            function checkOverlap() {
                 const logoRect = logo.getBoundingClientRect();
                 const leftRect = runnerLeft.getBoundingClientRect();
                 const rightRect = runnerRight.getBoundingClientRect();
 
-                // On vérifie le chevauchement avec une petite tolérance pour plus de fluidité
-                const isLeftColliding = (leftRect.right > logoRect.left + 20 && leftRect.left < logoRect.right - 20);
-                const isRightColliding = (rightRect.right > logoRect.left + 20 && rightRect.left < logoRect.right - 20);
-
-                if (isLeftColliding || isRightColliding) {
-                    if (!logo.classList.contains('vibrate-logo')) {
-                        logo.classList.add('vibrate-logo');
+                if (leftRect.right >= logoRect.left && leftRect.left <= logoRect.right) {
+                    if (!leftTriggered) {
+                        triggerLogoVibration();
+                        leftTriggered = true;
                     }
                 } else {
-                    logo.classList.remove('vibrate-logo');
+                    leftTriggered = false;
                 }
 
-                // Appeler de manière continue pour surveiller la position
-                requestAnimationFrame(checkCollision);
+                if (rightRect.right >= logoRect.left && rightRect.left <= logoRect.right) {
+                    if (!rightTriggered) {
+                        triggerLogoVibration();
+                        rightTriggered = true;
+                    }
+                } else {
+                    rightTriggered = false;
+                }
+
+                requestAnimationFrame(checkOverlap);
             }
+
+            function triggerLogoVibration() {
+                logo.classList.remove('vibrate-logo');
+                void logo.offsetWidth;
+                logo.classList.add('vibrate-logo');
+                setTimeout(() => {
+                    logo.classList.remove('vibrate-logo');
+                }, 1000);
+            }
+
+            requestAnimationFrame(checkOverlap);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initStoreSelect();
+            initFilterSelects();
+            renderGrille();
+            renderHistory();
+            updateKPIs();
+            document.getElementById('auditDate').value = formatDateISO(new Date());
             
-            // Lancer la boucle d'analyse
-            requestAnimationFrame(checkCollision);
+            initLogoVibrationDetector();
+            ecouterChangementsFirebase();
         });
     </script>
 </body>
