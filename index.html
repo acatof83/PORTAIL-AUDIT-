@@ -1,4 +1,4 @@
-<!DaCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -93,11 +93,7 @@
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { 
-            background: var(--card-bg); padding: 25px; border-radius: 10px; 
-            border: 1px solid var(--border); margin-bottom: 20px; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
-        }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
 
         .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem; }
         .btn-primary { background-color: var(--carrefour-orange); color: white; }
@@ -147,7 +143,7 @@
         .audit-item-card { background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; display: grid; grid-template-columns: 1.2fr 0.8fr 1fr; gap: 8px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.03); transition: border-color 0.2s, background-color 0.2s; }
         .audit-item-card:hover { border-color: var(--carrefour-blue); background-color: #f8fafc; }
 
-        /* TABLEAUX - STYLE D'ORIGINE RESTAURÉ */
+        /* TABLEAUX */
         .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; max-height: 68vh; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th { background: #f1f5f9; padding: 12px 14px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border); color: var(--carrefour-blue); font-weight: 700; text-transform: uppercase; font-size: 0.76rem; letter-spacing: 0.5px; }
@@ -236,7 +232,7 @@
 
                 <div id="activeStoreInfo" style="display: none;">
                     <div class="store-info-badge">
-                        <span id="dispEnseigne" style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; background: var(--carrefour-orange); padding: 2px 8px; border-radius: 4px;">-</span>
+                        <span id="dispEnseigne" style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; background: var(--carrefour-orange); padding: 2px 8px; border-radius: 4px;">CARREFOUR PROXIMITÉ</span>
                         <div class="nom"><span id="dispAnabel">-</span> - <span id="dispStore">-</span></div>
                         <div style="font-size: 0.9rem; opacity: 0.9;">Directeur Territorial : <strong id="dispDT">-</strong> | Chef de Secteur : <strong id="dispCDF">-</strong></div>
                     </div>
@@ -330,7 +326,6 @@
                 </div>
 
                 <div class="table-container">
-                    <!-- ATTENTION: Suppression de la classe excel-table ici -->
                     <table>
                         <thead>
                             <tr>
@@ -405,7 +400,7 @@
     
     <div id="toast">✅ Enregistré avec succès</div>
 
-    <!-- VOS SCRIPTS JS RESTENT INTACTS CI-DESSOUS (remplacez ces fonctions de test par votre code de gestion de données complet) -->
+    <!-- SCRIPT COMPLET AVEC LES 72 MAGASINS RESTAURÉS -->
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTPwnh-BXhJu-PlXhvfu4xgNnZ-abgftqIFLG_lZ7rb02HANtIVsrIPmWMY2g1ootf/exec";
 
@@ -439,6 +434,120 @@
             { cat: "MATÉRIEL RÉSERVE & MOBILITÉ", name: "Autre PC", qty: "0", state: "BON" }
         ];
 
+        /* LISTE DES 72 MAGASINS RESTAURÉE ET COMPLÉTÉE */
+        const magasins = [
+            { anabel: "6345", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "BOURDOT DAVID", store: "ARAMON -DE GAULLE", csi: "AMANDA" },
+            { anabel: "6266", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "BOURDOT DAVID", store: "MARSEILLE -LODI", csi: "AMANDA" },
+            { anabel: "5569", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "BOURDOT DAVID", store: "MARSEILLE -TURCAT", csi: "AMANDA" },
+            { anabel: "2752", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "GENSOLLEN MAELLE", store: "HYERES -TOULON", csi: "AMANDA" },
+            { anabel: "5280", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "GENSOLLEN MAELLE", store: "JUAN LES PIN -WILSON", csi: "AMANDA" },
+            { anabel: "2896", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "LOZA NATHALIE", store: "NICE -BORRIGLIONE 73", csi: "AMANDA" },
+            { anabel: "A46S", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "LOZA NATHALIE", store: "NICE -LAMARTINE", csi: "AMANDA" },
+            { anabel: "A46E", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "LOZA NATHALIE", store: "NICE -MEDECIN", csi: "AMANDA" },
+            { anabel: "8956", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "LOZA NATHALIE", store: "NICE -VILLERMONT", csi: "AMANDA" },
+            { anabel: "6617", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "LOZA NATHALIE", store: "SAINT-LAURENT-DU-VAR", csi: "AMANDA" },
+            { anabel: "8926", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "AJACCIO -DEL PELLEGR", csi: "AMANDA" },
+            { anabel: "5281", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "BEAUSOLEIL -MARCHE", csi: "AMANDA" },
+            { anabel: "7207", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "MENTON -FAURE", csi: "AMANDA" },
+            { anabel: "A5GU", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "NICE -DEROULEDE", csi: "AMANDA" },
+            { anabel: "5982", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "NICE -MALAUSSENA", csi: "AMANDA" },
+            { anabel: "5727", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "NICE -MEYERBEER", csi: "AMANDA" },
+            { anabel: "A5GW", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "NICE-CORNICHE", csi: "AMANDA" },
+            { anabel: "294", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "OTA- HAMEAU DE PORTO", csi: "AMANDA" },
+            { anabel: "6744", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "ROQUEBRUNE-CAP-MARTI", csi: "AMANDA" },
+            { anabel: "A4R6", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "SARROLA-CARCOPINO -B", csi: "AMANDA" },
+            { anabel: "1786", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "MALOT STEPHANE", store: "VENCE -RHIN DANUBE", csi: "AMANDA" },
+            { anabel: "6027", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "NEGREL NICOLAS", store: "AIX EN P -CORDEL 63", csi: "AMANDA" },
+            { anabel: "1076", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "NEGREL NICOLAS", store: "FORCALQUIER", csi: "AMANDA" },
+            { anabel: "2911", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "NEGREL NICOLAS", store: "ORAISON -AILLAUD", csi: "AMANDA" },
+            { anabel: "3095", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "NEGREL NICOLAS", store: "SAINTE-TULLE -PAUL", csi: "AMANDA" },
+            { anabel: "5332", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "NEGREL NICOLAS", store: "TOULON -15E CORP 709", csi: "AMANDA" },
+            { anabel: "6193", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "VINCENT AYMERIC", store: "MARSEILLE -BARA", csi: "AMANDA" },
+            { anabel: "5655", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "VINCENT AYMERIC", store: "MARSEILLE -CAMOINS", csi: "AMANDA" },
+            { anabel: "9467", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "VINCENT AYMERIC", store: "MARSEILLE -MONTAIGNE", csi: "AMANDA" },
+            { anabel: "4825", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "MULLER HELENE", store: "MONTPELLIER -MILHAU", csi: "CHRISTOPHE" },
+            { anabel: "6260", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "DUMONT HERVE", store: "CHAMBERY", csi: "CHRISTOPHE" },
+            { anabel: "8850", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "DUMONT HERVE", store: "ST ETIENNE -11 NOV", csi: "CHRISTOPHE" },
+            { anabel: "5311", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "DUMONT HERVE", store: "ST ETIENNE -FRAISSIN", csi: "CHRISTOPHE" },
+            { anabel: "7273", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "GIRARDON THIERRY", store: "BEDOIN", csi: "CHRISTOPHE" },
+            { anabel: "618", region: "SUD-EST", dt: "JEROME CHAPELLE", cdf: "GIRARDON THIERRY", store: "CAROMB -CARPENTRAS", csi: "CHRISTOPHE" },
+            { anabel: "A48H", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "CLERMONT FD -EYCHART", csi: "CHRISTOPHE" },
+            { anabel: "9485", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "LE COTEAU -LIBERATIO", csi: "CHRISTOPHE" },
+            { anabel: "7238", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "ST JUST EN CHEVALET", csi: "CHRISTOPHE" },
+            { anabel: "5700", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "ST JUST LA PENDUE", csi: "CHRISTOPHE" },
+            { anabel: "4988", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "CHAMALIERES -ROYAT", csi: "CHRISTOPHE" },
+            { anabel: "5578", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "CLERMONT FD -BLATN", csi: "CHRISTOPHE" },
+            { anabel: "5315", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "JOBERT EMMANUEL", store: "CLERMONT FD -DELILLE", csi: "CHRISTOPHE" },
+            { anabel: "A5GP", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "MAGNY CHRISTOPHE", store: "ALLAN -MALATAVERNE", csi: "CHRISTOPHE" },
+            { anabel: "1061", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "MAGNY CHRISTOPHE", store: "CHATILLON EN DIOIS", csi: "CHRISTOPHE" },
+            { anabel: "6307", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "MAGNY CHRISTOPHE", store: "MOURS-SAINT-EUSEBE", csi: "CHRISTOPHE" },
+            { anabel: "4686", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "MAGNY CHRISTOPHE", store: "VALENCE -LIBERATION", csi: "CHRISTOPHE" },
+            { anabel: "6586", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "BARRIOL AMELIE", store: "BRON -BROSSOLETTE", csi: "EMMANUEL" },
+            { anabel: "1790", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "BARRIOL AMELIE", store: "VILLEURBANNE -GENAS", csi: "EMMANUEL" },
+            { anabel: "1396", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "BRICOUT NICOLAS", store: "DIEMOZ -GR. NEUVE", csi: "EMMANUEL" },
+            { anabel: "7258", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "BRICOUT NICOLAS", store: "LES GETS -TANINGES", csi: "EMMANUEL" },
+            { anabel: "5627", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "BRICOUT NICOLAS", store: "ST-MARTIN-BELLEVUE", csi: "EMMANUEL" },
+            { anabel: "6057", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "BRICOUT NICOLAS", store: "TALLOIRES", csi: "EMMANUEL" },
+            { anabel: "A4XL", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "ANNEMASSE -GARE", csi: "EMMANUEL" },
+            { anabel: "1081", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "HAUTELUCE L. SAISIES", csi: "EMMANUEL" },
+            { anabel: "7259", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "LES HOUCHES", csi: "EMMANUEL" },
+            { anabel: "8887", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "LES MENUIRES -CROISE", csi: "EMMANUEL" },
+            { anabel: "6277", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "LES MENUIRES -PREYER", csi: "EMMANUEL" },
+            { anabel: "7260", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "MEGEVE -RTE NATIONAL", csi: "EMMANUEL" },
+            { anabel: "5591", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "VAL THORENS -ARCELLE", csi: "EMMANUEL" },
+            { anabel: "6184", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GALLIOT SANDRINE", store: "VAL THORENS -PORTILL", csi: "EMMANUEL" },
+            { anabel: "8942", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GONCALVES ISABELLE", store: "GRENOBLE -FUSILLES", csi: "EMMANUEL" },
+            { anabel: "4644", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "GONCALVES ISABELLE", store: "MONTBONNOT ST MARTIN", csi: "EMMANUEL" },
+            { anabel: "4922", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "RENAUD STEPHANE", store: "LYON -CREQUI", csi: "EMMANUEL" },
+            { anabel: "5568", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "RENAUD STEPHANE", store: "LYON -CROIX ROUSSE", csi: "EMMANUEL" },
+            { anabel: "5321", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "RENAUD STEPHANE", store: "LYON -DUQUESNE", csi: "EMMANUEL" },
+            { anabel: "1649", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "RENAUD STEPHANE", store: "LYON -JANIN", csi: "EMMANUEL" },
+            { anabel: "A4O2", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "RENAUD STEPHANE", store: "LYON -VITTON 6", csi: "EMMANUEL" },
+            { anabel: "A5Z5", region: "SUD-EST", dt: "CURT FLORIAN", cdf: "RENAUD STEPHANE", store: "LYON-FELIX FAURE", csi: "EMMANUEL" },
+            { anabel: "5326", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "ROBINET MANUEL", store: "CHAMBERY -MONTMELIAN", csi: "EMMANUEL" },
+            { anabel: "1943", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "ROBINET MANUEL", store: "FONTAINE -CURIE", csi: "EMMANUEL" },
+            { anabel: "9566", region: "SUD-EST", dt: "PELLON RENAUD", cdf: "ROBINET MANUEL", store: "ST CHEF EN DAUP", csi: "EMMANUEL" },
+            { anabel: "8636", region: "SUD-EST", dt: "LEROUX ARNOLD", cdf: "VASSON KEVIN", store: "AVIGNON -REPUBLIQUE", csi: "EMMANUEL" }
+        ];
+
+        /* --- INITIALISATION DE LA PAGE --- */
+        window.onload = function() {
+            // Charger les magasins dans le menu déroulant
+            const storeSelect = document.getElementById('storeSelect');
+            magasins.forEach(m => {
+                let opt = document.createElement('option');
+                opt.value = m.anabel;
+                opt.textContent = m.anabel + ' - ' + m.store + ' (' + m.dt + ')';
+                storeSelect.appendChild(opt);
+            });
+
+            // Générer la grille d'audit
+            const auditGridBody = document.getElementById('auditGridBody');
+            let currentCat = '';
+            defaultAuditItems.forEach((item) => {
+                if(item.cat !== currentCat) {
+                    currentCat = item.cat;
+                    let catHeader = document.createElement('div');
+                    catHeader.className = 'cat-header-row';
+                    catHeader.textContent = currentCat;
+                    auditGridBody.appendChild(catHeader);
+                }
+                let card = document.createElement('div');
+                card.className = 'audit-item-card';
+                card.innerHTML = `
+                    <div style="font-size: 0.82rem; font-weight: 600; color: var(--carrefour-blue);">${item.name}</div>
+                    <input type="text" placeholder="${item.qty}" style="padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem; width: 100%;">
+                    <select style="padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem; width: 100%;">
+                        <option value="BON">✅ BON</option>
+                        <option value="MOYEN">⚠️ MOYEN</option>
+                        <option value="MAUVAIS">❌ MAUVAIS</option>
+                        <option value="ABSENT">🚫 ABSENT</option>
+                    </select>
+                `;
+                auditGridBody.appendChild(card);
+            });
+        };
+
         /* --- FONCTIONS D'INTERFACE ET DE NAVIGATION --- */
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -451,23 +560,45 @@
             document.getElementById('printModal').style.display = 'none';
         }
         
+        /* --- RECHERCHE ET AFFICHAGE MAGASIN (Correction Inconnue) --- */
         function chercherMagasin() {
-            document.getElementById('activeStoreInfo').style.display = 'block';
-            document.getElementById('dispAnabel').innerText = document.getElementById('anabelSearch').value || "1234";
-            document.getElementById('dispStore').innerText = "Magasin de Test";
-            document.getElementById('dispEnseigne').innerText = "CARREFOUR CONTACT";
-            document.getElementById('dispDT').innerText = "JEROME CHAPELLE";
-            document.getElementById('dispCDF').innerText = "Nom CDF";
+            const anabelInput = document.getElementById('anabelSearch').value.toUpperCase().trim();
+            // Recherche par Anabel ou par partie du nom de la ville
+            let magasin = magasins.find(m => m.anabel === anabelInput || m.store.toUpperCase().includes(anabelInput));
+            
+            if(magasin) {
+                document.getElementById('activeStoreInfo').style.display = 'block';
+                document.getElementById('dispAnabel').innerText = magasin.anabel;
+                // C'est ici que l'erreur "inconnue" est corrigée en appelant magasin.store
+                document.getElementById('dispStore').innerText = magasin.store;
+                document.getElementById('dispDT').innerText = magasin.dt;
+                document.getElementById('dispCDF').innerText = magasin.cdf;
+                document.getElementById('auditCSI').value = magasin.csi;
+                document.getElementById('storeSelect').value = magasin.anabel;
+            } else {
+                alert("Magasin introuvable. Veuillez vérifier le code ANABEL ou le nom.");
+            }
         }
         
         function activerMagasin(val) {
-            if(val) chercherMagasin();
+            if(val) {
+                document.getElementById('anabelSearch').value = val;
+                chercherMagasin();
+            }
         }
 
         function archiverAudit() {
             const toast = document.getElementById('toast');
             toast.style.opacity = '1';
             setTimeout(() => toast.style.opacity = '0', 3000);
+        }
+
+        function filtrerGrille() {
+            // Logique de filtre si nécessaire
+        }
+
+        function chargerAuditsDepuisGoogle() {
+            alert("Rafraîchissement...");
         }
 
     </script>
